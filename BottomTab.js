@@ -37,6 +37,8 @@ export default function BottomTab() {
         name="home"
         component={HomeScreen}
         options={{
+          headerTitle: 'MyHome',
+          headerTransparent: false,
           tabBarIcon: ({ focused }) => (
             <AntDesign
               name="home"

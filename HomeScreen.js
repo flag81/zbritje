@@ -54,7 +54,8 @@ const HomeScreen = () => {
   const [selectedData, setSelectedData] = useState([]);
   const [saleData, setSaleData] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [filteredDataFinal, setFilteredDataFinal] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [filteredDataFinal, setFilteredFinal] = useState([]);
   const [favoritesData, setFavoritesData] = useState([]);
 
   const [isVisible, setIsVisible] = useState(false)
@@ -89,10 +90,12 @@ const HomeScreen = () => {
   const admin = 1 ;
 
 
+  
   const onRefresh = React.useCallback(() => {
       setRefreshing(true);
       setOriginalData([]);
       setSelectedData([]);
+      setCategories([]);
       getData(admin);
       getFavorites(admin);
       setTimeout(() => {
@@ -104,6 +107,8 @@ const HomeScreen = () => {
   useEffect(() => {
         setSelectedData([]);
         setOriginalData([]);
+        setCategories([]);
+        setFilteredProducts([]);
         setSaleData([]);
         getData(admin);
         getFavorites(admin);
@@ -162,13 +167,6 @@ const HomeScreen = () => {
   };
 
 
-  function handleFavorite(id) {
-    const newFavorites = favoritesData.map(item => {
-      return item.id === id ? { ...item, favorite: !item.favorite } : item;
-    });
-
-    setFavoritesData(newFavorites);
-  }
 
   //let filteredData = []
   let categoryFilters = []
@@ -181,34 +179,23 @@ const HomeScreen = () => {
     // Handle the data received from the child component
     categoryFilters = filters;
     
-    console.log("categoryFilters:",categoryFilters)
+    console.log("categoryFilters:",categoryFilters);
     
-    console.log("selected filters length:",categoryFilters.length)
+    console.log("categoryFilters length:",categoryFilters.length);
 
-    console.log("originalData:",originalData)
+    console.log("filteredDataProducts:",filteredProducts);
+
     //console.log("obj.categoryId",obj.categoryId);
+        
+      const filteredData = categoryFilters.length > 0
+      ? originalData.filter(item => categoryFilters.includes(item.categoryId))
+      : originalData;
 
-
-    //const myfilter = originalData.filter(obj => 
-      //{
-     // console.log("obj.categoryId", obj.categoryId);
-     // filters.includes(obj.categoryId);
-     // }
-      //);
-
-
-      
-      const filteredData = originalData.filter(obj => categoryFilters.includes(obj.categoryId));
-
-      console.log("FFFFFFFFFF",filteredData); 
-
-    //filteredData = categoryFilters.length > 0 ? originalData.filter(obj => { categoryFilters.includes(obj.categoryId)  }) : originalDataBackup ;
-
-    setOriginalData(filteredData);
+    setFilteredProducts(filteredData);
 
     console.log("filteredData:",filteredData);
 
-    console.log("filteredDataFinal.length:",filteredDataFinal.length);
+    console.log("filteredData.length:",filteredData.length);
 
     categoryFilters.length > 0 ? console.log("filteredData:",filteredData) : console.log("filteredData:", originalData)
       
@@ -316,6 +303,7 @@ const HomeScreen = () => {
     //console.log(data);
     setOriginalData(data);
     setOriginalDataBackup(data);
+    setFilteredProducts(data);
 
     }
     catch(e)
@@ -341,7 +329,7 @@ const HomeScreen = () => {
 
     const data = await resp.json();
 
-    //console.log(data);
+    console.log("categories----------------",data);
     setCategories(data);
 
     }
@@ -411,7 +399,8 @@ const HomeScreen = () => {
 
   const imageUrl = {uri:`${url}/images/${item.productPic}`};
 
-  //console.log("item id-", item.id)
+  console.log("imageUrl:",imageUrl);
+  //<MultiSelectComponent data={originalData}   onFilterChange={handleFilters} refreshing={refreshing}/>
 
   const favoriteProduct = favoritesData.some((obj) => obj.productId === item.productId);
 
@@ -421,7 +410,9 @@ const HomeScreen = () => {
 
   return (
     <TouchableOpacity onPress={()=> handleBottomSheet(true, item) }>
-      <View style={{ padding: 5, flexDirection: 'row' }}>
+      <View 
+      style={{ padding: 5, flexDirection: 'row', borderColor: 'gray', 
+      borderWidth:0, borderRadius:15, backgroundColor:'white', margin:5}}>
         <TouchableOpacity onPress={() => handlePressFavorites(item)}>
         <View style={{ padding: 5, flexDirection: 'row' }}>
 
@@ -468,22 +459,27 @@ const HomeScreen = () => {
 
     <View>
           <Banner />
-          <MultiSelectComponent data={originalData}   onFilterChange={handleFilters} refreshing={refreshing}/>
+          
     </View>
 
-    <View style={{height: 150}}>
-    <ProductCategories data={originalData}   onFilterChange={handleFilters} />
+    <View style={{height: 100}}>
+    <ProductCategories data={categories}   onFilterChange={handleFilters} />
     </View>
 
-<View style={{ height: 200, width: Dimensions.get("window").width }}>
+
+
+<View style={{ height: 400, width: Dimensions.get("window").width * 0.95}}>
 
 
     <MasonryFlashList
-      data={originalData}
+      data={filteredProducts}
       numColumns={2}
       renderItem={renderItem}
       estimatedItemSize={20}
+      contentContainerStyle={{padding: 5}}
       extraData={extraData}
+      showsVerticalScrollIndicator={false}
+      
 />
 
 

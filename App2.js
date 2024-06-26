@@ -6,7 +6,7 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import { MultiSelect } from 'react-native-element-dropdown';
 import BottomSheet from '@gorhom/bottom-sheet';
 
-
+import { NavigationContainer } from '@react-navigation/native';
 
 import MultiSelectComponent from './MultiSelectComponent';
 import BottomSheetComponent from './BottomSheetComponent';
@@ -72,9 +72,7 @@ const App = () => {
 
   const [extraData, setExtraData] = useState(0);
 
-  const toggleImage = () => {
-    setToggle(!toggle);
-  };
+
 
   console.log("enter:",isVisible);
 
@@ -363,7 +361,6 @@ const App = () => {
   }
 
   async function getSaleFavorites(userId) {
-
 
     try
     {

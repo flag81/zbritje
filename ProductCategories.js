@@ -2,8 +2,7 @@ import React, { useState, useEffect} from "react";
 import { SafeAreaView, View, Text, ScrollView, TextInput, TouchableOpacity , StyleSheet} from "react-native";
 import { COLORS , SIZES} from "./theme";
 
-import Icon from 'react-native-vector-icons/FontAwesome'
-import RangeSlider from "@jesster2k10/react-native-range-slider";
+
 
 
 const ProductCategories = ({data, onFilterChange}) => {
@@ -16,21 +15,33 @@ const ProductCategories = ({data, onFilterChange}) => {
     const [free, setFree] = useState(false);
 
 
+    const COLORS1 = { primary: '#007bff', grey: '#d3d3d3' };
+
     const [selected, setSelected] = useState([]);
+
+    const [currentCategory, setCurrentCategory] = useState('0');
+    const [activeBorderColor, setActiveBorderColor] = useState('grey');
+
+    const categoryId = 0;
+
+    const categories = data;
 
 
     useEffect(() => {
 
-        //setSelected([]);
+        setSelected([]);
         
         sendFilteredCategories();
+
+        console.log("Category data:-------------",data)
+
 
       }, []);
       
     useEffect(() => {
 
         //setSelected([]);
-        console.log("New categories:-------------",data)
+        //console.log("New categories:-------------",data)
         sendFilteredCategories();
 
       }, [selected]);
@@ -38,44 +49,131 @@ const ProductCategories = ({data, onFilterChange}) => {
 
     const sendFilteredCategories = () => {
         
-        console.log("New selected:",selected)
+        //console.log("New selected:",selected)
         onFilterChange(selected);
       };
 
 
       const handleAddSelection = (item) => {
-        setSelected((prevSelected) => [...prevSelected, item]);
-        
+
+        //console.log("selected[]:-------------",selected)
+        setCurrentCategory(item);
+
+
+        console.log("currentCategory:-------------",currentCategory)
+    
+        if (selected.length > 0 && selected.includes(item)) {
+            console.log("removed:-------------",item)
+            setSelected((prevFavorites) =>
+            prevFavorites.filter((product) => product !== item));
+        } else {
+            console.log("added:-------------",item)
+            setSelected((prevSelected) => Array.isArray(prevSelected) ? [...prevSelected, item] : [item]);
+        }
+
+        console.log("selected:-----------------------------------------------------------------",selected)
+
+      };
+
+      const renderCategoryItem = ({ item }) => 
+        {
+      
+        const imageUrl = {uri:`${url}/images/${item.productPic}`};
+      
+        console.log("imageUrl:",imageUrl);
+        //<MultiSelectComponent data={originalData}   onFilterChange={handleFilters} refreshing={refreshing}/>
+      
+        const favoriteProduct = favoritesData.some((obj) => obj.productId === item.productId);
+      
+        const sample = favoritesData.find((favorite) => favorite.productId === item.productId) ? require('./star.png') : require('./white-star.png')
+        console.log("sample-", favoriteProduct)
+      
+      
+        return (
+          <TouchableOpacity onPress={()=> handleBottomSheet(true, item) }>
+            <View 
+            style={{ padding: 5, flexDirection: 'row', borderColor: 'gray', 
+            borderWidth:0, borderRadius:15, backgroundColor:'white', margin:5}}>
+              <TouchableOpacity onPress={() => handlePressFavorites(item)}>
+              <View style={{ padding: 5, flexDirection: 'row' }}>
+      
+                <Image
+                      source={
+                        favoriteProduct ? require('./star.png') : require('./white-star.png')
+                      }
+                      style={styles.image}  />
+      
+                <Image source={imageUrl} style={styles.image} />
+                </View>
+              </TouchableOpacity>
+              <Text style={{ fontSize: 12, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle' }}>{item.productName}</Text>
+            </View>
+          </TouchableOpacity>
+        )
+      
       };
     
-    
-      const handleRemoveFavorites= (item) => {
-        setSelected((prevFavorites) =>
-          prevFavorites.filter((product) => product.productId !== item)
-        );}
-
-
 
     return(
            
-
                 <View style={styles1.item}>
                     <Text style={styles1.title}>KATEGORITE</Text>
+
+
+
+
+                        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+                            <View style={styles1.row}>
+
+                            <TouchableOpacity
+                            onPress={() => {
+                                setSelected([])
+                                 
+                            }}
+                            
+                            
+                            style={[styles1.category, {borderColor: selected.length == 0 ? COLORS1.primary : COLORS1.grey}]}
+                        >
+                            <Text style={[styles1.subtitle, { color: cuisines === 2 ? COLORS.primary : COLORS.grey }]}>Te gjitha</Text>
+                        </TouchableOpacity>
+                        
+                            {categories.map((category) => (
+                                <TouchableOpacity
+                                key={category.id}
+                                onPress={() => handleAddSelection(category.categoryId)}
+                                style={[styles1.category, { borderColor: selected.includes(category.categoryId) ? COLORS1.primary : COLORS1.grey}]} 
+                                >
+                                <Text style={[styles1.subtitle]}> 
+                                    {category.categoryName}
+                                </Text>
+                                </TouchableOpacity>
+                            ))}
+                            </View>
+                        </ScrollView>
+
+
+                    <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                     <View style={styles1.row}>
+                        
                         <TouchableOpacity
                             onPress={() => {
-                                setSelected(0)
+                                setSelected([])
+                                 
                             }}
-                            style={[styles1.category, { borderColor: cuisines === 1 ? COLORS.primary : COLORS.grey }]}
+                            
+                            
+                            style={[styles1.category, {borderColor: selected.length == 0 ? COLORS1.primary : COLORS1.grey}]}
                         >
-                            <Text style={[styles1.subtitle, { color: cuisines === 1 ? COLORS.primary : COLORS.grey }]}>Te gjitha</Text>
+                            <Text style={[styles1.subtitle, { color: cuisines === 2 ? COLORS.primary : COLORS.grey }]}>Te gjitha</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity
                             onPress={() => {
                                 handleAddSelection("1")
+                                //currentCategory("1")
+                                //setBorder(border === 'grey' ? 'red' : 'grey');
                             }}
-                            style={[styles1.category, { borderColor: cuisines === 2 ? COLORS.primary : COLORS.grey }]}
+                            style={[styles1.category, {borderColor: selected.includes("1") ? COLORS1.primary : COLORS1.grey}]}
                         >
                             <Text style={[styles1.subtitle, { color: cuisines === 2 ? COLORS.primary : COLORS.grey }]}>Ushqimore</Text>
                         </TouchableOpacity>
@@ -83,8 +181,9 @@ const ProductCategories = ({data, onFilterChange}) => {
                         <TouchableOpacity
                             onPress={() => {
                                 handleAddSelection("2")
+                                
                             }}
-                            style={[styles1.category, { borderColor: cuisines === 3 ? COLORS.primary : COLORS.grey }]}
+                            style={[styles1.category, { borderColor: selected.includes("2") ? COLORS1.primary : COLORS.grey }]}
                         >
                             <Text style={[styles1.subtitle, { color: cuisines === 3 ? COLORS.primary : COLORS.grey }]}>Pije</Text>
                         </TouchableOpacity>
@@ -93,21 +192,21 @@ const ProductCategories = ({data, onFilterChange}) => {
                             onPress={() => {
                                 handleAddSelection("3")
                             }}
-                            style={[styles1.category, { borderColor: cuisines === 4 ? COLORS.primary : COLORS.grey }]}
+                            style={[styles1.category, { borderColor: selected.includes("3")? COLORS1.primary : COLORS.grey }]}
                         >
-                            <Text style={[styles1.subtitle, { color: cuisines === 4 ? COLORS.primary : COLORS.grey }]}>Higjiene</Text>
+                            <Text style={[styles1.subtitle, { color: cuisines === 4 ? COLORS.primary : COLORS.grey }]}>Fruta-Perime</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             onPress={() => {
-                                setCuisines(5)
+                                handleAddSelection("4")
                             }}
                             style={[styles1.category, { borderColor: cuisines === 5 ? COLORS.primary : COLORS.grey }]}
                         >
-                            <Text style={[styles1.subtitle, { color: cuisines === 5 ? COLORS.primary : COLORS.grey }]}>Fruta-Perime</Text>
+                            <Text style={[styles1.subtitle, { color: cuisines === 5 ? COLORS.primary : COLORS.grey }]}>Higjiene</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             onPress={() => {
-                                setCuisines(6)
+                                handleAddSelection("6")
                             }}
                             style={[styles1.category, { borderColor: cuisines === 6 ? COLORS.primary : COLORS.grey }]}
                         >
@@ -115,7 +214,7 @@ const ProductCategories = ({data, onFilterChange}) => {
                         </TouchableOpacity>
                         <TouchableOpacity
                             onPress={() => {
-                                setCuisines(7)
+                                handleAddSelection("7")
                             }}
                             style={[styles1.category, { borderColor: cuisines === 7 ? COLORS.primary : COLORS.grey }]}
                         >
@@ -123,7 +222,7 @@ const ProductCategories = ({data, onFilterChange}) => {
                         </TouchableOpacity>
                         <TouchableOpacity
                             onPress={() => {
-                                setCuisines(8)
+                                handleAddSelection("8")
                             }}
                             style={[styles1.category, { borderColor: cuisines === 8 ? COLORS.primary : COLORS.grey }]}
                         >
@@ -133,6 +232,8 @@ const ProductCategories = ({data, onFilterChange}) => {
   
 
                     </View>
+
+                    </ScrollView>
                 </View>
                 
           
@@ -162,7 +263,7 @@ const styles1 = StyleSheet.create({
     },
     row: {
         flexDirection: 'row',
-        flexWrap: 'wrap',
+       
     },
     subtitle: {
         color: COLORS.grey,
