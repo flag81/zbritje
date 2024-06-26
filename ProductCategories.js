@@ -136,7 +136,7 @@ const ProductCategories = ({data, onFilterChange}) => {
                         >
                             <Text style={[styles1.subtitle, { color: cuisines === 2 ? COLORS.primary : COLORS.grey }]}>Te gjitha</Text>
                         </TouchableOpacity>
-                        
+
                             {categories.map((category) => (
                                 <TouchableOpacity
                                 key={category.id}
@@ -151,89 +151,6 @@ const ProductCategories = ({data, onFilterChange}) => {
                             </View>
                         </ScrollView>
 
-
-                    <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-                    <View style={styles1.row}>
-                        
-                        <TouchableOpacity
-                            onPress={() => {
-                                setSelected([])
-                                 
-                            }}
-                            
-                            
-                            style={[styles1.category, {borderColor: selected.length == 0 ? COLORS1.primary : COLORS1.grey}]}
-                        >
-                            <Text style={[styles1.subtitle, { color: cuisines === 2 ? COLORS.primary : COLORS.grey }]}>Te gjitha</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            onPress={() => {
-                                handleAddSelection("1")
-                                //currentCategory("1")
-                                //setBorder(border === 'grey' ? 'red' : 'grey');
-                            }}
-                            style={[styles1.category, {borderColor: selected.includes("1") ? COLORS1.primary : COLORS1.grey}]}
-                        >
-                            <Text style={[styles1.subtitle, { color: cuisines === 2 ? COLORS.primary : COLORS.grey }]}>Ushqimore</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            onPress={() => {
-                                handleAddSelection("2")
-                                
-                            }}
-                            style={[styles1.category, { borderColor: selected.includes("2") ? COLORS1.primary : COLORS.grey }]}
-                        >
-                            <Text style={[styles1.subtitle, { color: cuisines === 3 ? COLORS.primary : COLORS.grey }]}>Pije</Text>
-                        </TouchableOpacity>
-                        
-                        <TouchableOpacity
-                            onPress={() => {
-                                handleAddSelection("3")
-                            }}
-                            style={[styles1.category, { borderColor: selected.includes("3")? COLORS1.primary : COLORS.grey }]}
-                        >
-                            <Text style={[styles1.subtitle, { color: cuisines === 4 ? COLORS.primary : COLORS.grey }]}>Fruta-Perime</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={() => {
-                                handleAddSelection("4")
-                            }}
-                            style={[styles1.category, { borderColor: cuisines === 5 ? COLORS.primary : COLORS.grey }]}
-                        >
-                            <Text style={[styles1.subtitle, { color: cuisines === 5 ? COLORS.primary : COLORS.grey }]}>Higjiene</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={() => {
-                                handleAddSelection("6")
-                            }}
-                            style={[styles1.category, { borderColor: cuisines === 6 ? COLORS.primary : COLORS.grey }]}
-                        >
-                            <Text style={[styles1.subtitle, { color: cuisines === 6 ? COLORS.primary : COLORS.grey }]}>Bulmet</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={() => {
-                                handleAddSelection("7")
-                            }}
-                            style={[styles1.category, { borderColor: cuisines === 7 ? COLORS.primary : COLORS.grey }]}
-                        >
-                            <Text style={[styles1.subtitle, { color: cuisines === 7 ? COLORS.primary : COLORS.grey }]}>Te tjera</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={() => {
-                                handleAddSelection("8")
-                            }}
-                            style={[styles1.category, { borderColor: cuisines === 8 ? COLORS.primary : COLORS.grey }]}
-                        >
-                            <Text style={[styles1.subtitle, { color: cuisines === 8 ? COLORS.primary : COLORS.grey }]}>Mexican</Text>
-                        </TouchableOpacity>
-
-  
-
-                    </View>
-
-                    </ScrollView>
                 </View>
                 
           
