@@ -1,0 +1,27 @@
+{
+
+"query":{
+    "range":{
+
+        "drGenerationTime":{
+            "gte":"2024-06-01",
+            "lte":"2024-06-02"
+        }
+
+    },
+ "aggs": {
+     "myagg":{
+
+         "value_count":{
+             "field":{
+
+             }
+         }
+
+
+     }
+ }
+
+}
+
+}

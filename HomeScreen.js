@@ -54,6 +54,7 @@ const HomeScreen = () => {
   const [selectedData, setSelectedData] = useState([]);
   const [saleData, setSaleData] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [subCategories, setSubCategories] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [filteredDataFinal, setFilteredFinal] = useState([]);
   const [favoritesData, setFavoritesData] = useState([]);
@@ -71,7 +72,7 @@ const HomeScreen = () => {
 
 
 
-  console.log("enter:",isVisible);
+  //console.log("enter:",isVisible);
 
   const handleBottomSheet = (data, item) => {
 
@@ -96,6 +97,7 @@ const HomeScreen = () => {
       setOriginalData([]);
       setSelectedData([]);
       setCategories([]);
+      setSubCategories([]);
       getData(admin);
       getFavorites(admin);
       setTimeout(() => {
@@ -108,24 +110,26 @@ const HomeScreen = () => {
         setSelectedData([]);
         setOriginalData([]);
         setCategories([]);
+        setSubCategories([]);
         setFilteredProducts([]);
         setSaleData([]);
         getData(admin);
         getFavorites(admin);
         getCategories(admin);
+        getSubCategories(admin);
         setIsVisible(false);
     
   }, []);
 
 
   useEffect(() => {
-    console.log("originalData>>>>>:",originalData)
+    //console.log("originalData>>>>>:",originalData)
     handleFilterSale();
   }, [originalData]);
 
 
   useEffect(() => {
-    console.log("favorites>>>>>:",favoritesData)
+    //console.log("favorites>>>>>:",favoritesData)
     setExtraData(extraData + 1);
   }, [favoritesData]);
 
@@ -150,7 +154,7 @@ const HomeScreen = () => {
     //setSelectedProduct(productId);
 
       const result = favoritesData.some((element) => element.productId === item.productId);
-      console.log(result)
+      //console.log(result)
 
       if(result)
       {
@@ -169,7 +173,8 @@ const HomeScreen = () => {
 
 
   //let filteredData = []
-  let categoryFilters = []
+  let categoryFilters = [];
+  let subCategoryFilters = []
   
 
 
@@ -179,11 +184,11 @@ const HomeScreen = () => {
     // Handle the data received from the child component
     categoryFilters = filters;
     
-    console.log("categoryFilters:",categoryFilters);
+    //console.log("categoryFilters:",categoryFilters);
     
-    console.log("categoryFilters length:",categoryFilters.length);
+    //console.log("categoryFilters length:",categoryFilters.length);
 
-    console.log("filteredDataProducts:",filteredProducts);
+    //console.log("filteredDataProducts:",filteredProducts);
 
     //console.log("obj.categoryId",obj.categoryId);
         
@@ -193,11 +198,34 @@ const HomeScreen = () => {
 
     setFilteredProducts(filteredData);
 
-    console.log("filteredData:",filteredData);
+    //console.log("filteredData:",filteredData);
 
-    console.log("filteredData.length:",filteredData.length);
+    //console.log("filteredData.length:",filteredData.length);
 
-    categoryFilters.length > 0 ? console.log("filteredData:",filteredData) : console.log("filteredData:", originalData)
+    //categoryFilters.length > 0 ? console.log("filteredData:",filteredData) : console.log("filteredData:", originalData)
+      
+  };
+
+
+  const handleSubCategoryFilters = (filters) => {
+    // Handle the data received from the child component
+    subCategoryFilters = filters;
+    
+    console.log("SubcategoryFilters:",subCategoryFilters);
+    console.log("SubcategoryFilters length:",subCategoryFilters.length);
+    console.log("SubfilteredDataProducts:",filteredProducts);
+
+        
+    const filteredData = subCategoryFilters.length > 0
+    ? originalData.filter(item => subCategoryFilters.includes(item.categoryId))
+    : originalData;
+
+    setFilteredProducts(filteredData);
+
+    console.log("SUBfilteredData:",filteredData);
+    console.log("SUBfilteredData.length:",filteredData.length);
+
+    subCategoryFilters.length > 0 ? console.log("filteredData:",filteredData) : console.log("filteredData:", originalData)
       
   };
 
@@ -341,6 +369,31 @@ const HomeScreen = () => {
   }
 
 
+  
+  async function getSubCategories(userId) {
+
+    try
+    {
+
+      const resp = await fetch(`${url}/getSubCategories?userId=${userId}`,  {
+        method: 'GET',       
+        headers: {"Content-Type": "application/json"}
+      });
+
+    const data = await resp.json();
+
+    console.log("Subcategories----------------",data);
+    setSubCategories(data);
+
+    }
+    catch(e)
+    {
+      console.log(e);
+    }
+
+  }
+
+
   async function getFavorites(userId) {
 
     try
@@ -399,13 +452,13 @@ const HomeScreen = () => {
 
   const imageUrl = {uri:`${url}/images/${item.productPic}`};
 
-  console.log("imageUrl:",imageUrl);
+  //console.log("imageUrl:",imageUrl);
   //<MultiSelectComponent data={originalData}   onFilterChange={handleFilters} refreshing={refreshing}/>
 
   const favoriteProduct = favoritesData.some((obj) => obj.productId === item.productId);
 
   const sample = favoritesData.find((favorite) => favorite.productId === item.productId) ? require('./star.png') : require('./white-star.png')
-  console.log("sample-", favoriteProduct)
+  //console.log("sample-", favoriteProduct)
 
 
   return (
@@ -450,7 +503,7 @@ const HomeScreen = () => {
         }>
        
 
-<Text>Refresh ...</Text>
+  <Text>Refresh...</Text>
 
     
   </ScrollView>
@@ -462,8 +515,8 @@ const HomeScreen = () => {
           
     </View>
 
-    <View style={{height: 100}}>
-    <ProductCategories data={categories}   onFilterChange={handleFilters} />
+    <View style={{height: 120}}>
+    <ProductCategories data={categories}  subData={subCategories} onFilterChange={handleFilters} />
     </View>
 
 

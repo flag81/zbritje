@@ -189,6 +189,24 @@ app.get("/getCategories", (req, res) => {
   });
 });
 
+app.get("/getSubCategories", (req, res) => {
+
+  //const q = "SELECT tableid,  users.id  FROM orders join users on orders.userid = users.id WHERE orders.status = 0 ";
+    const q = `SELECT * FROM subcategories `;
+  
+    const userId=  parseInt(req.query.userId);
+  
+    db.query(q, [userId], (err, data) => {
+  
+      if (err) {
+        console.log(err);
+        return res.json(err);
+      }
+  
+      return res.json(data);
+    });
+  });
+
 
 
 app.get("/authUser", (req, res) => {

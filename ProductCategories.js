@@ -5,115 +5,196 @@ import { COLORS , SIZES} from "./theme";
 
 
 
-const ProductCategories = ({data, onFilterChange}) => {
+const ProductCategories = ({data, onFilterChange, subData}) => {
 
     const [location, setLocation] = useState();
     const [cuisines, setCuisines] = useState(1);
 
-    const [open, setOpen] = useState(false);
-    const [creditCard, setCreditCard] = useState(false);
-    const [free, setFree] = useState(false);
+
 
 
     const COLORS1 = { primary: '#007bff', grey: '#d3d3d3' };
 
-    const [selected, setSelected] = useState([]);
+    const [selectedCategories, setSelectedCategories] = useState([]);
+    const [selectedSubCategories, setSelectedSubCategorie] = useState([]);
 
     const [currentCategory, setCurrentCategory] = useState('0');
-    const [activeBorderColor, setActiveBorderColor] = useState('grey');
+    const [currentSubCategory, setSubCurrentCategory] = useState('0');
+
 
     const categoryId = 0;
 
     const categories = data;
 
+    const subCategories = subData;
+
 
     useEffect(() => {
 
-        setSelected([]);
-        
+        setSelectedCategories([]);       
         sendFilteredCategories();
 
-        console.log("Category data:-------------",data)
+        console.log("Category data:-------------",data);
+        
 
 
       }, []);
+
+
       
     useEffect(() => {
+
+        //setSelected([]);
+        console.log(" currentCategory data:-------------",currentCategory)
+        //sendFilteredCategories();
+
+        
+      }, [currentCategory]);
+
+      //let filteredSubData = [];
+
+        useEffect(() => {
 
         //setSelected([]);
         //console.log("New categories:-------------",data)
         sendFilteredCategories();
 
-      }, [selected]);
+        // how to get sub categories based on selected category
+
+    
+            
+       // filteredSubData = subData.filter((category) => selectedCategories.includes(category.categoryId));
+
+        console.log("filteredSubData:-------------",filteredSubData)
+        
+
+      }, [selectedCategories]);
+
+
+      useEffect(() => {
+
+        //setSelected([]);
+        //console.log("New categories:-------------",data)
+        sendFilteredSubCategories();
+
+      }, [selectedSubCategories]);
 
 
     const sendFilteredCategories = () => {
         
         //console.log("New selected:",selected)
-        onFilterChange(selected);
+        onFilterChange(selectedCategories);
       };
 
+
+    const sendFilteredSubCategories = () => {
+        
+        //console.log("New selected:",selected)
+        //onFilterChange(selectedSubCategories);
+      };  
+
+
+  
 
       const handleAddSelection = (item) => {
 
         //console.log("selected[]:-------------",selected)
-        setCurrentCategory(item);
+        
 
-
-        console.log("currentCategory:-------------",currentCategory)
+        
     
-        if (selected.length > 0 && selected.includes(item)) {
-            console.log("removed:-------------",item)
-            setSelected((prevFavorites) =>
+        if (selectedCategories.length > 0 && selectedCategories.includes(item)) {
+            console.log("removed:-------------",item);
+             //set filterd  list of products
+            setSelectedCategories((prevFavorites) =>
             prevFavorites.filter((product) => product !== item));
         } else {
             console.log("added:-------------",item)
-            setSelected((prevSelected) => Array.isArray(prevSelected) ? [...prevSelected, item] : [item]);
-        }
+            
+            //set filterd  list of products
+            setSelectedCategories((prevSelected) => Array.isArray(prevSelected) ? [...prevSelected, item] : [item]);
+            setCurrentCategory(item);
 
-        console.log("selected:-----------------------------------------------------------------",selected)
+            console.log("currentCategory:-------------",currentCategory)
+        }
+        
+        // get sub categories list from all sub categories based on selected category on the selected array
+
+
+        //filter sub categories based on selected category
+
+
+
+
+            console.log("selected:-----------------------------------------------------------------",selectedCategories)
+
+            console.log("currentCategory:-----------------------------------------------------------------",currentCategory)
+
+            console.log("subCategories data:-------------",subCategories)
 
       };
 
-      const renderCategoryItem = ({ item }) => 
+
+      
+      const handleSubCategoriesSelection = (item) => {
+
+        //console.log("selected[]:-------------",selected)
+        setSubCurrentCategory(item);
+
+
+        console.log("currentSubCategory:-------------",currentSubCategory)
+    
+        if (selectedSubCategories.length > 0 && selectedSubCategories.includes(item)) {
+            console.log("removed sub:-------------",item)
+            setSelectedSubCategorie((prevFavorites) =>
+            prevFavorites.filter((product) => product !== item));
+        } else {
+            console.log("added sub:-------------",item)
+            setSelectedSubCategorie((prevSelected) => Array.isArray(prevSelected) ? [...prevSelected, item] : [item]);
+        }
+
+            //console.log("selected:-----------------------------------------------------------------",selected)
+
+      };
+
+
+      const SubCategoriesFilter = ({ subCategories, selectedCategories }) => 
         {
       
-        const imageUrl = {uri:`${url}/images/${item.productPic}`};
-      
-        console.log("imageUrl:",imageUrl);
-        //<MultiSelectComponent data={originalData}   onFilterChange={handleFilters} refreshing={refreshing}/>
-      
-        const favoriteProduct = favoritesData.some((obj) => obj.productId === item.productId);
-      
-        const sample = favoritesData.find((favorite) => favorite.productId === item.productId) ? require('./star.png') : require('./white-star.png')
-        console.log("sample-", favoriteProduct)
+
+             let filteredSubData = subCategories.filter((category) => selectedCategories.includes(category.categoryId));
+
+            const [subCat, setSubCat] = useState([]);
+
+            useEffect(() => {
+                // Actions to perform when filteredSubData changes
+                console.log('filteredSubData changed:', filteredSubData);
+              }, [selectedCategories]); // Dependency array includes filteredSubData to watch for changes
+            
       
       
         return (
-          <TouchableOpacity onPress={()=> handleBottomSheet(true, item) }>
-            <View 
-            style={{ padding: 5, flexDirection: 'row', borderColor: 'gray', 
-            borderWidth:0, borderRadius:15, backgroundColor:'white', margin:5}}>
-              <TouchableOpacity onPress={() => handlePressFavorites(item)}>
-              <View style={{ padding: 5, flexDirection: 'row' }}>
-      
-                <Image
-                      source={
-                        favoriteProduct ? require('./star.png') : require('./white-star.png')
-                      }
-                      style={styles.image}  />
-      
-                <Image source={imageUrl} style={styles.image} />
-                </View>
-              </TouchableOpacity>
-              <Text style={{ fontSize: 12, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle' }}>{item.productName}</Text>
+            <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+            <View style={styles1.row}>
+
+            {filteredSubData.map((category) => (
+                <TouchableOpacity
+                key={category.id}
+                onPress={() => handleSubCategoriesSelection(category.categoryId)}
+                style={[styles1.category, { borderColor: selectedSubCategories.includes(category.categoryId) ? COLORS1.primary : COLORS1.grey}]} 
+                >
+                <Text style={[styles1.subtitle]}> 
+                    {category.subCategoryName}
+                </Text>
+                </TouchableOpacity>
+            ))}
             </View>
-          </TouchableOpacity>
+        </ScrollView>
         )
       
       };
-    
 
+    
     return(
            
                 <View style={styles1.item}>
@@ -127,12 +208,12 @@ const ProductCategories = ({data, onFilterChange}) => {
 
                             <TouchableOpacity
                             onPress={() => {
-                                setSelected([])
+                                setSelectedCategories([])
                                  
                             }}
                             
                             
-                            style={[styles1.category, {borderColor: selected.length == 0 ? COLORS1.primary : COLORS1.grey}]}
+                            style={[styles1.category, {borderColor: selectedCategories.length == 0 ? COLORS1.primary : COLORS1.grey}]}
                         >
                             <Text style={[styles1.subtitle, { color: cuisines === 2 ? COLORS.primary : COLORS.grey }]}>Te gjitha</Text>
                         </TouchableOpacity>
@@ -141,7 +222,7 @@ const ProductCategories = ({data, onFilterChange}) => {
                                 <TouchableOpacity
                                 key={category.id}
                                 onPress={() => handleAddSelection(category.categoryId)}
-                                style={[styles1.category, { borderColor: selected.includes(category.categoryId) ? COLORS1.primary : COLORS1.grey}]} 
+                                style={[styles1.category, { borderColor: selectedCategories.includes(category.categoryId) ? COLORS1.primary : COLORS1.grey}]} 
                                 >
                                 <Text style={[styles1.subtitle]}> 
                                     {category.categoryName}
@@ -150,6 +231,10 @@ const ProductCategories = ({data, onFilterChange}) => {
                             ))}
                             </View>
                         </ScrollView>
+
+
+
+                      <SubCategoriesFilter subCategories={subCategories} selectedCategories={selectedCategories} />
 
                 </View>
                 
@@ -164,7 +249,7 @@ const styles1 = StyleSheet.create({
         margin: 5,
     },
     item: {
-        marginVertical: 10,
+        marginVertical: 5,
     },
     title: {
         color: COLORS.title,
