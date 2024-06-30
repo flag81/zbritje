@@ -65,7 +65,7 @@ const ProductCategories = ({data, onFilterChange, subData}) => {
             
        // filteredSubData = subData.filter((category) => selectedCategories.includes(category.categoryId));
 
-        console.log("filteredSubData:-------------",filteredSubData)
+        //console.log("filteredSubData:-------------",filteredSubData)
         
 
       }, [selectedCategories]);
@@ -158,11 +158,14 @@ const ProductCategories = ({data, onFilterChange, subData}) => {
       };
 
 
+
       const SubCategoriesFilter = ({ subCategories, selectedCategories }) => 
         {
       
 
-             let filteredSubData = subCategories.filter((category) => selectedCategories.includes(category.categoryId));
+            let filteredSubData = [];
+
+              filteredSubData = subCategories.filter((category) => selectedCategories.includes(category.categoryId));
 
             const [subCat, setSubCat] = useState([]);
 
@@ -181,7 +184,7 @@ const ProductCategories = ({data, onFilterChange, subData}) => {
                 <TouchableOpacity
                 key={category.id}
                 onPress={() => handleSubCategoriesSelection(category.categoryId)}
-                style={[styles1.category, { borderColor: selectedSubCategories.includes(category.categoryId) ? COLORS1.primary : COLORS1.grey}]} 
+                style={[styles1.category, { borderColor: selectedCategories.includes(category.categoryId) ? COLORS1.primary : COLORS1.grey}]} 
                 >
                 <Text style={[styles1.subtitle]}> 
                     {category.subCategoryName}
