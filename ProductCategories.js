@@ -57,14 +57,10 @@ const ProductCategories = ({data, onFilterChange, subData}) => {
 
         //setSelected([]);
         //console.log("New categories:-------------",data)
+
         sendFilteredCategories();
 
-        // how to get sub categories based on selected category
-
-    
-            
        // filteredSubData = subData.filter((category) => selectedCategories.includes(category.categoryId));
-
         //console.log("filteredSubData:-------------",filteredSubData)
         
 
@@ -83,14 +79,14 @@ const ProductCategories = ({data, onFilterChange, subData}) => {
     const sendFilteredCategories = () => {
         
         //console.log("New selected:",selected)
-        onFilterChange(selectedCategories);
+        onFilterChange(selectedCategories, selectedSubCategories);
       };
 
 
     const sendFilteredSubCategories = () => {
         
         //console.log("New selected:",selected)
-        //onFilterChange(selectedSubCategories);
+        onFilterChange(selectedCategories, selectedSubCategories);
       };  
 
 
@@ -139,11 +135,10 @@ const ProductCategories = ({data, onFilterChange, subData}) => {
       const handleSubCategoriesSelection = (item) => {
 
         //console.log("selected[]:-------------",selected)
-        setSubCurrentCategory(item);
-
-
-        console.log("currentSubCategory:-------------",currentSubCategory)
+        //setSubCurrentCategory(item);
+        //console.log("currentSubCategory:-------------",currentSubCategory)
     
+
         if (selectedSubCategories.length > 0 && selectedSubCategories.includes(item)) {
             console.log("removed sub:-------------",item)
             setSelectedSubCategorie((prevFavorites) =>
@@ -176,6 +171,8 @@ const ProductCategories = ({data, onFilterChange, subData}) => {
             
       
       
+
+              
         return (
             <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
             <View style={styles1.row}>
@@ -183,7 +180,7 @@ const ProductCategories = ({data, onFilterChange, subData}) => {
             {filteredSubData.map((category) => (
                 <TouchableOpacity
                 key={category.id}
-                onPress={() => handleSubCategoriesSelection(category.categoryId)}
+                onPress={() => handleSubCategoriesSelection(category.subCategoryId)}
                 style={[styles1.category, { borderColor: selectedCategories.includes(category.categoryId) ? COLORS1.primary : COLORS1.grey}]} 
                 >
                 <Text style={[styles1.subtitle]}> 

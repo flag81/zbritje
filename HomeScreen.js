@@ -173,43 +173,47 @@ const HomeScreen = () => {
 
 
   //let filteredData = []
-  let categoryFilters = [];
-  let subCategoryFilters = []
+  //let categoryFilters = [];
+  //let subCategoryFilters = [];
+  //let subFilters = [];
   
 
-
-
-
-  const handleFilters = (filters) => {
+  const handleFilters = (categoryFilters, subFilters) => {
     // Handle the data received from the child component
-    categoryFilters = filters;
-    
-    //console.log("categoryFilters:",categoryFilters);
-    
+    //categoryFilters = filters;
+    //subFilters = subCat;
+
+    console.log("categoryFilters:",categoryFilters); 
+    console.log("subFilters:",subFilters); 
+
     //console.log("categoryFilters length:",categoryFilters.length);
-
     //console.log("filteredDataProducts:",filteredProducts);
-
     //console.log("obj.categoryId",obj.categoryId);
         
       const filteredData = categoryFilters.length > 0
       ? originalData.filter(item => categoryFilters.includes(item.categoryId))
       : originalData;
 
-    setFilteredProducts(filteredData);
+      console.log("filteredData:",filteredData);
+
+      const filteredSubData = subFilters.length > 0
+      ? filteredData.filter(item => subFilters.includes(item.subCategoryId))
+      : filteredData;
+
+      console.log("filteredSubData:",filteredSubData);
+
+    setFilteredProducts(filteredSubData);
 
     //console.log("filteredData:",filteredData);
-
     //console.log("filteredData.length:",filteredData.length);
-
     //categoryFilters.length > 0 ? console.log("filteredData:",filteredData) : console.log("filteredData:", originalData)
       
   };
 
 
-  const handleSubCategoryFilters = (filters) => {
+  const handleSubCategoryFilters = (subFilters) => {
     // Handle the data received from the child component
-    subCategoryFilters = filters;
+    subCategoryFilters = subFilters;
     
     console.log("SubcategoryFilters:",subCategoryFilters);
     console.log("SubcategoryFilters length:",subCategoryFilters.length);
