@@ -58,7 +58,7 @@ export default function BottomTab() {
             />
           ),
         }}
-        name="chats"
+        name="Kompanite"
         component={Chats}
       />
       <BottomTabNavigator.Screen
@@ -94,10 +94,10 @@ export default function BottomTab() {
 const styles = StyleSheet.create({
   tabContainer: {
     position: 'absolute',
-    width: '90%',
+    width: '96%',
     borderRadius: 12,
-    left: '5%',
-    bottom: 20,
+    left: '2%',
+    bottom: 10,
     backgroundColor: 'white',
     height: 60,
   },

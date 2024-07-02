@@ -93,13 +93,17 @@ const HomeScreen = () => {
 
   
   const onRefresh = React.useCallback(() => {
-      setRefreshing(true);
-      setOriginalData([]);
+      setRefreshing(true);      
       setSelectedData([]);
+      setOriginalData([]);
       setCategories([]);
       setSubCategories([]);
-      getData(admin);
+      setFilteredProducts([]); 
+      setSaleData([]);     
       getFavorites(admin);
+      getData(admin);
+      getCategories(admin);
+      getSubCategories(admin);
       setTimeout(() => {
       setRefreshing(false);
 
@@ -112,9 +116,9 @@ const HomeScreen = () => {
         setCategories([]);
         setSubCategories([]);
         setFilteredProducts([]);
-        setSaleData([]);
-        getData(admin);
+        setSaleData([]); 
         getFavorites(admin);
+        getData(admin);
         getCategories(admin);
         getSubCategories(admin);
         setIsVisible(false);
@@ -129,8 +133,11 @@ const HomeScreen = () => {
 
 
   useEffect(() => {
-    //console.log("favorites>>>>>:",favoritesData)
+    console.log("favoritesData:",favoritesData)
     setExtraData(extraData + 1);
+
+    //sort favoritesData
+
   }, [favoritesData]);
 
 
@@ -202,7 +209,13 @@ const HomeScreen = () => {
 
       console.log("filteredSubData:",filteredSubData);
 
-    setFilteredProducts(filteredSubData);
+      const finalProductList = sortProducts(filteredSubData, favoritesData);
+
+
+
+console.log("finalProductList:",finalProductList);
+
+    setFilteredProducts(finalProductList);
 
     //console.log("filteredData:",filteredData);
     //console.log("filteredData.length:",filteredData.length);
@@ -211,27 +224,26 @@ const HomeScreen = () => {
   };
 
 
-  const handleSubCategoryFilters = (subFilters) => {
-    // Handle the data received from the child component
-    subCategoryFilters = subFilters;
+
+
+
+  const sortProducts = (firstArray, secondArray) => {
+
+    const sortedFirstArray = firstArray.sort((a, b) => {
+      const aIsMatch = secondArray.some(obj => obj.productId === a.productId);
+      const bIsMatch = secondArray.some(obj => obj.productId === b.productId);
     
-    console.log("SubcategoryFilters:",subCategoryFilters);
-    console.log("SubcategoryFilters length:",subCategoryFilters.length);
-    console.log("SubfilteredDataProducts:",filteredProducts);
+    
+    
+      if (aIsMatch && !bIsMatch) return -1;
+      if (!aIsMatch && bIsMatch) return 1;
+      return 0;
+    });
 
-        
-    const filteredData = subCategoryFilters.length > 0
-    ? originalData.filter(item => subCategoryFilters.includes(item.categoryId))
-    : originalData;
+    return sortedFirstArray;
 
-    setFilteredProducts(filteredData);
+  }
 
-    console.log("SUBfilteredData:",filteredData);
-    console.log("SUBfilteredData.length:",filteredData.length);
-
-    subCategoryFilters.length > 0 ? console.log("filteredData:",filteredData) : console.log("filteredData:", originalData)
-      
-  };
 
 
   const handleFilterSale = () => {
@@ -335,7 +347,10 @@ const HomeScreen = () => {
     //console.log(data);
     setOriginalData(data);
     setOriginalDataBackup(data);
-    setFilteredProducts(data);
+    
+    const finalData = sortProducts(data, favoritesData);
+
+    setFilteredProducts(finalData);
 
     }
     catch(e)
@@ -449,6 +464,14 @@ const HomeScreen = () => {
   }
 
 
+  function isWithinDateRange(startDate, endDate) {
+    const today = new Date();
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    return start.getTime() <= today.getTime() && today.getTime() <= end.getTime();
+  }
+
+
 
 
   const renderItem = ({ item }) => 
@@ -461,28 +484,45 @@ const HomeScreen = () => {
 
   const favoriteProduct = favoritesData.some((obj) => obj.productId === item.productId);
 
-  const sample = favoritesData.find((favorite) => favorite.productId === item.productId) ? require('./star.png') : require('./white-star.png')
-  //console.log("sample-", favoriteProduct)
+  const isOnSale = isWithinDateRange(item.saleStartDate, item.saleEndDate);
 
+  const date = new Date(item.saleEndDate);
+  const formatter = new Intl.DateTimeFormat('en-GB', { dateStyle: 'short' });
+  const formattedEndDate = formatter.format(date);
+
+  console.log("item.saleStartDate:",item.saleStartDate);
+  console.log("item.saleEndDate:",item.saleEndDate);
+  console.log("today:", new Date());
+
+  console.log("isOnSale:",isOnSale);
 
   return (
     <TouchableOpacity onPress={()=> handleBottomSheet(true, item) }>
       <View 
-      style={{ padding: 5, flexDirection: 'row', borderColor: 'gray', 
-      borderWidth:0, borderRadius:15, backgroundColor:'white', margin:5}}>
-        <TouchableOpacity onPress={() => handlePressFavorites(item)}>
-        <View style={{ padding: 5, flexDirection: 'row' }}>
+      style={{ padding: 5, borderColor: 'gray', 
+      borderWidth:0, borderRadius:15, backgroundColor:'white', margin:5, height:150}}>
+        
+        <View style={{ padding: 5, flexDirection: 'row', position: 'relative' }}>
 
-          <Image
-                source={
-                  favoriteProduct ? require('./star.png') : require('./white-star.png')
-                }
-                style={styles.image}  />
-
-          <Image source={imageUrl} style={styles.image} />
+          <Image id="productImage" source={imageUrl} style={styles.image} />
           </View>
-        </TouchableOpacity>
-        <Text style={{ fontSize: 12, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle' }}>{item.productName}</Text>
+        
+
+          <View style={{ padding: 5, flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center'}}>
+
+          {isOnSale ? <Image id="saleImage" source={require('./discount.png')} style={styles.icon} /> : null}
+        <Text style={{ fontSize: 15, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle' }}>{item.productName}</Text>
+          <TouchableOpacity onPress={() => handlePressFavorites(item)}>
+            <Image id="favoriteImage"
+                  source={
+                    favoriteProduct ? require('./star.png') : require('./white-star.png')
+                  }
+                  style={styles.star}  />
+          </TouchableOpacity>
+
+      </View>
+        {isOnSale ? <Text style={{ fontSize: 10, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle' }}>{formattedEndDate}</Text> : null}
+      
       </View>
     </TouchableOpacity>
   )
@@ -536,6 +576,7 @@ const HomeScreen = () => {
       contentContainerStyle={{padding: 5}}
       extraData={extraData}
       showsVerticalScrollIndicator={false}
+      marginBottom={100}
       
 />
 
@@ -582,10 +623,25 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
   },
+
+
   image: {
-    width: 40,
-    height: 40,
+    width: 80,
+    height: 80,
     marginRight: 8,
+  },
+  icon: {
+    width: 30,
+    height: 30,
+    marginRight: 8,
+    marginTop: 5,
+  },
+  star: {
+    width: 30,
+    height: 30,
+    marginRight: 8,
+    marginTop: 8,
+    horizontalAlign: 'right',
   },
 });
 

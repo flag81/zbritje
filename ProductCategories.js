@@ -172,7 +172,7 @@ const ProductCategories = ({data, onFilterChange, subData}) => {
       
       
 
-              
+
         return (
             <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
             <View style={styles1.row}>
@@ -181,7 +181,7 @@ const ProductCategories = ({data, onFilterChange, subData}) => {
                 <TouchableOpacity
                 key={category.id}
                 onPress={() => handleSubCategoriesSelection(category.subCategoryId)}
-                style={[styles1.category, { borderColor: selectedCategories.includes(category.categoryId) ? COLORS1.primary : COLORS1.grey}]} 
+                style={[styles1.category, { borderColor: selectedSubCategories.includes(category.subCategoryId) ? COLORS1.primary : COLORS1.grey}]} 
                 >
                 <Text style={[styles1.subtitle]}> 
                     {category.subCategoryName}
