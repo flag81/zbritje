@@ -1,16 +1,14 @@
 import React, { useState, useEffect} from "react";
-import { SafeAreaView, View, Text, ScrollView, TextInput, TouchableOpacity , StyleSheet} from "react-native";
+import { SafeAreaView, View, Text, ScrollView, TextInput, TouchableOpacity , StyleSheet, Image} from "react-native";
 import { COLORS , SIZES} from "./theme";
 
 
 
 
-const ProductCategories = ({data, onFilterChange, subData}) => {
+const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData}) => {
 
     const [location, setLocation] = useState();
     const [cuisines, setCuisines] = useState(1);
-
-
 
 
     const COLORS1 = { primary: '#007bff', grey: '#d3d3d3' };
@@ -19,13 +17,13 @@ const ProductCategories = ({data, onFilterChange, subData}) => {
     const [selectedSubCategories, setSelectedSubCategorie] = useState([]);
 
     const [currentCategory, setCurrentCategory] = useState('0');
-    const [currentSubCategory, setSubCurrentCategory] = useState('0');
 
 
-    const categoryId = 0;
+    const [favoritesFilter, setFavoritesFilter] = useState(false);
+    const [onSaleFilter, setOnSaleFilter] = useState(false);
+
 
     const categories = data;
-
     const subCategories = subData;
 
 
@@ -34,10 +32,8 @@ const ProductCategories = ({data, onFilterChange, subData}) => {
         setSelectedCategories([]);       
         sendFilteredCategories();
 
-        console.log("Category data:-------------",data);
+        //console.log("Category data:-------------",data);
         
-
-
       }, []);
 
 
@@ -45,7 +41,7 @@ const ProductCategories = ({data, onFilterChange, subData}) => {
     useEffect(() => {
 
         //setSelected([]);
-        console.log(" currentCategory data:-------------",currentCategory)
+        //console.log(" currentCategory data:-------------",currentCategory)
         //sendFilteredCategories();
 
         
@@ -76,6 +72,15 @@ const ProductCategories = ({data, onFilterChange, subData}) => {
       }, [selectedSubCategories]);
 
 
+      useEffect(() => {
+
+        //setSelected([]);
+        //console.log("New categories:-------------",data)
+        onMainFilterChange(favoritesFilter,onSaleFilter); // sales and favorites filters are applied
+
+      }, [favoritesFilter, onSaleFilter]);
+
+
     const sendFilteredCategories = () => {
         
         //console.log("New selected:",selected)
@@ -90,7 +95,22 @@ const ProductCategories = ({data, onFilterChange, subData}) => {
       };  
 
 
+
+      const handleFavoritesFilter = () => {
+        
+
+        setFavoritesFilter(!favoritesFilter);
+        //console.log("New selected:",selected)
+        //onFilterChange(selectedCategories, selectedSubCategories);
+      };  
   
+      const handleOnSaleFilter = () => {
+        
+
+        setOnSaleFilter(!onSaleFilter);
+        //console.log("New selected:",selected)
+        //onFilterChange(selectedCategories, selectedSubCategories);
+      }; 
 
       const handleAddSelection = (item) => {
 
@@ -104,12 +124,19 @@ const ProductCategories = ({data, onFilterChange, subData}) => {
              //set filterd  list of products
             setSelectedCategories((prevFavorites) =>
             prevFavorites.filter((product) => product !== item));
+            //remove sub categories that belong to the selected category where subCategoryId is not equal to the selected category
+            
+
+            //setSelectedSubCategorie([]);
         } else {
             console.log("added:-------------",item)
             
             //set filterd  list of products
             setSelectedCategories((prevSelected) => Array.isArray(prevSelected) ? [...prevSelected, item] : [item]);
             setCurrentCategory(item);
+
+            //remove sub categories that belong to the selected category
+            
 
             console.log("currentCategory:-------------",currentCategory)
         }
@@ -166,7 +193,7 @@ const ProductCategories = ({data, onFilterChange, subData}) => {
 
             useEffect(() => {
                 // Actions to perform when filteredSubData changes
-                console.log('filteredSubData changed:', filteredSubData);
+                //console.log('filteredSubData changed:', filteredSubData);
               }, [selectedCategories]); // Dependency array includes filteredSubData to watch for changes
             
       
@@ -197,10 +224,34 @@ const ProductCategories = ({data, onFilterChange, subData}) => {
     
     return(
            
-                <View style={styles1.item}>
-                    <Text style={styles1.title}>KATEGORITE</Text>
+            <View style={styles1.item}>
+
+                    <View style={{ padding: 5, flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center'}}>
+                            <Text style={styles1.title}>KATEGORITE</Text>
+
+                    <TouchableOpacity onPress={() => handleOnSaleFilter()}>
+                        <Image id="favoriteImage"
+                        source={
 
 
+
+                            onSaleFilter ? require('./discount-red.png') : require('./discount.png')
+                           
+                        }
+                        style={styles1.star}  />
+                    </TouchableOpacity>
+
+
+                    <TouchableOpacity onPress={() =>  handleFavoritesFilter()}>
+                    <Image id="favoriteImage"
+                        source={
+
+                            favoritesFilter ? require('./star.png') : require('./white-star.png')
+                        }
+                        style={styles1.star}  />
+                </TouchableOpacity>
+
+                    </View>
 
 
                         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
@@ -304,7 +355,13 @@ const styles1 = StyleSheet.create({
         color: COLORS.white,
         fontWeight: 'bold',
         fontSize: SIZES.h4,
-    }
+    },
+    star: {
+        width: 30,
+        height: 30,
+        marginRight: 8,
+        marginTop: 8,
+      },
 
 });
 

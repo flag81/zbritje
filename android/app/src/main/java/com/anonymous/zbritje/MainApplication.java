@@ -1,4 +1,4 @@
-package com.zbritje;
+package com.anonymous.zbritje;
 
 import android.app.Application;
 import android.content.res.Configuration;

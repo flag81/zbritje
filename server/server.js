@@ -94,11 +94,24 @@ app.get("/", (req, res) => {
 });
 
 
+
+
 app.get("/products", (req, res) => {
 
   //console.log("valuessssss")
   //const q = "SELECT tableid,  users.id  FROM orders join users on orders.userid = users.id WHERE orders.status = 0 ";
-  const q = "SELECT * FROM products where productId ";
+  const q = `SELECT products.productId, products.productName, products.productPic, products.categoryId, products.productSize , products.subCategoryId,
+    sales.saleId, sales.saleStartDate,sales.saleEndDate,sales.storeId,sales.storeLogo, sales.oldPrice, sales.discountPrice,
+    sales.discountPercentage
+  
+  
+  FROM products
+  
+  left join sales on products.productId = sales.productId
+
+  order by sales.saleEndDate desc
+
+  `;
 
   const userId= req.query.userId;
 
@@ -142,7 +155,7 @@ console.log()
   });
 });
 
-app.get("/getSaleFavorites", (req, res) => {
+app.get("/getProductOnSale", (req, res) => {
 
   //console.log("valuessssss")
   const date = new Date();
@@ -154,7 +167,13 @@ let year = date.getFullYear();
 let today = year +"-"+ month + "-" + day;
 console.log()
 //const q = "SELECT tableid,  users.id  FROM orders join users on orders.userid = users.id WHERE orders.status = 0 ";
-const q = `SELECT * FROM products join favorites on products.productId = favorites.productId where favorites.userId=? and CURRENT_DATE() between products.saleStartDate and products.saleEndDate`;
+const q = `SELECT products.productId, products.productName, products.productPic, products.categoryId, products.productSize , products.subCategoryId,
+    sales.saleId, sales.productId,sales.saleStartDate,sales.saleEndDate,sales.storeId,sales.storeLogo, sales.oldPrice, sales.discountPrice,
+    sales.discountPercentage
+
+FROM products 
+join sales on products.productId = sales.productId where 
+CURRENT_DATE() between sales.saleStartDate and sales.saleEndDate`;
 
 const userId=  parseInt(req.query.userId);
 
