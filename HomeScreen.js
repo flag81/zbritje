@@ -5,7 +5,6 @@ import BottomSheet ,{BottomSheetBackdrop } from '@gorhom/bottom-sheet';
 
 import { NavigationContainer } from '@react-navigation/native';
 
-import BottomSheetComponent from './BottomSheetComponent';
 import Banner from './Banner';
 
 import { MasonryFlashList } from "@shopify/flash-list";
@@ -14,28 +13,19 @@ import ProductCategories from './ProductCategories';
 import EmojiPicker from "./EmojiPicker";
 import * as Device from 'expo-device';
 
-
+import useStore from './useStore';
 
 import React, { useState, useEffect , useRef, useMemo, useCallback } from 'react';
-import {
-  View,
-  Text,
-  Button,
-
-  TouchableOpacity,
-  Image,
-  StyleSheet,
-  SafeAreaView,
-  ScrollView,
-  RefreshControl,
-  Dimensions
-
+import { View,Text,Button, TouchableOpacity,Image,StyleSheet,SafeAreaView,ScrollView,RefreshControl,Dimensions
 
 } from 'react-native';
 
 
-//import  { SQLite, SQLiteDatabase } from 'expo-sqlite';
-//import { open } from '@op-engineering/op-sqlite';
+import messaging from '@react-native-firebase/messaging';
+
+import {PermissionsAndroid} from 'react-native';
+
+
 
 
 
@@ -44,8 +34,19 @@ const mystar = require('./white-star.png');
 const favstar = require('./star.png');
 
 
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query'
 
 // debounce the sendQuery function
+
+import * as SecureStore from 'expo-secure-store';
+
+import UserNamePicker from './UserNamePicker'; // 
 
 
 const HomeScreen = () => {
@@ -61,7 +62,6 @@ const HomeScreen = () => {
   const [filteredDataFinal, setFilteredFinal] = useState([]);
   const [favoritesData, setFavoritesData] = useState([]);
   const [saleProductsData, setSaleProductsData] = useState([]);
-
   const [isVisible, setIsVisible] = useState(false)
   const [currentItem, setCurrentItem] = useState({})
   const sheetRef = useRef(null);
@@ -69,9 +69,43 @@ const HomeScreen = () => {
   const [productSheet, setProductSheet] = useState();
   const [extraData, setExtraData] = useState(0);
 
-  //const [db, setDb] = useState(await SQLite.openDatabaseAsync('zbritje'));
 
-  
+  const [productData, setProductData] = useState([]);
+
+
+
+  const [storedUserName, setStoredUserName] = useState("");
+  const [showUserNamePicker, setShowUserNamePicker] = useState(false);
+
+
+  const { myUserName, setMyUserName } = useStore();
+
+async function setLocalUsername(key, value) {
+  await SecureStore.setItemAsync(key, value);
+}
+
+
+async function getLocalUsername(key) {
+  let result = await SecureStore.getItemAsync(key);
+  if (result) {
+    //alert("🔐 Here's your value 🔐 \n" + result);
+    return result;
+  } else {
+    //alert('No values stored under that key.');
+    return false;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
   const handleBottomSheet = (data, item) => {
 
     console.log("---",data);
@@ -80,10 +114,7 @@ const HomeScreen = () => {
   
   };
 
-  const closeProductSheet = () => {
-    //parentSignal.value = 'Hello from the child';
-    setProductSheet();
-  };
+
 
 	const snapPoints = useMemo(() => ['25%', '50%', '70%'], []);
 
@@ -97,6 +128,7 @@ const HomeScreen = () => {
 		(props) => <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />,
 		[]
 	);
+
 
 
   const url = 'http://10.12.13.197:8800';
@@ -122,7 +154,53 @@ const HomeScreen = () => {
     }, 1000);
   }, []);
 
+
+  const requestUserPermission = async() => {
+
+    PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+
+    const authStatus = await messaging().requestPermission();
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+  
+    if (enabled) {
+      console.log('Authorization status:', authStatus);
+    }
+  }
+
+
+
+
    useEffect(() => {
+
+
+    //(async() => await setLocalUsername('username', 'myadmin'))();
+
+
+
+
+       const userName =  getLocalUsername('username').then((result) => {
+          console.log("username:------------------------------------------------:",result);
+          //setShowUserNamePicker(true);
+
+
+
+          if(!result)
+          {
+            console.log("result found:", result);
+            //poup login modal 
+            setShowUserNamePicker(true);
+            //setLocalUsername('username', 'admin');
+
+          }
+          else{
+            setMyUserName(result);    
+            console.log("result found setMyUserName:");  
+          }
+        });
+
+    
         setSelectedData([]);
         setOriginalData([]);
         setCategories([]);
@@ -133,7 +211,6 @@ const HomeScreen = () => {
         getData(admin);
         getCategories(admin);
         getSubCategories(admin);
-        
         setIsVisible(false);
         getProductOnSale(admin);
 
@@ -142,11 +219,6 @@ const HomeScreen = () => {
     
   }, []);
 
-
-  useEffect(() => {
-    //console.log("originalData>>>>>:",originalData)
-    //handleFilterSale();
-  }, [originalData]);
 
 
   useEffect(() => {
@@ -159,15 +231,10 @@ const HomeScreen = () => {
     //console.log("favoritesData:",favoritesData)
     setExtraData(extraData + 1);
 
-
-    //sort favoritesData
-
   }, [favoritesData, saleData]);
 
 
   const [uniqueId, setUniqueId] = useState('');
-
-
 
 
   const handleAddProduct = (item) => {
@@ -182,8 +249,6 @@ const HomeScreen = () => {
     );
     
   };
-
-
 
 
   const handlePressFavorites = (item) => {
@@ -202,25 +267,13 @@ const HomeScreen = () => {
         addFavorite(admin, item.productId);
       }
 
-
-
   };
 
 
-
-  //let filteredData = []
-  //let categoryFilters = [];
-  //let subCategoryFilters = [];
-  //let subFilters = [];
-
   const handleMainFilters = (favoritesFilter, onSaleFilter) => {
-
-
 
     if(favoritesFilter)
     {
-
-
 
       console.log("favoritesFilter----:",favoritesFilter);
       setFilteredProducts(favoritesData); 
@@ -228,7 +281,6 @@ const HomeScreen = () => {
     }
     else if (onSaleFilter)
     {
-
 
       console.log("onSaleFilter----:",onSaleFilter);
       console.log("saleData>>>>>>>>>>:",saleData);
@@ -244,10 +296,9 @@ const HomeScreen = () => {
   }
   
 
+
   const handleFilters = (categoryFilters, subFilters) => {
     // Handle the data received from the child component
-    //categoryFilters = filters;
-    //subFilters = subCat;
 
       console.log("categoryFilters:",categoryFilters); 
       console.log("subFilters:",subFilters); 
@@ -267,10 +318,8 @@ const HomeScreen = () => {
 
       const finalProductList = sortProducts(filteredSubData, favoritesData);
 
-
       console.log("finalProductList:",finalProductList);
       setFilteredProducts(finalProductList);
-
 
   };
 
@@ -295,52 +344,6 @@ const HomeScreen = () => {
   }
 
 
-
-  const handleFilterSale = () => {
-    // Handle the data received from the child component
-
-    //console.log("favorites data -----------:", selectedData);
-        // Filter the data based on today's date
-        const today = new Date().toISOString().slice(0, 10);
-        //console.log("today -----------:", today);
-        const filtered = selectedData.filter(item => {
-          const start = new Date(item.saleStartDate).toISOString().slice(0, 10);
-          //console.log("start -----------:", start);
-          const end = new Date(item.saleEndDate).toISOString().slice(0, 10);
-         // console.log("today -----------:", end);
-          return today >= start && today <= end;
-        });
-    
-        setSaleData(filtered);
-        //console.log("filterd -----------:", filtered);
-        //console.log("sale data -----------:", saleData);
-      
-  };
-
-
-  const filterSaleData = () => {
-    // Handle the data received from the child component
-
-    //console.log("favorites data -----------:", selectedData);
-        // Filter the data based on today's date
-        const today = new Date().toISOString().slice(0, 10);
-        //console.log("today -----------:", today);
-        const filteredSaleProducts = originalData.filter(item => {
-          const start = new Date(item.saleStartDate).toISOString().slice(0, 10);
-          //console.log("start -----------:", start);
-          const end = new Date(item.saleEndDate).toISOString().slice(0, 10);
-          //console.log("today -----------:", end);
-          return today >= start && today <= end;
-        });
-    
-        setSaleData(filteredSaleProducts);
-        console.log("filteredSaleProducts -----------:", filteredSaleProducts);
-        //console.log("sale data -----------:", saleData);
-      
-  };
-
-
-
   async function addFavorite(userId, productId) {
 
     console.log("addFav:" + userId + "-" + productId);
@@ -362,13 +365,11 @@ const HomeScreen = () => {
       headers: {"Content-Type": "application/json"}
     });
 
-
     }
     catch(e)
     {
       console.log(e);
     }
-
 
   }
 
@@ -379,26 +380,25 @@ const HomeScreen = () => {
     console.log("removeFavorite");
     try
     {
-      const resp = await fetch(`${url}/removeFavorite/${userId}/${productId}`,
+        const resp = await fetch(`${url}/removeFavorite/${userId}/${productId}`,
     
-    {
-      method: 'DELETE',
-      headers: {"Content-Type": "application/json"}
-  
-    }
-  
-  );
+        {
+          method: 'DELETE',
+          headers: {"Content-Type": "application/json"}
+      
+        }
+      
+        );
 
-    const data = await resp.json();
-    //console.log(data);
-    //setOriginalData(data)
 
-    }
-    catch(e)
-    {
-      //console.log(e);
+        const data = await resp.json();
+        //console.log(data);
+        }
+          catch(e)
+        {
+          //console.log(e);
 
-    }
+        }
 
 
   }
@@ -485,6 +485,31 @@ const HomeScreen = () => {
   }
 
 
+
+  async function checkIfUserNameExists(userName) {
+    try
+    {
+
+      const resp = await fetch(`${url}/checkIfUserNameExists?userName=${userName}`,  {
+        method: 'GET',       
+        headers: {"Content-Type": "application/json"}
+      });
+
+
+    const data = await resp.json();
+
+    console.log("checkIfUserNameExists",data);
+    //setFavoritesData(data)
+    // handleFilterSale();
+        
+    }
+    catch(e)
+    {
+      console.log(e);
+    }
+
+  }
+
   async function getFavorites(userId) {
 
     try
@@ -510,6 +535,7 @@ const HomeScreen = () => {
 
   }
 
+
   async function getProductOnSale(userId) {
 
     try
@@ -520,20 +546,16 @@ const HomeScreen = () => {
         headers: {"Content-Type": "application/json"}
       });
 
+      const data = await resp.json();
 
-    const data = await resp.json();
-
-    console.log("saleData fetch ------------------------------------------------:",data);
-    //console.log(data);
-    setSaleData(data)
-
-
+      console.log("saleData fetch ------------------------------------------------:",data);
+      //console.log(data);
+      setSaleData(data)
 
     }
     catch(e)
     {
       console.log(e);
-
     }
 
   }
@@ -550,7 +572,9 @@ const HomeScreen = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   // ...rest of the code remains same
 
-  const onModalOpen = () => {
+  const onModalOpen = (item) => {
+    // setProductData([]);
+    setProductData([item]);
     setIsModalVisible(true);
   };
 
@@ -566,32 +590,30 @@ const HomeScreen = () => {
 }
 
 
-
-
   const renderItem = ({ item }) => 
   {
 
       const imageUrl = {uri:`${url}/images/${item.productPic}`};
-
       const favoriteProduct = favoritesData.some((obj) => obj.productId === item.productId);
-
       const isOnSale = isWithinDateRange(item.saleStartDate, item.saleEndDate);
-
       const onSaleProduct = saleData.some((obj) => obj.productId === item.productId);
-
       const saleProductsDetails = saleData.filter(product => product.productId === item.productId);
-
       const storeLogo = saleProductsDetails[0]; 
 
+  /*
 
-      let logo = "";
+  
+
+  */
+
+      let logo = '';
       let storeLogoUrl ='';
       let oldPrice = '';
       let discountPrice = '';
       let discountPercentage = '';
       let endDate = '';
-
       let formattedEndDate = '';
+
 
     if (saleProductsDetails.length > 0)
     {
@@ -613,21 +635,6 @@ const HomeScreen = () => {
     }
 
 
-
-
-
-
-
-  
-
-  //console.log("filteredProducts:",filteredProducts);
-  //console.log("saleProductsDetails:-----------", logo);
-  //console.log("saleData:", saleData);
-  //console.log("onSaleProduct:", onSaleProduct);
-  //console.log("isOnSale:",isOnSale);
-
-  
-
   return (
     <TouchableOpacity onPress={()=> handleBottomSheet(true, item) }>
       <View 
@@ -636,11 +643,10 @@ const HomeScreen = () => {
         
         <View style={{ padding: 5, flexDirection: 'row', position: 'relative', justifyContent: 'space-between', alignItems: 'center' }}>
 
-
         <View style={{ flexDirection: 'col',  alignItems: 'center'}}>
         <View style={{ flexDirection: 'row' , alignItems: 'center'}}>
 
-        <View style={{ zIndex: 1 }}><TouchableOpacity onPress={() => onModalOpen()}>
+        <View style={{ zIndex: 1 }}><TouchableOpacity onPress={() => onModalOpen(item)}>
             <Image id="productImage" source={imageUrl} style={styles.image} />
             </TouchableOpacity></View>
             
@@ -652,20 +658,13 @@ const HomeScreen = () => {
 
             <View style={{ flexDirection: 'col',  alignItems: 'center'}}>
 
-
               {saleProductsDetails.length > 0 ? <Image id="saleImage" source={storeLogoUrl} style={[styles.icon,  { }]} /> : null}
             
             </View>
-          
-
+        
           </View>
 
-
           <View style={{ flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center'}}>
-
-          
-
-
 
         <Text style={{ fontSize: 15, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle' }}>{item.productName}</Text>
           <TouchableOpacity onPress={() => handlePressFavorites(item)}>
@@ -678,10 +677,9 @@ const HomeScreen = () => {
 
       </View>
       <View style={{  flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center'}}>
-      {onSaleProduct ? <Text style={{ borderRadius: 7, paddingHorizontal: 5,fontSize: 15, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle',textDecorationLine: 'line-through', backgroundColor:'#F44336' }}>{`€${oldPrice}`}</Text> : null}
-      {onSaleProduct ? <Text style={{ borderRadius: 7, paddingHorizontal: 5,fontSize: 15, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle', backgroundColor:'#9CCC65' }}>{`€${discountPrice}`}</Text> : null}
-      {onSaleProduct ? <Text style={{ borderRadius: 7, paddingHorizontal: 5,fontSize: 15, fontWeight: 'bold', textAlign: 'center', verticalAlign:'top', backgroundColor:'#BBDEFB'  }}>{formattedEndDate}</Text> : null}
-      
+          {onSaleProduct ? <Text style={{ borderRadius: 7, paddingHorizontal: 5,fontSize: 15, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle',textDecorationLine: 'line-through', backgroundColor:'#F44336' }}>{`€${oldPrice}`}</Text> : null}
+          {onSaleProduct ? <Text style={{ borderRadius: 7, paddingHorizontal: 5,fontSize: 15, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle', backgroundColor:'#9CCC65' }}>{`€${discountPrice}`}</Text> : null}
+          {onSaleProduct ? <Text style={{ borderRadius: 7, paddingHorizontal: 5,fontSize: 15, fontWeight: 'bold', textAlign: 'center', verticalAlign:'top', backgroundColor:'#BBDEFB'  }}>{formattedEndDate}</Text> : null}        
       </View>
       </View>
     </TouchableOpacity>
@@ -699,6 +697,7 @@ const HomeScreen = () => {
 <View style={{ flex: 1, padding: 10, flexDirection:'col'}}>
    <View>
       <Text>{Device.manufacturer}: {Device.deviceName}</Text>
+      <Text>Username: {myUserName}</Text>
     </View>
 
       <View>
@@ -709,7 +708,6 @@ const HomeScreen = () => {
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
               }>
             
-
         <Text>Refresh...</Text>
 
           
@@ -718,18 +716,13 @@ const HomeScreen = () => {
       </View>
 
       <View>
-                <Banner />
-                
+          <Banner />            
       </View>
-
-
-
 
 
       <View >
           <ProductCategories data={categories}  subData={subCategories} onFilterChange={handleFilters} onMainFilterChange={handleMainFilters}/>
       </View>
-
 
 
       <View style={{ height: 400, width: Dimensions.get("window").width * 0.95}}>
@@ -745,28 +738,26 @@ const HomeScreen = () => {
             showsVerticalScrollIndicator={false}
             marginBottom={100}
             
-      />
+          />
+
+
 
 
       </View>
-
-
-
-
 
       <View>
-      <EmojiPicker isVisible={isModalVisible} onClose={onModalClose}>
-        {/* A list of emoji component will go here */}
-      </EmojiPicker>
+        <EmojiPicker isVisible={isModalVisible} onClose={onModalClose} productData={productData}>
+          {/* Details Screen */}
+        </EmojiPicker>
       </View>
+
+
+      {
+        showUserNamePicker && <View><UserNamePicker isVisible={showUserNamePicker} onClose={() => setShowUserNamePicker(false)}  /></View>
+      }
           
   
   </View>
-
-  
-
-
-
 
   </SafeAreaView>
 

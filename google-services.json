@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "698680816210",
+    "project_id": "zbritje-fdcb9",
+    "storage_bucket": "zbritje-fdcb9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:698680816210:android:4247c7ba65616b1139258b",
+        "android_client_info": {
+          "package_name": "com.anonymous.zbritje"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDd7N-orLxKrfq37D2Gc7axekYvYEoHq8U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

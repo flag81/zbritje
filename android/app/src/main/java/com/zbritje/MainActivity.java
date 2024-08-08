@@ -1,4 +1,4 @@
-package com.anonymous.zbritje;
+package com.zbritje;
 
 import android.os.Build;
 import android.os.Bundle;

@@ -228,15 +228,14 @@ app.get("/getSubCategories", (req, res) => {
 
 
 
-app.get("/authUser", (req, res) => {
+app.get("/checkIfUserNameExists", (req, res) => {
 
-  const username = req.query.username;
-  const password = req.query.password;
+  const username = req.query.userName;
 
   //console.log("x",req.query.id);
 
-  const q = "SELECT count(*) FROM users WHERE username = ? AND password = ?";
-  db.query(q, [username, password], (err, data) => {
+  const q = "SELECT count(*) as found FROM users WHERE userName = ? ";
+  db.query(q, [username], (err, data) => {
 
 
     if (err) {
@@ -246,6 +245,8 @@ app.get("/authUser", (req, res) => {
     return res.json(data);
   });
 });
+
+
 
 
 app.get("/getOrder", (req, res) => {
@@ -339,6 +340,25 @@ app.post("/add", (req, res) => {
     return res.json(data);
   });
 });
+
+app.post("/addUser", (req, res) => {
+ 
+    const my = {errors:''}
+    console.clear();
+    console.log("valuessssss111111");
+    const q = "INSERT INTO users(`userName`) VALUES (?)";
+  
+    const values = [
+      req.body.userName
+    ];
+    console.log(">>" + req.body.userName);
+   
+    db.query(q, [values], (err, data) => {
+  
+      if (err) return res.send(err);
+      return res.json(data);
+    });
+  });
 
 
 
