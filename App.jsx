@@ -1,7 +1,9 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { StyleSheet, Text, View, Button, Platform } from 'react-native';
 
 import React, { useState, useEffect , useRef, useMemo, useCallback } from 'react';
+
+
 
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
@@ -13,8 +15,13 @@ import {
 } from '@tanstack/react-query'
 
 
+
 import { NavigationContainer } from '@react-navigation/native';
 import BottomTab from './BottomTab';
+
+import { AutocompleteDropdownContextProvider } from 'react-native-autocomplete-dropdown'
+
+//import { usePushNotifications } from './usePushNotifications';
 
 
 //console.log("x",Constants.easConfig.projectId);  // --> undefined
@@ -26,6 +33,14 @@ Notifications.setNotificationHandler({
     shouldPlaySound: false,
     shouldSetBadge: false,
   }),
+});
+
+Notifications.scheduleNotificationAsync({
+  content: {
+    title: 'Look at that notification',
+    body: "I'm so proud of myself!",
+  },
+  trigger: null,
 });
 
 async function sendPushNotification(expoPushToken) {
@@ -115,10 +130,14 @@ const queryClient = new QueryClient();
 
 export default function App() {
 
+  //const { expoPushToken, notification } = usePushNotifications();
+  //const data = JSON.stringify(notification, undefined, 2);
+
+  //console.log("expoPushToken",expoPushToken);
+  //console.log("data",data); 
+
   const [expoPushToken, setExpoPushToken] = useState('');
-  const [notification, setNotification] = useState(
-    undefined
-  );
+  const [notification, setNotification] = useState();
   const notificationListener = useRef();
   const responseListener = useRef();
 
@@ -145,17 +164,19 @@ export default function App() {
 
 
 
+
   return (
 <QueryClientProvider client={queryClient}>
+<AutocompleteDropdownContextProvider >
     <NavigationContainer>
 
-
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'space-around', height: '10%' }}>
+ {/*
+    <View style={{  alignItems: 'center', justifyContent: 'space-around' }}>
       <Text>Your Expo push token: {expoPushToken}</Text>
       <View style={{ alignItems: 'center', justifyContent: 'center' }}>
         <Text>Title: {notification && notification.request.content.title} </Text>
         <Text>Body: {notification && notification.request.content.body}</Text>
-        <Text>Dataaa: {notification && JSON.stringify(notification.request.content.data)}</Text>
+        <Text>Data: {notification && JSON.stringify(notification.request.content.data)}</Text>
       </View>
       <Button
         title="Press to Send Notification"
@@ -164,10 +185,12 @@ export default function App() {
         }}
       />
     </View>
+      */}
 
 
       <BottomTab />
     </NavigationContainer>
+    </AutocompleteDropdownContextProvider>
 </QueryClientProvider>
   );
 }

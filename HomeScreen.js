@@ -26,10 +26,6 @@ import messaging from '@react-native-firebase/messaging';
 import {PermissionsAndroid} from 'react-native';
 
 
-
-
-
-
 const mystar = require('./white-star.png');
 const favstar = require('./star.png');
 
@@ -40,6 +36,7 @@ import {
   useQueryClient,
   QueryClient,
   QueryClientProvider,
+  usePrefetchQuery
 } from '@tanstack/react-query'
 
 // debounce the sendQuery function
@@ -47,6 +44,8 @@ import {
 import * as SecureStore from 'expo-secure-store';
 
 import UserNamePicker from './UserNamePicker'; // 
+
+import { AutocompleteDropdown } from 'react-native-autocomplete-dropdown';
 
 
 const HomeScreen = () => {
@@ -68,14 +67,15 @@ const HomeScreen = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [productSheet, setProductSheet] = useState();
   const [extraData, setExtraData] = useState(0);
-
-
+  const [prefetchedProductsData, setPrefetchedProductsData] = useState([]);
   const [productData, setProductData] = useState([]);
-
 
 
   const [storedUserName, setStoredUserName] = useState("");
   const [showUserNamePicker, setShowUserNamePicker] = useState(false);
+
+
+
 
 
   const { myUserName, setMyUserName } = useStore();
@@ -95,15 +95,6 @@ async function getLocalUsername(key) {
     return false;
   }
 }
-
-
-
-
-
-
-
-
-
 
 
   const handleBottomSheet = (data, item) => {
@@ -213,6 +204,7 @@ async function getLocalUsername(key) {
         getSubCategories(admin);
         setIsVisible(false);
         getProductOnSale(admin);
+        prefetchProducts(admin);
 
         console.log("*************************************************************************************************")
         //filterSaleData();
@@ -536,6 +528,58 @@ async function getLocalUsername(key) {
   }
 
 
+  async function prefetchProducts(userId) {
+
+    try
+    {
+      const resp = await fetch(`${url}/prefetchProducts?userId=${userId}`,  {
+        method: 'GET',       
+        headers: {"Content-Type": "application/json"}
+      });
+
+      const data = await resp.json();
+
+      console.log("prefetchProducts data ------------------------------------------------:",data);
+      //console.log(data);
+      setPrefetchedProductsData(data);
+
+    }
+    catch(e)
+    {
+      console.log(e);
+    }
+
+  }
+
+
+
+
+  async function getProductsByIds(userId, productIds) {
+
+    try
+    {
+      const resp = await fetch(`${url}/getProductsByIds?userId=${userId}&ids=${productIds}`,  {
+        method: 'GET',       
+        headers: {"Content-Type": "application/json"}
+      });
+
+      const data = await resp.json();
+      
+      console.log("getProductsByIds data ------------------------------------------------:",data);
+      //console.log(data);
+      //setPrefetchedProductsData(data);
+      setFilteredProducts(data);
+
+    }
+    catch(e)
+    {
+      console.log(e);
+    }
+
+  }
+
+
+
   async function getProductOnSale(userId) {
 
     try
@@ -590,6 +634,80 @@ async function getLocalUsername(key) {
 }
 
 
+
+
+
+const [selectedItem, setSelectedItem] = useState(null);
+const [suggestionsList, setSuggestionsList] = useState(null)
+
+useEffect(() => {
+  console.log("suggestionList changed-------:", suggestionsList)
+}, [suggestionsList]);
+
+
+useEffect(() => {
+  console.log("prefetchedProductsData changed-------:", prefetchedProductsData)
+}, [prefetchedProductsData]);
+
+
+const getSuggestions = (q) => {
+  const filterToken = q.toLowerCase()
+  console.log('getSuggestions', q)
+  if (typeof q !== 'string' || q.length < 3) {
+    setSuggestionsList(null)
+    return
+  }
+  //setLoading(true)
+  //const response = await fetch('https://jsonplaceholder.typicode.com/posts')
+  const items = prefetchedProductsData;
+
+  console.log("prefetchedProductsData::::::::::",prefetchedProductsData);
+
+
+
+
+  const suggestions = prefetchedProductsData
+    .filter(item => item.title.toLowerCase().includes(filterToken))
+    .map(item => ({
+      id: item.id,
+      title: item.title,
+    }))
+  setSuggestionsList(suggestions)
+  //setLoading(false)
+  }
+
+
+
+const onSubmitSearch = (searchText) => {
+  console.log("searchText:",searchText);
+  // write the code to extract the id from suggestionsList array into an new array of ids
+
+
+
+
+  console.log("suggestionsList:",suggestionsList);
+
+  if(suggestionsList)
+    {
+      const suggestionsListIds = suggestionsList.length > 0 ? suggestionsList.map(obj => obj.id) : [];
+      console.log("suggestionsListIds:",suggestionsListIds);
+      const paramsString = suggestionsListIds.join(',');
+      console.log("paramsString:",paramsString  );
+      const productListSearch = getProductsByIds(admin, paramsString);
+    }
+
+  //console.log("productListSearch:",productListSearch);
+
+}
+
+
+const onClearPress = useCallback(() => {
+  setSuggestionsList(null);
+  setFilteredProducts(originalData);
+
+}, []);
+
+
   const renderItem = ({ item }) => 
   {
 
@@ -633,6 +751,10 @@ async function getLocalUsername(key) {
     else{
         logo = "no-logo"; 
     }
+
+
+
+
 
 
   return (
@@ -689,15 +811,57 @@ async function getLocalUsername(key) {
 
 
 
+
+
+
+
+
   return (
 
 <SafeAreaView style={styles.container}>
 
 
-<View style={{ flex: 1, padding: 10, flexDirection:'col'}}>
+<View style={{ padding: 10, flexDirection:'col'}}>
    <View>
       <Text>{Device.manufacturer}: {Device.deviceName}</Text>
       <Text>Username: {myUserName}</Text>
+    </View>
+
+
+    <View>
+      {/* <Banner />   */}
+     
+      <AutocompleteDropdown
+          clearOnFocus={false}
+          closeOnBlur={true}
+          closeOnSubmit={false}
+          //initialValue={{ id: '2' }} // or just '2'
+          onSelectItem={setSelectedItem}
+          dataSet={suggestionsList}
+          useFilter={false}
+          onChangeText={getSuggestions}
+          onSubmit={(e) => onSubmitSearch(e.nativeEvent.text)}
+          onClear={onClearPress}
+          textInputProps={{
+            placeholder: 'Kerko produktet',
+            autoCorrect: false,
+            autoCapitalize: 'none',
+            style: {
+              borderRadius: 25,
+              paddingLeft: 18,
+            },
+          }}
+          renderItem={({title,id}) => (
+            <TouchableOpacity 
+              onPress={() => {}}>
+              <Text style={{  padding: 15 }}> 
+                  {title}
+              </Text>
+            </TouchableOpacity>
+          )}
+      />
+     
+
     </View>
 
       <View>
@@ -715,9 +879,9 @@ async function getLocalUsername(key) {
 
       </View>
 
-      <View>
-          <Banner />            
-      </View>
+
+
+
 
 
       <View >
@@ -725,7 +889,9 @@ async function getLocalUsername(key) {
       </View>
 
 
-      <View style={{ height: 400, width: Dimensions.get("window").width * 0.95}}>
+      <View style={{ flex:1, width: Dimensions.get("window").width * 0.95}}>
+
+
 
 
           <MasonryFlashList

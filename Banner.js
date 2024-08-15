@@ -5,6 +5,11 @@ import Carousel from 'react-native-reanimated-carousel';
 function Banner() {
     const width = Dimensions.get('window').width;
 
+    //console.log("width",width);
+    //console.log("height",width / 2);
+
+    const height = width / 2;
+
     const carouselData = [
 		{
 			id: "01",
@@ -22,11 +27,10 @@ function Banner() {
 	];
 
     return (
-        <View>
+        <View style={{height: height}}>
             <Carousel
                 loop
-                width={width}
-               
+                width={width}             
                 height={width / 2}
                 autoPlay={true}
                 data={carouselData}

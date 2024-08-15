@@ -94,7 +94,69 @@ app.get("/", (req, res) => {
 });
 
 
+app.get("/prefetchProducts", (req, res) => {
 
+  //const q = "SELECT tableid,  users.id  FROM orders join users on orders.userid = users.id WHERE orders.status = 0 ";
+  const q = `SELECT products.productId as id, products.productName as title
+  
+  FROM products
+
+
+  `;
+
+  const userId= req.query.userId;
+
+  db.query(q, [userId], (err, data) => {
+
+    if (err) {
+      console.log(err);
+      return res.json(err);
+    }
+
+    return res.json(data);
+  });
+});
+
+//write app.get like the one above that take paramerter a comma separated list of product ids and return the producct ids 
+//and the product name of the products with the given ids
+
+app.get("/getProductsByIds", (req, res) => {
+
+  console.log("req.query.ids", req.query.ids)
+  
+
+    const q = `SELECT products.productId, products.productName, products.productPic, products.categoryId, products.productSize , products.subCategoryId,
+    sales.saleId, sales.saleStartDate,sales.saleEndDate,sales.storeId,sales.storeLogo, sales.oldPrice, sales.discountPrice,
+    sales.discountPercentage
+  
+  
+  FROM products
+  
+  left join sales on products.productId = sales.productId
+
+  where products.productId in (${req.query.ids})
+
+  order by sales.saleEndDate desc
+
+  `;
+
+  console.log('q',q);
+  
+    const userId= req.query.userId;
+
+    
+  
+    db.query(q, [userId], (err, data) => {
+  
+      if (err) {
+        console.log(err);
+        return res.json(err);
+      }
+  
+      return res.json(data);
+    });
+  }
+  );
 
 app.get("/products", (req, res) => {
 
