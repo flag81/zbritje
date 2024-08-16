@@ -641,6 +641,10 @@ const [selectedItem, setSelectedItem] = useState(null);
 const [suggestionsList, setSuggestionsList] = useState(null)
 
 useEffect(() => {
+  console.log("selectedItem changed-------:", selectedItem)
+}, [selectedItem]);
+
+useEffect(() => {
   console.log("suggestionList changed-------:", suggestionsList)
 }, [suggestionsList]);
 
@@ -677,6 +681,24 @@ const getSuggestions = (q) => {
   }
 
 
+
+  const onSelectItemSearch = (productId) => {
+    console.log("productId:",productId);
+    // write the code to extract the id from suggestionsList array into an new array of ids
+
+  
+    if(productId)
+      {
+        //const suggestionsListIds = suggestionsList.length > 0 ? suggestionsList.map(obj => obj.id) : [];
+        //console.log("suggestionsListIds:",suggestionsListIds);
+        //const paramsString = suggestionsListIds.join(',');
+        //console.log("paramsString:",paramsString  );
+        const productSearchById = getProductsByIds(admin, productId);
+      }
+  
+    //console.log("productListSearch:",productListSearch);
+  
+  }
 
 const onSubmitSearch = (searchText) => {
   console.log("searchText:",searchText);
@@ -811,15 +833,9 @@ const onClearPress = useCallback(() => {
 
 
 
-
-
-
-
-
-  return (
+return (
 
 <SafeAreaView style={styles.container}>
-
 
 <View style={{ padding: 10, flexDirection:'col'}}>
    <View>
@@ -828,15 +844,18 @@ const onClearPress = useCallback(() => {
     </View>
 
 
+
     <View>
       {/* <Banner />   */}
      
       <AutocompleteDropdown
           clearOnFocus={false}
           closeOnBlur={true}
-          closeOnSubmit={false}
+          closeOnSubmit={true}
           //initialValue={{ id: '2' }} // or just '2'
-          onSelectItem={setSelectedItem}
+          onSelectItem={item => {
+            item && onSelectItemSearch(item.id)
+          }}
           dataSet={suggestionsList}
           useFilter={false}
           onChangeText={getSuggestions}
@@ -852,12 +871,11 @@ const onClearPress = useCallback(() => {
             },
           }}
           renderItem={({title,id}) => (
-            <TouchableOpacity 
-              onPress={() => {}}>
+           
               <Text style={{  padding: 15 }}> 
                   {title}
               </Text>
-            </TouchableOpacity>
+           
           )}
       />
      
