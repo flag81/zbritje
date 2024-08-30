@@ -5,6 +5,7 @@ import HomeScreen from './HomeScreen';
 import Chats from './Chats';
 import Settings from './Settings';
 import Account from './Account';
+import Companies from './Companies';
 import { AntDesign } from '@expo/vector-icons';
 
 const BottomTabNavigator = createBottomTabNavigator();
@@ -20,7 +21,7 @@ export default function BottomTab() {
           Platform.OS === 'ios' && {
             shadowOffset: { height: -2, width: 2 },
             shadowOpacity: 0.1,
-            shadowRadius: 15,
+            shadowRadius: 10,
           },
         ],
         tabBarItemStyle: {
@@ -52,17 +53,17 @@ export default function BottomTab() {
         options={{
           tabBarIcon: ({ focused }) => (
             <AntDesign
-              name="message1"
+              name="tags"
               size={21}
               color={focused ? '#0071ff' : 'gray'}
             />
           ),
         }}
         name="Kompanite"
-        component={Chats}
+        component={Companies}
       />
       <BottomTabNavigator.Screen
-        name="settings"
+        name="Konfigurimet"
         component={Settings}
         options={{
           tabBarIcon: ({ focused }) => (
@@ -75,7 +76,7 @@ export default function BottomTab() {
         }}
       />
       <BottomTabNavigator.Screen
-        name="account"
+        name="Profili"
         component={Account}
         options={{
           tabBarIcon: ({ focused }) => (

@@ -1,52 +1,33 @@
 import 'react-native-url-polyfill/auto';
 import 'react-native-get-random-values';
-
 import BottomSheet ,{BottomSheetBackdrop } from '@gorhom/bottom-sheet';
-
-import { NavigationContainer } from '@react-navigation/native';
-
 import Banner from './Banner';
-
 import { MasonryFlashList } from "@shopify/flash-list";
 import ProductCategories from './ProductCategories';
-
 import EmojiPicker from "./EmojiPicker";
 import * as Device from 'expo-device';
-
 import useStore from './useStore';
-
 import React, { useState, useEffect , useRef, useMemo, useCallback } from 'react';
 import { View,Text,Button, TouchableOpacity,Image,StyleSheet,SafeAreaView,ScrollView,RefreshControl,Dimensions
+
 
 } from 'react-native';
 
 
+
 import messaging from '@react-native-firebase/messaging';
-
 import {PermissionsAndroid} from 'react-native';
-
-
-const mystar = require('./white-star.png');
-const favstar = require('./star.png');
-
-
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  QueryClient,
-  QueryClientProvider,
-  usePrefetchQuery
-} from '@tanstack/react-query'
-
+import {QueryClient} from '@tanstack/react-query'
 // debounce the sendQuery function
 
 import * as SecureStore from 'expo-secure-store';
-
 import UserNamePicker from './UserNamePicker'; // 
-
 import { AutocompleteDropdown } from 'react-native-autocomplete-dropdown';
+import Toast from 'react-native-root-toast';
 
+
+
+const queryClient = new QueryClient();
 
 const HomeScreen = () => {
 
@@ -69,14 +50,8 @@ const HomeScreen = () => {
   const [extraData, setExtraData] = useState(0);
   const [prefetchedProductsData, setPrefetchedProductsData] = useState([]);
   const [productData, setProductData] = useState([]);
-
-
   const [storedUserName, setStoredUserName] = useState("");
   const [showUserNamePicker, setShowUserNamePicker] = useState(false);
-
-
-
-
 
   const { myUserName, setMyUserName } = useStore();
 
@@ -146,6 +121,32 @@ async function getLocalUsername(key) {
   }, []);
 
 
+  const prefetchGetData = async (admin) => {
+    // The results of this query will be cached like a normal query
+    await queryClient.prefetchQuery({
+      queryKey: ['getData'],
+      queryFn: getData,
+    })
+  }
+
+
+  const prefetchGetFavorites = async (admin) => {
+    // The results of this query will be cached like a normal query
+    await queryClient.prefetchQuery({
+      queryKey: ['getFavorites'],
+      queryFn: getFavorites(admin),
+    })
+  }
+
+  const prefetchGetCategories = async (admin) => {
+    // The results of this query will be cached like a normal query
+    await queryClient.prefetchQuery({
+      queryKey: ['getCategories'],
+      queryFn: getCategories(admin),
+    })
+  }
+
+
   const requestUserPermission = async() => {
 
     PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
@@ -163,18 +164,15 @@ async function getLocalUsername(key) {
 
 
 
+
    useEffect(() => {
 
 
-    //(async() => await setLocalUsername('username', 'myadmin'))();
-
-
-
+      //showToast("toast message");
 
        const userName =  getLocalUsername('username').then((result) => {
           console.log("username:------------------------------------------------:",result);
           //setShowUserNamePicker(true);
-
 
 
           if(!result)
@@ -198,17 +196,20 @@ async function getLocalUsername(key) {
         setSubCategories([]);
         setFilteredProducts([]);
         setSaleData([]); 
-        getFavorites(admin);
-        getData(admin);
-        getCategories(admin);
+        prefetchGetFavorites(admin);
+        //getData(admin);
+        prefetchGetData(admin);
+        //getCategories(admin);
+        prefetchGetCategories(admin);
         getSubCategories(admin);
         setIsVisible(false);
         getProductOnSale(admin);
         prefetchProducts(admin);
 
+        
         console.log("*************************************************************************************************")
         //filterSaleData();
-    
+
   }, []);
 
 
@@ -221,12 +222,30 @@ async function getLocalUsername(key) {
 
   useEffect(() => {
     //console.log("favoritesData:",favoritesData)
+    const favoritesOnSale = filterSaleData();
     setExtraData(extraData + 1);
 
   }, [favoritesData, saleData]);
 
 
   const [uniqueId, setUniqueId] = useState('');
+
+
+  const showToast = (message) => {
+    //setFavoritesData((prevProducts) => [...prevProducts, item]);
+
+    let toast = Toast.show(message, {
+      duration: Toast.durations.SHORT,
+      position: Toast.positions.TOP,
+      shadow: false,
+      animation: true,
+      hideOnPress: true,
+      delay: 0
+  
+  });
+    
+  };
+
 
 
   const handleAddProduct = (item) => {
@@ -243,6 +262,7 @@ async function getLocalUsername(key) {
   };
 
 
+
   const handlePressFavorites = (item) => {
     //setSelectedProduct(productId);
 
@@ -252,11 +272,11 @@ async function getLocalUsername(key) {
       if(result)
       {
         handleRemoveFavorites(item)
-        removeFavorite(admin, item.productId);
+        removeFavorite(admin, item.productId, item.productName);
       }
       else{
         handleAddProduct(item)
-        addFavorite(admin, item.productId);
+        addFavorite(admin, item.productId, item.productName);
       }
 
   };
@@ -287,6 +307,14 @@ async function getLocalUsername(key) {
 
   }
   
+//write function to filter the to match the sale data with the favorites data
+  const filterSaleData = () => {
+
+    const filteredSaleData = saleData.filter(item => favoritesData.some(obj => obj.productId === item.productId));
+    console.log("filteredFavoritesDataOnSale",filteredSaleData);
+    //setFilteredProducts(filteredSaleData);
+
+  }
 
 
   const handleFilters = (categoryFilters, subFilters) => {
@@ -318,6 +346,10 @@ async function getLocalUsername(key) {
 
 
 
+
+
+
+
 // sort the products based on the favorite products moved on top of the array
   const sortProducts = (firstArray, secondArray) => {
 
@@ -336,7 +368,7 @@ async function getLocalUsername(key) {
   }
 
 
-  async function addFavorite(userId, productId) {
+  async function addFavorite(userId, productId, productName) {
 
     console.log("addFav:" + userId + "-" + productId);
   
@@ -357,6 +389,8 @@ async function getLocalUsername(key) {
       headers: {"Content-Type": "application/json"}
     });
 
+    showToast(`Produkti ${productName} u shtua ne te preferuarat tuaja.`);
+
     }
     catch(e)
     {
@@ -366,7 +400,7 @@ async function getLocalUsername(key) {
   }
 
 
-  async function removeFavorite(userId, productId) {
+  async function removeFavorite(userId, productId, productName) {
 
     //const queryParams = new URLSearchParams({ userId: userId, productId:productId });
     console.log("removeFavorite");
@@ -385,6 +419,9 @@ async function getLocalUsername(key) {
 
         const data = await resp.json();
         //console.log(data);
+
+        showToast(`Produkti ${productName} u largua nga te preferuarat tuaja.`);
+
         }
           catch(e)
         {
@@ -423,6 +460,8 @@ async function getLocalUsername(key) {
 
     }
 
+    return data;
+
   }
 
 
@@ -442,6 +481,8 @@ async function getLocalUsername(key) {
 
     //console.log("categories----------------",data);
     setCategories(data);
+
+    return data;
 
     }
     catch(e)
@@ -515,9 +556,13 @@ async function getLocalUsername(key) {
 
     const data = await resp.json();
 
-    //console.log(data);
+    console.log("FAVO----------------------------",data);
     setFavoritesData(data)
    // handleFilterSale();
+
+   //if favorites data is empty then 
+
+   return data;
         
     }
     catch(e)
@@ -566,7 +611,7 @@ async function getLocalUsername(key) {
       const data = await resp.json();
       
       console.log("getProductsByIds data ------------------------------------------------:",data);
-      //console.log(data);
+      //console.log(data); 
       //setPrefetchedProductsData(data);
       setFilteredProducts(data);
 
@@ -586,6 +631,31 @@ async function getLocalUsername(key) {
     {
 
       const resp = await fetch(`${url}/getProductOnSale?userId=${userId}`,  {
+        method: 'GET',       
+        headers: {"Content-Type": "application/json"}
+      });
+
+      const data = await resp.json();
+
+      console.log("saleData fetch ------------------------------------------------:",data);
+      //console.log(data);
+      setSaleData(data)
+
+    }
+    catch(e)
+    {
+      console.log(e);
+    }
+
+  }
+
+
+  async function getProductOnSaleByTag(userId) {
+
+    try
+    {
+
+      const resp = await fetch(`${url}/getProductOnSaleByTag?tag=${userId}`,  {
         method: 'GET',       
         headers: {"Content-Type": "application/json"}
       });
@@ -730,6 +800,7 @@ const onClearPress = useCallback(() => {
 }, []);
 
 
+
   const renderItem = ({ item }) => 
   {
 
@@ -803,21 +874,21 @@ const onClearPress = useCallback(() => {
             <View style={{ flexDirection: 'col',  alignItems: 'center'}}>
 
               {saleProductsDetails.length > 0 ? <Image id="saleImage" source={storeLogoUrl} style={[styles.icon,  { }]} /> : null}
-            
-            </View>
-        
-          </View>
-
-          <View style={{ flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center'}}>
-
-        <Text style={{ fontSize: 15, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle' }}>{item.productName}</Text>
-          <TouchableOpacity onPress={() => handlePressFavorites(item)}>
+              <TouchableOpacity onPress={() => handlePressFavorites(item)}>
             <Image id="favoriteImage"
                   source={
                     favoriteProduct ? require('./star.png') : require('./white-star.png')
                   }
                   style={styles.star} />
           </TouchableOpacity>
+            </View>
+        
+          </View>
+
+        <View style={{ flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center'}}>
+
+        <Text style={{ fontSize: 15, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle' }}>{item.productName}</Text>
+
 
       </View>
       <View style={{  flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center'}}>
@@ -832,21 +903,20 @@ const onClearPress = useCallback(() => {
 };
 
 
-
 return (
 
 <SafeAreaView style={styles.container}>
 
 <View style={{ padding: 10, flexDirection:'col'}}>
    <View>
-      <Text>{Device.manufacturer}: {Device.deviceName}</Text>
+      <Text>Emri i telefonit: {Device.deviceName}</Text>
       <Text>Username: {myUserName}</Text>
     </View>
 
 
 
-    <View>
-      {/* <Banner />   */}
+    <View >
+      {/* <Banner />   style={{flex: 1}} */}
      
       <AutocompleteDropdown
           clearOnFocus={false}
@@ -920,10 +990,9 @@ return (
             contentContainerStyle={{padding: 5}}
             extraData={extraData}
             showsVerticalScrollIndicator={false}
-            marginBottom={100}
+            marginBottom={60}
             
           />
-
 
 
 
@@ -981,6 +1050,7 @@ const styles = StyleSheet.create({
   },
 
 
+
   image: {
     width: 70,
     height: 70,
@@ -996,8 +1066,8 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     marginRight: 5,
-
-
+    marginTop: 5,
+   
   }
 
 

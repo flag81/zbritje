@@ -2,6 +2,34 @@ import React, { useState, useEffect} from "react";
 import { SafeAreaView, View, Text, ScrollView, TextInput, TouchableOpacity , StyleSheet, Image} from "react-native";
 import { COLORS , SIZES} from "./theme";
 
+/*
+
+code description: This code snippet is a react native component that displays a list of categories and subcategories. 
+The user can select a category and subcategory to filter the products. 
+The user can also filter the products based on sales and favorites. 
+
+*/
+
+/*
+
+
+//write a simalar component that displays a list of stores and allows the user to filter the products based on the store selected.
+
+//  start wrting the code below this comment
+
+
+
+
+*/
+
+//write a simalar component that displays a list of stores and allows the user to filter the products based on the store selected
+
+//  start wrting the code below this comment
+
+
+
+
+
 
 
 
@@ -37,28 +65,12 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData}) 
       }, []);
 
 
-      
-    useEffect(() => {
-
-        //setSelected([]);
-        //console.log(" currentCategory data:-------------",currentCategory)
-        //sendFilteredCategories();
-
-        
-      }, [currentCategory]);
-
-      //let filteredSubData = [];
-
         useEffect(() => {
 
         //setSelected([]);
         //console.log("New categories:-------------",data)
 
         sendFilteredCategories();
-
-       // filteredSubData = subData.filter((category) => selectedCategories.includes(category.categoryId));
-        //console.log("filteredSubData:-------------",filteredSubData)
-        
 
       }, [selectedCategories]);
 
@@ -189,7 +201,7 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData}) 
 
               filteredSubData = subCategories.filter((category) => selectedCategories.includes(category.categoryId));
 
-            const [subCat, setSubCat] = useState([]);
+
 
             useEffect(() => {
                 // Actions to perform when filteredSubData changes

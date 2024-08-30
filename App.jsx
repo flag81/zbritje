@@ -20,6 +20,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import BottomTab from './BottomTab';
 
 import { AutocompleteDropdownContextProvider } from 'react-native-autocomplete-dropdown'
+import HomeScreen from './HomeScreen';
+
+import { RootSiblingParent } from 'react-native-root-siblings';
 
 //import { usePushNotifications } from './usePushNotifications';
 
@@ -168,6 +171,8 @@ export default function App() {
   return (
 <QueryClientProvider client={queryClient}>
 <AutocompleteDropdownContextProvider >
+<RootSiblingParent>
+
     <NavigationContainer>
 
  {/*
@@ -190,6 +195,7 @@ export default function App() {
 
       <BottomTab />
     </NavigationContainer>
+    </RootSiblingParent>
     </AutocompleteDropdownContextProvider>
 </QueryClientProvider>
   );

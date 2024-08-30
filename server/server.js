@@ -14,7 +14,7 @@ import basicAuth from 'express-basic-auth';
 
 const __filename = fileURLToPath(import.meta.url);
 
-const app = express();
+export const app = express();
 
 
 //const ts = require('./order')
@@ -90,7 +90,51 @@ app.get('/get-data', (req, res) => {
 
 
 app.get("/", (req, res) => {
-  res.json("hello from backend ...");
+  //res.json("hello from backend ...");
+  res.sendFile(path.join(__dirname, 'index.html'));
+
+
+
+});
+
+app.get("/getUserEmail", (req, res) => {
+
+  //const q = "SELECT tableid,  users.id  FROM orders join users on orders.userid = users.id WHERE orders.status = 0 ";
+  const q = `SELECT email FROM users WHERE userId = ${req.query.userId}`;
+  
+
+  const userId= req.query.userId;
+
+  db.query(q, [userId], (err, data) => {
+
+    if (err) {
+      console.log(err);
+      return res.json(err);
+    }
+
+    return res.json(data);
+  });
+});
+
+
+
+app.get("/getUserNotificationLevel", (req, res) => {
+
+  //const q = "SELECT tableid,  users.id  FROM orders join users on orders.userid = users.id WHERE orders.status = 0 ";
+  const q = `SELECT notificationLevel FROM users WHERE userId = ${req.query.userId}`;
+  
+
+  const userId= req.query.userId;
+
+  db.query(q, [userId], (err, data) => {
+
+    if (err) {
+      console.log(err);
+      return res.json(err);
+    }
+
+    return res.json(data);
+  });
 });
 
 
@@ -270,6 +314,44 @@ app.get("/getCategories", (req, res) => {
   });
 });
 
+app.get("/getAllStores", (req, res) => {
+
+  //const q = "SELECT tableid,  users.id  FROM orders join users on orders.userid = users.id WHERE orders.status = 0 ";
+    const q = `SELECT * FROM store`;
+  
+    const userId=  parseInt(req.query.userId);
+  
+    db.query(q, [userId], (err, data) => {
+  
+      if (err) {
+        console.log(err);
+        return res.json(err);
+      }
+  
+      return res.json(data);
+    });
+  });
+
+
+  app.get("/getUserFavoriteStores", (req, res) => {
+
+    //const q = "SELECT tableid,  users.id  FROM orders join users on orders.userid = users.id WHERE orders.status = 0 ";
+      const q = `SELECT userId, storeId FROM storeFavorites WHERE userId = ?`;
+    
+      const userId=  parseInt(req.query.userId);
+    
+      db.query(q, [userId], (err, data) => {
+    
+        if (err) {
+          console.log(err);
+          return res.json(err);
+        }
+    
+        return res.json(data);
+      });
+    });
+
+
 app.get("/getSubCategories", (req, res) => {
 
   //const q = "SELECT tableid,  users.id  FROM orders join users on orders.userid = users.id WHERE orders.status = 0 ";
@@ -423,6 +505,53 @@ app.post("/addUser", (req, res) => {
   });
 
 
+  app.put("/updateUserEmail", (req, res) => {
+
+    //convert string to number
+    const userId = parseInt(req.body.userId);
+
+    //convert to string with escape characters
+    const userEmail = db.escape(req.body.userEmail);
+
+  
+    const q = `UPDATE users SET email=${userEmail} WHERE userId = ${userId}`;
+
+    const values = [
+      req.body.userId,
+      req.body.userEmail
+    ];
+
+    //console.log(">>" + q);
+    //console.log(">>" + req.body.userEmail);
+  
+    db.query(q, [values], (err, data) => {
+      if (err) return res.send(err);
+  
+      //console.log("id",bookId)
+      return res.json(data);
+    });
+  });
+
+
+  app.put("/updateUserNotificationLevel", (req, res) => {
+  
+    const q = `UPDATE users SET notificationLevel= ${req.body.notificationId} WHERE userId = ${req.body.userId}`;
+
+    const values = [
+      req.body.userId,
+      req.body.notificationId
+    ];
+  
+    db.query(q, [values], (err, data) => {
+      if (err) return res.send(err);
+  
+      //console.log("id",bookId)
+      return res.json(data);
+    });
+  });
+
+
+
 
 app.post("/addFavorite", (req, res) => {
  
@@ -452,6 +581,38 @@ const my = {errors:''}
 });
 
 
+app.post("/addStoreToFavorites", (req, res) => {
+ 
+  const my = {errors:''}
+  
+     // console.log("valuessssss111111")
+    const q = "INSERT INTO storefavorites( `userId`, `storeId`) VALUES (?)";
+  
+    const values = [
+      req.body.userId,
+      req.body.storeId
+    ];
+  
+    const userId = req.body.userId
+  
+    console.log(">>" + req.body.userId);
+    console.log(">>" + req.body.storeId);
+    console.log(">>--" + req.method);
+  
+  
+  
+    db.query(q, [values], (err, data) => {
+  
+console.log("error",err)
+
+      if (err) return res.send(err);
+        
+      
+      return res.json(data);
+    });
+  });
+
+
 app.post("/books", (req, res) => {
   const q = "INSERT INTO books(`title`, `desc`, `price`, `cover`) VALUES (?)";
 
@@ -468,6 +629,25 @@ app.post("/books", (req, res) => {
   });
 });
 
+
+
+app.delete("/removeStoreFromFavorites/:userId/:storeId", (req, res) => {
+
+
+  //console.log("usersssss");
+
+const q = " DELETE FROM storefavorites WHERE userId = ? and storeId = ? LIMIT 1";
+
+const userId = req.params.userId;
+const storeId = req.params.storeId;
+
+console.log("user",req.params.userId)
+
+db.query(q, [userId,storeId], (err, data) => {
+  if (err) return res.send(err);
+  return res.json(data);
+});
+});
 
 
 
