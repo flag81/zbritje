@@ -169,7 +169,7 @@ app.get("/getProductsByIds", (req, res) => {
   console.log("req.query.ids", req.query.ids)
   
 
-    const q = `SELECT products.productId, products.productName, products.productPic, products.categoryId, products.productSize , products.subCategoryId,
+    const q = `SELECT products.productId, products.productName, products.productPic, products.categoryId, products.storeId, products.productSize , products.subCategoryId,
     sales.saleId, sales.saleStartDate,sales.saleEndDate,sales.storeId,sales.storeLogo, sales.oldPrice, sales.discountPrice,
     sales.discountPercentage
   
@@ -206,16 +206,24 @@ app.get("/products", (req, res) => {
 
   //console.log("valuessssss")
   //const q = "SELECT tableid,  users.id  FROM orders join users on orders.userid = users.id WHERE orders.status = 0 ";
-  const q = `SELECT products.productId, products.productName, products.productPic, products.categoryId, products.productSize , products.subCategoryId,
-    sales.saleId, sales.saleStartDate,sales.saleEndDate,sales.storeId,sales.storeLogo, sales.oldPrice, sales.discountPrice,
-    sales.discountPercentage
+  const q = `SELECT products.productId, products.productName, products.productPic, products.categoryId, 
+  products.productSize , products.subCategoryId, products.storeId,
+    sales.saleId, sales.saleStartDate,sales.saleEndDate,sales.storeLogo, sales.oldPrice, sales.discountPrice,
+    sales.discountPercentage, store.storeLogo as storeLogo,
+
+    CASE 
+        WHEN f.id IS NOT NULL THEN true 
+        ELSE false 
+    END AS isFavorite
   
   
   FROM products
   
   left join sales on products.productId = sales.productId
+  left join store on products.storeId = store.storeId
+  left join favorites f on products.productId = f.productId
 
-  order by sales.saleEndDate desc
+  order by isFavorite DESC,sales.saleEndDate desc
 
   `;
 

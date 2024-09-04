@@ -1,34 +1,7 @@
 import React, { useState, useEffect} from "react";
 import { SafeAreaView, View, Text, ScrollView, TextInput, TouchableOpacity , StyleSheet, Image} from "react-native";
 import { COLORS , SIZES} from "./theme";
-
-/*
-
-code description: This code snippet is a react native component that displays a list of categories and subcategories. 
-The user can select a category and subcategory to filter the products. 
-The user can also filter the products based on sales and favorites. 
-
-*/
-
-/*
-
-
-//write a simalar component that displays a list of stores and allows the user to filter the products based on the store selected.
-
-//  start wrting the code below this comment
-
-
-
-
-*/
-
-//write a simalar component that displays a list of stores and allows the user to filter the products based on the store selected
-
-//  start wrting the code below this comment
-
-
-
-
+import useStore from './useStore';
 
 
 
@@ -54,6 +27,8 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData}) 
     const categories = data;
     const subCategories = subData;
 
+    const { admin, url, onSale, setOnSale, isFavorite, setIsFavorite, categoryId, setCategoryId, subCategoryId, selectedSubCategoriyId} = useStore();
+
 
     useEffect(() => {
 
@@ -63,6 +38,8 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData}) 
         //console.log("Category data:-------------",data);
         
       }, []);
+
+
 
 
         useEffect(() => {
@@ -112,25 +89,32 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData}) 
         
 
         setFavoritesFilter(!favoritesFilter);
+        setIsFavorite(!isFavorite);
         //console.log("New selected:",selected)
         //onFilterChange(selectedCategories, selectedSubCategories);
       };  
   
       const handleOnSaleFilter = () => {
-        
 
-        setOnSaleFilter(!onSaleFilter);
-        //console.log("New selected:",selected)
-        //onFilterChange(selectedCategories, selectedSubCategories);
+        setOnSale(!onSale);
+
       }; 
+
+
+      const handleCategoriesFilter = (id) =>
+      {
+
+        console.log("selected catwegory id:-------------",id)
+            setCategoryId(id);
+      }
+
+
 
       const handleAddSelection = (item) => {
 
         //console.log("selected[]:-------------",selected)
         
-
-        
-    
+ 
         if (selectedCategories.length > 0 && selectedCategories.includes(item)) {
             console.log("removed:-------------",item);
              //set filterd  list of products
@@ -153,19 +137,14 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData}) 
             console.log("currentCategory:-------------",currentCategory)
         }
         
+
         // get sub categories list from all sub categories based on selected category on the selected array
-
-
         //filter sub categories based on selected category
 
 
-
-
-            console.log("selected:-----------------------------------------------------------------",selectedCategories)
-
-            console.log("currentCategory:-----------------------------------------------------------------",currentCategory)
-
-            console.log("subCategories data:-------------",subCategories)
+            //console.log("selected:-----------------------------------------------------------------",selectedCategories)
+            //console.log("currentCategory:-----------------------------------------------------------------",currentCategory)
+            //console.log("subCategories data:-------------",subCategories)
 
       };
 
@@ -208,9 +187,6 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData}) 
                 //console.log('filteredSubData changed:', filteredSubData);
               }, [selectedCategories]); // Dependency array includes filteredSubData to watch for changes
             
-      
-      
-
 
         return (
             <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
@@ -234,6 +210,7 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData}) 
       };
 
     
+
     return(
            
             <View style={styles1.item}>
@@ -244,11 +221,7 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData}) 
                     <TouchableOpacity onPress={() => handleOnSaleFilter()}>
                         <Image id="favoriteImage"
                         source={
-
-
-
-                            onSaleFilter ? require('./discount-red.png') : require('./discount.png')
-                           
+                            onSale ? require('./discount-red.png') : require('./discount.png')                           
                         }
                         style={styles1.star}  />
                     </TouchableOpacity>
@@ -258,7 +231,7 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData}) 
                     <Image id="favoriteImage"
                         source={
 
-                            favoritesFilter ? require('./star.png') : require('./white-star.png')
+                            isFavorite ? require('./star.png') : require('./white-star.png')
                         }
                         style={styles1.star}  />
                 </TouchableOpacity>
@@ -271,12 +244,12 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData}) 
 
                             <TouchableOpacity
                             onPress={() => {
-                                setSelectedCategories([])
+                               // setSelectedCategories([])
+                               handleCategoriesFilter(0);
                                  
                             }}
                             
-                            
-                            style={[styles1.category, {borderColor: selectedCategories.length == 0 ? COLORS1.primary : COLORS1.grey}]}
+                            style={[styles1.category, {borderColor: categoryId == 0 ? COLORS1.primary : COLORS1.grey}]}
                         >
                             <Text style={[styles1.subtitle, { color: cuisines === 2 ? COLORS.primary : COLORS.grey }]}>Te gjitha</Text>
                         </TouchableOpacity>
@@ -284,8 +257,8 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData}) 
                             {categories.map((category) => (
                                 <TouchableOpacity
                                 key={category.id}
-                                onPress={() => handleAddSelection(category.categoryId)}
-                                style={[styles1.category, { borderColor: selectedCategories.includes(category.categoryId) ? COLORS1.primary : COLORS1.grey}]} 
+                                onPress={() => handleCategoriesFilter(category.categoryId)}
+                                style={[styles1.category, { borderColor: categoryId == category.categoryId ? COLORS1.primary : COLORS1.grey}]} 
                                 >
                                 <Text style={[styles1.subtitle]}> 
                                     {category.categoryName}
@@ -295,14 +268,10 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData}) 
                             </View>
                         </ScrollView>
 
-
-
                       <SubCategoriesFilter subCategories={subCategories} selectedCategories={selectedCategories} />
 
                 </View>
                 
-          
-
     )
 }
 

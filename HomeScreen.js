@@ -24,6 +24,8 @@ import * as SecureStore from 'expo-secure-store';
 import UserNamePicker from './UserNamePicker'; // 
 import { AutocompleteDropdown } from 'react-native-autocomplete-dropdown';
 import Toast from 'react-native-root-toast';
+import StoreFilter from './StoreFilter';
+
 
 
 
@@ -53,7 +55,9 @@ const HomeScreen = () => {
   const [storedUserName, setStoredUserName] = useState("");
   const [showUserNamePicker, setShowUserNamePicker] = useState(false);
 
-  const { myUserName, setMyUserName } = useStore();
+  const { myUserName, setMyUserName, storeId, onSale, categoryId, subCategoryId, isFavorite } = useStore();
+
+
 
 async function setLocalUsername(key, value) {
   await SecureStore.setItemAsync(key, value);
@@ -161,11 +165,31 @@ async function getLocalUsername(key) {
     }
   }
 
+  useEffect(() => {
+
+    //console.log("storeId changed>>>>>:",storeId)
+    //onStoreFilterChange();
+
+   const returnData =  applyStoreFilters();
+
+   console.log("returnData from applyStoreFilters:",returnData);
+
+   setFilteredProducts(returnData);
+
+  }, [storeId, onSale, categoryId, subCategoryId, isFavorite]);
 
 
 
 
-   useEffect(() => {
+
+  useEffect(() => {
+
+    //console.log("filteredProducts changed>>>>>:",filteredProducts)
+
+  }, [filteredProducts]);
+
+  
+  useEffect(() => {
 
 
       //showToast("toast message");
@@ -189,7 +213,7 @@ async function getLocalUsername(key) {
           }
         });
 
-    
+
         setSelectedData([]);
         setOriginalData([]);
         setCategories([]);
@@ -199,14 +223,13 @@ async function getLocalUsername(key) {
         prefetchGetFavorites(admin);
         //getData(admin);
         prefetchGetData(admin);
-        //getCategories(admin);
         prefetchGetCategories(admin);
         getSubCategories(admin);
         setIsVisible(false);
         getProductOnSale(admin);
         prefetchProducts(admin);
-
         
+       
         console.log("*************************************************************************************************")
         //filterSaleData();
 
@@ -218,6 +241,7 @@ async function getLocalUsername(key) {
     console.log("saleData changed>>>>>:",saleData)
     //handleFilterSale();
   }, [saleData]);
+
 
 
   useEffect(() => {
@@ -344,7 +368,17 @@ async function getLocalUsername(key) {
   };
 
 
-
+  function applyStoreFilters() {
+    //write code here
+    let filteredProducts = originalData.filter(product => {
+        return (subCategoryId === 0 || product.subCategoryId == subCategoryId) &&
+            (categoryId === 0 || product.categoryId == categoryId) &&
+            (storeId === 0 || product.storeId === storeId) &&
+            (!isFavorite || product.isFavorite) &&
+            (!onSale || product.isOnSale);
+    });
+    return filteredProducts;
+}
 
 
 
@@ -433,10 +467,37 @@ async function getLocalUsername(key) {
   }
 
 
+
+
+  function addIsFavoriteKey(allProducts, favorites) {
+    //write code here
+
+    //console.log("allProducts:",allProducts);
+    //console.log("favoritesssssssssssssssssssssssssss:",favorites);
+
+    let newProducts = allProducts.map(product => {
+        let isFavorite = favorites.some(favorite => favorite.productId === product.productId);
+        let isOnSale = new Date() >= new Date(product.saleStartDate) && new Date() <= new Date(product.saleEndDate);
+        return {...product, isFavorite, isOnSale};
+    });
+    return newProducts;
+}
+
+
+
+
   async function getData(userId) {
 
     try
     {
+
+
+      
+
+      //const responses = await Promise.all([fetch(url1), fetch(url2)])
+
+      //const resp = await fetch(`${url}/getFavorites?userId=${userId}`,  {
+      
 
       const resp = await fetch(`${url}/products?userId=${userId}`,  {
         method: 'GET',       
@@ -445,13 +506,26 @@ async function getLocalUsername(key) {
 
     const data = await resp.json();
 
+    console.log("first data------------------------------------------------:",data);
+
     //console.log(data);
     setOriginalData(data);
     setOriginalDataBackup(data);
     
-    const finalData = sortProducts(data, favoritesData);
 
-    setFilteredProducts(finalData);
+    //const finalData = sortProducts(data, favoritesData);
+
+
+    //setFilteredProducts(finalData);
+
+    //const withFavData= addIsFavoriteKey(data, favoritesData);
+
+    //console.log("withFavData",withFavData);
+
+    //setOriginalData(data);
+   setFilteredProducts(data);
+
+   
 
     }
     catch(e)
@@ -464,7 +538,7 @@ async function getLocalUsername(key) {
 
   }
 
-
+  
 
 
   async function getCategories(userId) {
@@ -547,6 +621,8 @@ async function getLocalUsername(key) {
 
     try
     {
+
+      //const responses = await Promise.all([fetch(url1), fetch(url2)])
 
       const resp = await fetch(`${url}/getFavorites?userId=${userId}`,  {
         method: 'GET',       
@@ -809,7 +885,10 @@ const onClearPress = useCallback(() => {
       const isOnSale = isWithinDateRange(item.saleStartDate, item.saleEndDate);
       const onSaleProduct = saleData.some((obj) => obj.productId === item.productId);
       const saleProductsDetails = saleData.filter(product => product.productId === item.productId);
-      const storeLogo = saleProductsDetails[0]; 
+      //const storeLogo = saleProductsDetails[0]; 
+      const storeLogo = {uri:`${url}/images/${item.storeLogo}`};
+
+      // 
 
   /*
 
@@ -817,20 +896,22 @@ const onClearPress = useCallback(() => {
 
   */
 
-      let logo = '';
-      let storeLogoUrl ='';
+      let logo = ''; 
       let oldPrice = '';
       let discountPrice = '';
       let discountPercentage = '';
       let endDate = '';
       let formattedEndDate = '';
+      let storeLogoUrl = '';
 
 
     if (saleProductsDetails.length > 0)
     {
+        
+      
         logo = saleProductsDetails[0].storeLogo; 
-        //const storeLogoUrl = {uri:`${url}/images/${logo`};
-        storeLogoUrl = {uri:`${url}/images/${logo}`};
+        //storeLogoUrl = {uri:`${url}/images/${logo}`};
+
         oldPrice = saleProductsDetails[0].oldPrice;
         discountPrice = saleProductsDetails[0].discountPrice;
         discountPercentage = getPercentageChange(oldPrice, discountPrice);
@@ -863,21 +944,23 @@ const onClearPress = useCallback(() => {
 
         <View style={{ zIndex: 1 }}><TouchableOpacity onPress={() => onModalOpen(item)}>
             <Image id="productImage" source={imageUrl} style={styles.image} />
+
+           
             </TouchableOpacity></View>
             
               {onSaleProduct ? <View style={{marginLeft: -15, zIndex: 3 }}><Text style={{ fontSize: 12 , color:'black', fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle',  }}>{`-${discountPercentage}%`}</Text></View> : null}
-              {onSaleProduct ? <View style={{marginLeft: -28, zIndex: 2}}><Image id="saleImage" source={require('./discount-red.png')} style={styles.icon} /></View> : null}
+              {item.isOnSale ? <View style={{marginLeft: -28, zIndex: 2}}><Image id="saleImage" source={require('./discount-red.png')} style={styles.icon} /></View> : null}
             
             </View>
             </View>
 
             <View style={{ flexDirection: 'col',  alignItems: 'center'}}>
+            <Image id="productImage" source={storeLogo} style={styles.star} />
 
-              {saleProductsDetails.length > 0 ? <Image id="saleImage" source={storeLogoUrl} style={[styles.icon,  { }]} /> : null}
               <TouchableOpacity onPress={() => handlePressFavorites(item)}>
             <Image id="favoriteImage"
                   source={
-                    favoriteProduct ? require('./star.png') : require('./white-star.png')
+                    item.isFavorite ? require('./star.png') : require('./white-star.png')
                   }
                   style={styles.star} />
           </TouchableOpacity>
@@ -969,6 +1052,9 @@ return (
 
 
 
+      <View >
+          <StoreFilter />
+      </View>
 
 
 
