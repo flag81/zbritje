@@ -206,16 +206,23 @@ app.get("/products", (req, res) => {
 
   //console.log("valuessssss")
   //const q = "SELECT tableid,  users.id  FROM orders join users on orders.userid = users.id WHERE orders.status = 0 ";
-  const q = `SELECT products.productId, products.productName, products.productPic, products.categoryId, 
-  products.productSize , products.subCategoryId, products.storeId,
+  const q = 
+  
+  `SELECT products.productId, products.productName, products.productPic, products.categoryId, 
+  products.productSize , products.subCategoryId, products.storeId, products.imageUrl,
     sales.saleId, sales.saleStartDate,sales.saleEndDate,sales.storeLogo, sales.oldPrice, sales.discountPrice,
     sales.discountPercentage, store.storeLogo as storeLogo,
 
     CASE 
         WHEN f.id IS NOT NULL THEN true 
         ELSE false 
-    END AS isFavorite
+    END AS isFavorite ,
   
+  CASE 
+        WHEN
+    CURRENT_DATE() between sales.saleStartDate and sales.saleEndDate THEN true 
+            ELSE false 
+    END AS onSale
   
   FROM products
   

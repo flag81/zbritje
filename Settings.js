@@ -9,6 +9,7 @@ export default function Settings() {
 
   const { admin , myUserName, url} = useStore();
   const [selectedId, setSelectedId] = useState(null);
+  const [newSelectedId, setNewSelectedId] = useState(null);
 
   const radioButtons = [
     {
@@ -57,14 +58,14 @@ export default function Settings() {
 
   useEffect(() => {
 
-
+/*
         const selectedIdInt = parseInt(selectedId);
 
-        if(selectedIdInt >= 0)
+        if(selectedIdInt >= 0 && selectedId != null)
           {
             updateUserNotificationLevel(selectedId);
           }
-
+*/
 
     //updateUserNotificationLevel(selectedId);
       console.log('new SelectedId:', selectedId);
@@ -153,6 +154,7 @@ export default function Settings() {
       headers: {"Content-Type": "application/json"}
     });
 
+    //setSelectedId(notificationId);
     showToast(`Preferencat tuaja u ndryshuan me sukses.`);
 
     }
@@ -164,10 +166,28 @@ export default function Settings() {
   }
 
 
+  const handleSelectedId = (event) => {
 
-   
+
+
+    console.log("event:",event);
+    //console.log('selectedId::::', selectedId);
+    setSelectedId(event);
+    //console.log(' new selectedId:::::', selectedId);
+    updateUserNotificationLevel(event);
+  }
 
   
+// how to get the press event from line   onPress={()=>handleSelectedId()} 
+
+  //write code
+
+
+
+
+
+
+
 
 
 
@@ -190,12 +210,13 @@ export default function Settings() {
       </View>
         <View style={{alignItems: 'flex-start'
         }}>
+
+        
+        
           <RadioGroup 
               radioButtons={radioButtons} 
-              onPress={setSelectedId}  
+              onPress={(id)=>handleSelectedId(id)}  
               selectedId={selectedId}
-              
-
 
           />      
         </View>

@@ -7,7 +7,7 @@ import ProductCategories from './ProductCategories';
 import EmojiPicker from "./EmojiPicker";
 import * as Device from 'expo-device';
 import useStore from './useStore';
-import React, { useState, useEffect , useRef, useMemo, useCallback } from 'react';
+import React, { useState, useEffect , useRef, useCallback } from 'react';
 import { View,Text,Button, TouchableOpacity,Image,StyleSheet,SafeAreaView,ScrollView,RefreshControl,Dimensions
 
 
@@ -17,7 +17,7 @@ import { View,Text,Button, TouchableOpacity,Image,StyleSheet,SafeAreaView,Scroll
 
 import messaging from '@react-native-firebase/messaging';
 import {PermissionsAndroid} from 'react-native';
-import {QueryClient} from '@tanstack/react-query'
+import {QueryClient, useInfiniteQuery} from '@tanstack/react-query'
 // debounce the sendQuery function
 
 import * as SecureStore from 'expo-secure-store';
@@ -30,6 +30,11 @@ import StoreFilter from './StoreFilter';
 
 
 const queryClient = new QueryClient();
+
+
+
+
+
 
 const HomeScreen = () => {
 
@@ -58,6 +63,25 @@ const HomeScreen = () => {
   const { myUserName, setMyUserName, storeId, onSale, categoryId, subCategoryId, isFavorite } = useStore();
 
 
+  const { 
+    data, 
+    isLoading, 
+    fetchNextPage, 
+    hasNextPage
+  }  = useInfiniteQuery({
+    queryKey: ['getData'],
+    queryFn: getData(admin,1),
+    getNextPageParam: (lastPage) => lastPage?.hasNextPage
+  });
+
+
+
+
+  useEffect(() => {
+
+    console.log("data changed>>>>>:",data)
+
+  }, [data]);
 
 async function setLocalUsername(key, value) {
   await SecureStore.setItemAsync(key, value);
@@ -84,23 +108,6 @@ async function getLocalUsername(key) {
   
   };
 
-
-
-	const snapPoints = useMemo(() => ['25%', '50%', '70%'], []);
-
-	const bottomSheetRef = useRef(null);
-
-	const handleClosePress = () => bottomSheetRef.current?.close();
-	const handleOpenPress = () => bottomSheetRef.current?.expand();
-	const handleCollapsePress = () => bottomSheetRef.current?.collapse();
-	const snapeToIndex = (index) => bottomSheetRef.current?.snapToIndex(index);
-	const renderBackdrop = useCallback(
-		(props) => <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />,
-		[]
-	);
-
-
-
   const url = 'http://10.12.13.197:8800';
   const admin = 1 ;
 
@@ -114,7 +121,7 @@ async function getLocalUsername(key) {
       setFilteredProducts([]); 
       setSaleData([]);     
       getFavorites(admin);
-      getData(admin);
+      getData(admin,1);
       getCategories(admin);
       getSubCategories(admin);
       //filterSaleData();
@@ -165,6 +172,7 @@ async function getLocalUsername(key) {
     }
   }
 
+
   useEffect(() => {
 
     //console.log("storeId changed>>>>>:",storeId)
@@ -172,7 +180,7 @@ async function getLocalUsername(key) {
 
    const returnData =  applyStoreFilters();
 
-   console.log("returnData from applyStoreFilters:",returnData);
+   //console.log("returnData from applyStoreFilters:",returnData);
 
    setFilteredProducts(returnData);
 
@@ -191,8 +199,6 @@ async function getLocalUsername(key) {
   
   useEffect(() => {
 
-
-      //showToast("toast message");
 
        const userName =  getLocalUsername('username').then((result) => {
           console.log("username:------------------------------------------------:",result);
@@ -220,9 +226,9 @@ async function getLocalUsername(key) {
         setSubCategories([]);
         setFilteredProducts([]);
         setSaleData([]); 
-        prefetchGetFavorites(admin);
-        //getData(admin);
-        prefetchGetData(admin);
+        //prefetchGetFavorites(admin);
+        getData(admin);
+        //prefetchGetData(admin);
         prefetchGetCategories(admin);
         getSubCategories(admin);
         setIsVisible(false);
@@ -237,8 +243,9 @@ async function getLocalUsername(key) {
 
 
 
+
   useEffect(() => {
-    console.log("saleData changed>>>>>:",saleData)
+    //console.log("saleData changed>>>>>:",saleData)
     //handleFilterSale();
   }, [saleData]);
 
@@ -292,6 +299,8 @@ async function getLocalUsername(key) {
 
       const result = favoritesData.some((element) => element.productId === item.productId);
       //console.log(result)
+
+      // updateIsFavorite(item.productId);
 
       if(result)
       {
@@ -375,7 +384,7 @@ async function getLocalUsername(key) {
             (categoryId === 0 || product.categoryId == categoryId) &&
             (storeId === 0 || product.storeId === storeId) &&
             (!isFavorite || product.isFavorite) &&
-            (!onSale || product.isOnSale);
+            (!onSale || product.onSale);
     });
     return filteredProducts;
 }
@@ -486,46 +495,32 @@ async function getLocalUsername(key) {
 
 
 
-  async function getData(userId) {
-
+  async function getData(userId, page=1) {
     try
     {
 
-
-      
-
-      //const responses = await Promise.all([fetch(url1), fetch(url2)])
-
-      //const resp = await fetch(`${url}/getFavorites?userId=${userId}`,  {
-      
-
-      const resp = await fetch(`${url}/products?userId=${userId}`,  {
+      const resp = await fetch(`${url}/products?userId=${userId}&page=${page}`,  {
         method: 'GET',       
         headers: {"Content-Type": "application/json"}
       });
 
     const data = await resp.json();
 
+    
+
     console.log("first data------------------------------------------------:",data);
 
     //console.log(data);
     setOriginalData(data);
     setOriginalDataBackup(data);
-    
 
-    //const finalData = sortProducts(data, favoritesData);
+    //explain the code : data?.pages.flat()
+    //console.log("data?.pages.flat()------------------------------------------------:",data?.pages.flat()); 
 
 
-    //setFilteredProducts(finalData);
+    setFilteredProducts(data);
 
-    //const withFavData= addIsFavoriteKey(data, favoritesData);
-
-    //console.log("withFavData",withFavData);
-
-    //setOriginalData(data);
-   setFilteredProducts(data);
-
-   
+    console.log("datatatatatatatatatatat",);
 
     }
     catch(e)
@@ -539,8 +534,6 @@ async function getLocalUsername(key) {
   }
 
   
-
-
   async function getCategories(userId) {
 
     try
@@ -634,8 +627,8 @@ async function getLocalUsername(key) {
 
     console.log("FAVO----------------------------",data);
     setFavoritesData(data)
-   // handleFilterSale();
 
+   // handleFilterSale();
    //if favorites data is empty then 
 
    return data;
@@ -660,7 +653,7 @@ async function getLocalUsername(key) {
 
       const data = await resp.json();
 
-      console.log("prefetchProducts data ------------------------------------------------:",data);
+      //console.log("prefetchProducts data ------------------------------------------------:",data);
       //console.log(data);
       setPrefetchedProductsData(data);
 
@@ -713,7 +706,7 @@ async function getLocalUsername(key) {
 
       const data = await resp.json();
 
-      console.log("saleData fetch ------------------------------------------------:",data);
+      //console.log("saleData fetch ------------------------------------------------:",data);
       //console.log(data);
       setSaleData(data)
 
@@ -738,7 +731,7 @@ async function getLocalUsername(key) {
 
       const data = await resp.json();
 
-      console.log("saleData fetch ------------------------------------------------:",data);
+      console.log("getProductOnSaleByTag fetch ------------------------------------------------:",data);
       //console.log(data);
       setSaleData(data)
 
@@ -751,12 +744,7 @@ async function getLocalUsername(key) {
   }
 
 
-  function isWithinDateRange(startDate, endDate) {
-    const today = new Date();
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    return start.getTime() <= today.getTime() && today.getTime() <= end.getTime();
-  }
+
 
 
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -796,7 +784,7 @@ useEffect(() => {
 
 
 useEffect(() => {
-  console.log("prefetchedProductsData changed-------:", prefetchedProductsData)
+  //console.log("prefetchedProductsData changed-------:", prefetchedProductsData)
 }, [prefetchedProductsData]);
 
 
@@ -835,10 +823,6 @@ const getSuggestions = (q) => {
   
     if(productId)
       {
-        //const suggestionsListIds = suggestionsList.length > 0 ? suggestionsList.map(obj => obj.id) : [];
-        //console.log("suggestionsListIds:",suggestionsListIds);
-        //const paramsString = suggestionsListIds.join(',');
-        //console.log("paramsString:",paramsString  );
         const productSearchById = getProductsByIds(admin, productId);
       }
   
@@ -864,7 +848,6 @@ const onSubmitSearch = (searchText) => {
       const productListSearch = getProductsByIds(admin, paramsString);
     }
 
-  //console.log("productListSearch:",productListSearch);
 
 }
 
@@ -875,14 +858,47 @@ const onClearPress = useCallback(() => {
 
 }, []);
 
+//write function to update the isfavorite key in the original data array basen on product id, by setting the opposite value of the isFavorite key
+// if the isfavorite key is set to true then call the fucntion addFavorite, if the isfavorite key is set to false then call the function removeFavorite 
+
+const updateIsFavorite = (productId) => {
+
+  console.log("productId:",productId);
+
+  const updatedData = originalData.map((item) => {
+    if (item.productId === productId) {
+      return { ...item, isFavorite: !item.isFavorite };
+    }
+    return item;
+  });
+
+
+
+  setOriginalData(updatedData);
+  setFilteredProducts(updatedData);
+
+  const item = updatedData.find((obj) => obj.productId === productId);
+
+  if(item.isFavorite)
+  {
+    addFavorite(admin, item.productId, item.productName);
+  }
+  else{
+    removeFavorite(admin, item.productId, item.productName);
+  }
+
+  //console.log("setOriginalData:",originalData);  
+
+}
+
 
 
   const renderItem = ({ item }) => 
   {
 
-      const imageUrl = {uri:`${url}/images/${item.productPic}`};
+      const imageUrl = {uri:item.imageUrl};
       const favoriteProduct = favoritesData.some((obj) => obj.productId === item.productId);
-      const isOnSale = isWithinDateRange(item.saleStartDate, item.saleEndDate);
+      //const isOnSale = isWithinDateRange(item.saleStartDate, item.saleEndDate);
       const onSaleProduct = saleData.some((obj) => obj.productId === item.productId);
       const saleProductsDetails = saleData.filter(product => product.productId === item.productId);
       //const storeLogo = saleProductsDetails[0]; 
@@ -949,7 +965,7 @@ const onClearPress = useCallback(() => {
             </TouchableOpacity></View>
             
               {onSaleProduct ? <View style={{marginLeft: -15, zIndex: 3 }}><Text style={{ fontSize: 12 , color:'black', fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle',  }}>{`-${discountPercentage}%`}</Text></View> : null}
-              {item.isOnSale ? <View style={{marginLeft: -28, zIndex: 2}}><Image id="saleImage" source={require('./discount-red.png')} style={styles.icon} /></View> : null}
+              {item.onSale ? <View style={{marginLeft: -28, zIndex: 2}}><Image id="saleImage" source={require('./discount-red.png')} style={styles.icon} /></View> : null}
             
             </View>
             </View>
@@ -957,7 +973,7 @@ const onClearPress = useCallback(() => {
             <View style={{ flexDirection: 'col',  alignItems: 'center'}}>
             <Image id="productImage" source={storeLogo} style={styles.star} />
 
-              <TouchableOpacity onPress={() => handlePressFavorites(item)}>
+              <TouchableOpacity onPress={() => updateIsFavorite(item.productId)}>
             <Image id="favoriteImage"
                   source={
                     item.isFavorite ? require('./star.png') : require('./white-star.png')
@@ -1077,6 +1093,7 @@ return (
             extraData={extraData}
             showsVerticalScrollIndicator={false}
             marginBottom={60}
+    
             
           />
 
