@@ -188,6 +188,7 @@ app.get("/getProductsByIds", (req, res) => {
   
     const userId= req.query.userId;
 
+
     
   
     db.query(q, [userId], (err, data) => {
@@ -204,8 +205,46 @@ app.get("/getProductsByIds", (req, res) => {
 
 app.get("/products", (req, res) => {
 
+
+  let offset1 = parseInt(req.query.offset, 10);
+  if (isNaN(offset1) || offset1 < 0) {
+    offset1 = 0;
+  } 
+  else {
+    // Multiply the valid offset by 10
+    offset1 = (offset1 -1) * 10;
+  }
+
+
+  let storeId = parseInt(req.query.storeId, 10);
+  if (isNaN(storeId) || storeId < 0) {
+    storeId = 0;
+  } 
+
+
+
+
+
+  console.log("offset1:", offset1);
+
+  console.log("storeId", storeId)
+
+  //offset1 = parseInt(offset1);
+
   //console.log("valuessssss")
   //const q = "SELECT tableid,  users.id  FROM orders join users on orders.userid = users.id WHERE orders.status = 0 ";
+
+// change the query so if storeId is greater than 0 then it will filter by storeId
+// if storeId is 0 then it will return all products
+
+
+
+
+
+
+
+
+
   const q = 
   
   `SELECT products.productId, products.productName, products.productPic, products.categoryId, 
@@ -230,13 +269,22 @@ app.get("/products", (req, res) => {
   left join store on products.storeId = store.storeId
   left join favorites f on products.productId = f.productId
 
-  order by isFavorite DESC,sales.saleEndDate desc
 
-  `;
+  WHERE 
+  CASE 
+    WHEN ${storeId} > 0 THEN products.storeId = ${storeId}
+    ELSE true
+  END
 
+  order by isFavorite DESC,sales.saleEndDate DESC limit 10 OFFSET ${offset1} `;
+
+
+  //LIMIT ${req.query.limit} OFFSET ${req.query.offset}
   const userId= req.query.userId;
 
-  db.query(q, [userId], (err, data) => {
+
+
+  db.query(q, [storeId, offset1], (err, data) => {
 
     if (err) {
       console.log(err);

@@ -25,6 +25,8 @@ import UserNamePicker from './UserNamePicker'; //
 import { AutocompleteDropdown } from 'react-native-autocomplete-dropdown';
 import Toast from 'react-native-root-toast';
 import StoreFilter from './StoreFilter';
+import { all } from 'axios';
+//import useFetchData from './useFetchData';
 
 
 
@@ -34,10 +36,11 @@ const queryClient = new QueryClient();
 
 
 
-
-
 const HomeScreen = () => {
 
+
+  const [allProducts, setAllProducts] = useState([]);
+  const [listLength, setListLength] = useState(0);
 
   const [originalData, setOriginalData] = useState([]);
   const [originalDataBackup, setOriginalDataBackup] = useState([]);
@@ -52,7 +55,7 @@ const HomeScreen = () => {
   const [isVisible, setIsVisible] = useState(false)
   const [currentItem, setCurrentItem] = useState({})
   const sheetRef = useRef(null);
-  const [refreshing, setRefreshing] = useState(false);
+  const [refreshing, setRefreshing] = useState(true);
   const [productSheet, setProductSheet] = useState();
   const [extraData, setExtraData] = useState(0);
   const [prefetchedProductsData, setPrefetchedProductsData] = useState([]);
@@ -60,28 +63,12 @@ const HomeScreen = () => {
   const [storedUserName, setStoredUserName] = useState("");
   const [showUserNamePicker, setShowUserNamePicker] = useState(false);
 
-  const { myUserName, setMyUserName, storeId, onSale, categoryId, subCategoryId, isFavorite } = useStore();
+  const { count, increment ,myUserName, setMyUserName, storeId, onSale, categoryId, subCategoryId, isFavorite } = useStore();
 
 
-  const { 
-    data, 
-    isLoading, 
-    fetchNextPage, 
-    hasNextPage
-  }  = useInfiniteQuery({
-    queryKey: ['getData'],
-    queryFn: getData(admin,1),
-    getNextPageParam: (lastPage) => lastPage?.hasNextPage
-  });
+  //const first = useFetchData();
 
 
-
-
-  useEffect(() => {
-
-    console.log("data changed>>>>>:",data)
-
-  }, [data]);
 
 async function setLocalUsername(key, value) {
   await SecureStore.setItemAsync(key, value);
@@ -121,7 +108,7 @@ async function getLocalUsername(key) {
       setFilteredProducts([]); 
       setSaleData([]);     
       getFavorites(admin);
-      getData(admin,1);
+      //getData(admin,1);
       getCategories(admin);
       getSubCategories(admin);
       //filterSaleData();
@@ -132,11 +119,18 @@ async function getLocalUsername(key) {
   }, []);
 
 
+
+  // write code to use useInfiniteQuery from @tanstack/react-query to fetch the data from the server with paggination and infinite scroll 
+  // the data should be fetched in pages of 10 items per page, the data should be fetched from the server using the getData function
+
+
+
+
   const prefetchGetData = async (admin) => {
     // The results of this query will be cached like a normal query
     await queryClient.prefetchQuery({
       queryKey: ['getData'],
-      queryFn: getData,
+      queryFn() {return getData(admin,1)},
     })
   }
 
@@ -148,6 +142,8 @@ async function getLocalUsername(key) {
       queryFn: getFavorites(admin),
     })
   }
+
+
 
   const prefetchGetCategories = async (admin) => {
     // The results of this query will be cached like a normal query
@@ -173,6 +169,7 @@ async function getLocalUsername(key) {
   }
 
 
+
   useEffect(() => {
 
     //console.log("storeId changed>>>>>:",storeId)
@@ -182,7 +179,16 @@ async function getLocalUsername(key) {
 
    //console.log("returnData from applyStoreFilters:",returnData);
 
-   setFilteredProducts(returnData);
+   // if storeId is greater that 0 then apply the store filters
+    // if storeId is 0 then apply the other filters
+    // if storeId is 0 and onSale is true then apply the onSale filter
+    // if storeId is 0 and isFavorite is true then apply the isFavorite filter
+    // if storeId is 0 and categoryId is greater than 0 then apply the category filter
+    // if storeId is 0 and subCategoryId is greater than 0 then apply the subCategory filter
+
+
+
+   setFilteredProducts(returnData); //onendreached and it fires, to prevent 
 
   }, [storeId, onSale, categoryId, subCategoryId, isFavorite]);
 
@@ -192,55 +198,63 @@ async function getLocalUsername(key) {
 
   useEffect(() => {
 
-    //console.log("filteredProducts changed>>>>>:",filteredProducts)
+    console.log("filteredProducts changed>>>>>:",filteredProducts?.length)
+    setListLength(filteredProducts?.length);
 
   }, [filteredProducts]);
+
+
+  const loadInitaialData = () => {
+   
+    const userName =  getLocalUsername('username').then((result) => {
+      console.log("username:------------------------------------------------:",result);
+      //setShowUserNamePicker(true);
+
+
+      if(!result)
+      {
+        console.log("result found:", result);
+        //poup login modal 
+        setShowUserNamePicker(true);
+        //setLocalUsername('username', 'admin');
+
+      }
+      else{
+        setMyUserName(result);    
+        console.log("result found setMyUserName:");  
+      }
+    });
+
+
+    setSelectedData([]);
+    setOriginalData([]);
+    setCategories([]);
+    setSubCategories([]);
+    setFilteredProducts([]);
+    setSaleData([]); 
+
+    prefetchGetCategories(admin);
+    getSubCategories(admin);
+    setIsVisible(false);
+    getProductOnSale(admin);
+    prefetchProducts(admin);
+    
+   
+    console.log("*************************************************************************************************")
+    //filterSaleData();
+
+
+
+  ;}
+
 
   
   useEffect(() => {
 
-
-       const userName =  getLocalUsername('username').then((result) => {
-          console.log("username:------------------------------------------------:",result);
-          //setShowUserNamePicker(true);
-
-
-          if(!result)
-          {
-            console.log("result found:", result);
-            //poup login modal 
-            setShowUserNamePicker(true);
-            //setLocalUsername('username', 'admin');
-
-          }
-          else{
-            setMyUserName(result);    
-            console.log("result found setMyUserName:");  
-          }
-        });
-
-
-        setSelectedData([]);
-        setOriginalData([]);
-        setCategories([]);
-        setSubCategories([]);
-        setFilteredProducts([]);
-        setSaleData([]); 
-        //prefetchGetFavorites(admin);
-        getData(admin);
-        //prefetchGetData(admin);
-        prefetchGetCategories(admin);
-        getSubCategories(admin);
-        setIsVisible(false);
-        getProductOnSale(admin);
-        prefetchProducts(admin);
-        
-       
-        console.log("*************************************************************************************************")
-        //filterSaleData();
+      loadInitaialData();
+ 
 
   }, []);
-
 
 
 
@@ -357,9 +371,10 @@ async function getLocalUsername(key) {
       console.log("subFilters:",subFilters); 
 
         
-      const filteredData = categoryFilters.length > 0
-      ? originalData.filter(item => categoryFilters.includes(item.categoryId))
+      const filteredData = categoryFilters?.length > 0
+      ? originalData?.filter(item => categoryFilters.includes(item.categoryId))
       : originalData;
+
 
       console.log("filteredData:",filteredData);
 
@@ -377,9 +392,15 @@ async function getLocalUsername(key) {
   };
 
 
+
+
   function applyStoreFilters() {
+    
     //write code here
-    let filteredProducts = originalData.filter(product => {
+
+    console.log("Store filters changed to storeId:",storeId);
+
+    let filteredProducts = allProducts?.filter(product => {
         return (subCategoryId === 0 || product.subCategoryId == subCategoryId) &&
             (categoryId === 0 || product.categoryId == categoryId) &&
             (storeId === 0 || product.storeId === storeId) &&
@@ -396,7 +417,7 @@ async function getLocalUsername(key) {
 // sort the products based on the favorite products moved on top of the array
   const sortProducts = (firstArray, secondArray) => {
 
-    const sortedProductsArray = firstArray.sort((a, b) => {
+    const sortedProductsArray = firstArray?.sort((a, b) => {
       const aIsMatch = secondArray.some(obj => obj.productId === a.productId);
       const bIsMatch = secondArray.some(obj => obj.productId === b.productId);
     
@@ -491,36 +512,123 @@ async function getLocalUsername(key) {
     });
     return newProducts;
 }
+/*
+
+
+  const {data, isLoading, refetch, hasNextPage, fetchNextPage, allPages } =
+
+useInfiniteQuery({
+    queryKey: ["getData"],
+    queryFn: getData,
+    getNextPageParam: (lastPage, allPages) => {
+			if (lastPage.length === 0) return undefined;
+      return allPages.length + 1;
+    }
+  });
+
+*/
+
+
+
+// how to trigger useinfinitequery 
+// how to trigger useinfinitequery
+
+
+const params = { admin:admin, storeId:storeId };
+
+
+console.log("params:",params);
+
+function useCustomInfiniteQuery(params) {
+  const {
+    data,
+    isLoading,
+    refetch,
+    hasNextPage,
+    fetchNextPage,
+    allPages
+  } = useInfiniteQuery({
+    queryKey: ['getData', params.admin ,params.storeId],
+    queryFn: ({ pageParam = 1 }) => getData(params.admin, pageParam, params.storeId),
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage?.length === 0) return undefined;
+      return allPages.length + 1;
+    },
+  });
+
+  return { data, isLoading, refetch, hasNextPage, fetchNextPage, allPages, error };
+}
+
+
+
+const { data, isLoading, refetch, hasNextPage, fetchNextPage, allPages, error } = useCustomInfiniteQuery(params);
 
 
 
 
-  async function getData(userId, page=1) {
+
+
+useEffect
+(() => {
+
+
+
+  //console.log(" filtered data changed:",data?.pages?.map(page=>page).flat());
+  setFilteredProducts(data?.pages?.map(page=>page).flat());
+  //setOriginalData(data?.pages?.map(page=>page).flat());
+
+  filteredProducts?.forEach(obj2 => {
+    if (!allProducts.some(obj1 => obj1.productId === obj2.productId)) {
+      allProducts.push(obj2);
+    }
+  });
+
+  console.log("allProducts:>>>>>>>>>>",allProducts.length);
+
+
+
+
+}, [data]);
+
+
+
+
+
+//console.log("dataArray:",dataArray);
+
+  async function getData(userId,page, storeId) {
     try
     {
 
-      const resp = await fetch(`${url}/products?userId=${userId}&page=${page}`,  {
+
+
+
+      //console.log("pageParam:",page);
+
+
+      const resp = await fetch(`${url}/products?limit=10&userId=${userId}&offset=${page}&storeId=${storeId}`,  {
         method: 'GET',       
         headers: {"Content-Type": "application/json"}
       });
 
     const data = await resp.json();
 
-    
+    //console.log(" data length------------------------------------------------:",data.length);
 
-    console.log("first data------------------------------------------------:",data);
+
+
+
 
     //console.log(data);
-    setOriginalData(data);
+    setOriginalData(...data);
     setOriginalDataBackup(data);
 
-    //explain the code : data?.pages.flat()
-    //console.log("data?.pages.flat()------------------------------------------------:",data?.pages.flat()); 
+    setRefreshing(false);
+
+    return data;
+  
 
 
-    setFilteredProducts(data);
-
-    console.log("datatatatatatatatatatat",);
 
     }
     catch(e)
@@ -528,8 +636,6 @@ async function getLocalUsername(key) {
       console.log(e);
 
     }
-
-    return data;
 
   }
 
@@ -625,7 +731,7 @@ async function getLocalUsername(key) {
 
     const data = await resp.json();
 
-    console.log("FAVO----------------------------",data);
+    //console.log("FAVO----------------------------",data);
     setFavoritesData(data)
 
    // handleFilterSale();
@@ -778,6 +884,7 @@ useEffect(() => {
   console.log("selectedItem changed-------:", selectedItem)
 }, [selectedItem]);
 
+
 useEffect(() => {
   console.log("suggestionList changed-------:", suggestionsList)
 }, [suggestionsList]);
@@ -891,6 +998,41 @@ const updateIsFavorite = (productId) => {
 
 }
 
+const LoadingPlaceholder = () => ( 
+<View>
+  <View style={{ alignItems: 'center', padding: 20 }}>
+    <Text>Loading...</Text>
+  </View>
+    <View style={{ alignItems: 'center', padding: 20 }}>
+    <Text>Loading...</Text>
+  </View>
+    <View style={{ alignItems: 'center', padding: 20 }}>
+    <Text>Loading...</Text>
+  </View>
+    <View style={{ alignItems: 'center', padding: 20 }}>
+    <Text>Loading...</Text>
+  </View>
+  <View style={{ alignItems: 'center', padding: 20 }}>
+    <Text>Loading...</Text>
+  </View>
+  <View style={{ alignItems: 'center', padding: 20 }}>
+    <Text>Loading...</Text>
+  </View>
+  <View style={{ alignItems: 'center', padding: 20 }}>
+    <Text>Loading...</Text>
+  </View>
+  <View style={{ alignItems: 'center', padding: 20 }}>
+    <Text>Loading...</Text>
+  </View>
+  <View style={{ alignItems: 'center', padding: 20 }}>
+    <Text>Loading...</Text>
+  </View>
+  <View style={{ alignItems: 'center', padding: 20 }}>
+    <Text>Loading...</Text>
+  </View>
+</View>
+);
+
 
 
   const renderItem = ({ item }) => 
@@ -921,29 +1063,18 @@ const updateIsFavorite = (productId) => {
       let storeLogoUrl = '';
 
 
-    if (saleProductsDetails.length > 0)
-    {
-        
-      
-        logo = saleProductsDetails[0].storeLogo; 
-        //storeLogoUrl = {uri:`${url}/images/${logo}`};
-
-        oldPrice = saleProductsDetails[0].oldPrice;
-        discountPrice = saleProductsDetails[0].discountPrice;
-        discountPercentage = getPercentageChange(oldPrice, discountPrice);
-        endDate = saleProductsDetails[0].saleEndDate;
-
-        const date = new Date(endDate);
-        const formatter = new Intl.DateTimeFormat('en-GB', { dateStyle: 'short' });
-        formattedEndDate = formatter.format(date);
-
-    } 
-    else{
-        logo = "no-logo"; 
-    }
 
 
 
+
+    oldPrice = item.oldPrice;
+    discountPrice = item.discountPrice;
+    discountPercentage = getPercentageChange(item.oldPrice, item.discountPrice);
+
+    endDate = item.saleEndDate;
+    const date = new Date(endDate);
+    const formatter = new Intl.DateTimeFormat('en-GB', { dateStyle: 'short' });
+    formattedEndDate = formatter.format(date);
 
 
 
@@ -964,7 +1095,7 @@ const updateIsFavorite = (productId) => {
            
             </TouchableOpacity></View>
             
-              {onSaleProduct ? <View style={{marginLeft: -15, zIndex: 3 }}><Text style={{ fontSize: 12 , color:'black', fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle',  }}>{`-${discountPercentage}%`}</Text></View> : null}
+              {item.onSale ? <View style={{marginLeft: -15, zIndex: 3 }}><Text style={{ fontSize: 12 , color:'black', fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle',  }}>{`-${discountPercentage}%`}</Text></View> : null}
               {item.onSale ? <View style={{marginLeft: -28, zIndex: 2}}><Image id="saleImage" source={require('./discount-red.png')} style={styles.icon} /></View> : null}
             
             </View>
@@ -991,15 +1122,17 @@ const updateIsFavorite = (productId) => {
 
       </View>
       <View style={{  flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center'}}>
-          {onSaleProduct ? <Text style={{ borderRadius: 7, paddingHorizontal: 5,fontSize: 15, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle',textDecorationLine: 'line-through', backgroundColor:'#F44336' }}>{`€${oldPrice}`}</Text> : null}
-          {onSaleProduct ? <Text style={{ borderRadius: 7, paddingHorizontal: 5,fontSize: 15, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle', backgroundColor:'#9CCC65' }}>{`€${discountPrice}`}</Text> : null}
-          {onSaleProduct ? <Text style={{ borderRadius: 7, paddingHorizontal: 5,fontSize: 15, fontWeight: 'bold', textAlign: 'center', verticalAlign:'top', backgroundColor:'#BBDEFB'  }}>{formattedEndDate}</Text> : null}        
+          {item.onSale  ? <Text style={{ borderRadius: 7, paddingHorizontal: 5,fontSize: 15, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle',textDecorationLine: 'line-through', backgroundColor:'#F44336' }}>{`€${oldPrice}`}</Text> : null}
+          {item.onSale  ? <Text style={{ borderRadius: 7, paddingHorizontal: 5,fontSize: 15, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle', backgroundColor:'#9CCC65' }}>{`€${discountPrice}`}</Text> : null}
+          {item.onSale  ? <Text style={{ borderRadius: 7, paddingHorizontal: 5,fontSize: 15, fontWeight: 'bold', textAlign: 'center', verticalAlign:'top', backgroundColor:'#BBDEFB'  }}>{formattedEndDate}</Text> : null}        
       </View>
       </View>
     </TouchableOpacity>
   )
 
+
 };
+
 
 
 return (
@@ -1051,20 +1184,6 @@ return (
 
     </View>
 
-      <View>
-        <ScrollView nestedScrollEnabled={true} 
-              contentContainerStyle={styles.container}
-              horizontal
-              refreshControl={
-                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-              }>
-            
-        <Text>Refresh...</Text>
-
-          
-        </ScrollView>
-
-      </View>
 
 
 
@@ -1081,7 +1200,7 @@ return (
 
       <View style={{ flex:1, width: Dimensions.get("window").width * 0.95}}>
 
-
+            <View ><Text>Numri i producteve: {listLength}</Text></View>
 
 
           <MasonryFlashList
@@ -1093,8 +1212,20 @@ return (
             extraData={extraData}
             showsVerticalScrollIndicator={false}
             marginBottom={60}
-    
             
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={refetch} />
+            }
+
+            onEndReached={() => {
+              console.log("onEndReached");
+                if(hasNextPage && !isLoading) fetchNextPage();
+            }}
+         
+            onEndReachedThreshold={0.9} 
+            
+
+
           />
 
 
