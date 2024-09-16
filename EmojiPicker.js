@@ -1,10 +1,19 @@
-import { Modal, View, Text, Pressable, StyleSheet, Image } from 'react-native';
+import { Modal, View, Text, Pressable, StyleSheet, Image, ScrollView } from 'react-native';
+
+import { Rating, RatingProps } from '@rneui/themed';
 
 export default function EmojiPicker({ isVisible, children, onClose, productData }) {
 
 
+  const ratingCompleted = (rating) => {
+    console.log('Rating is: ' + rating);
+  };
+
+
   // productdata is passed from the parent component and is an array of objects and i need to reference the first object in the array and then the key value pair of productPic
 // write code for the above
+
+console.log("productData",productData);
 
 
 const url = 'http://10.12.13.197:8800';
@@ -51,6 +60,8 @@ let storeLogo = '' ;
 
   return (
     <Modal animationType="slide" transparent={true} visible={isVisible}>
+      
+
       <View style={styles2.modalContent}>
         <View style={styles2.titleContainer}>
           <Text style={styles2.title}>Detajet</Text>
@@ -61,17 +72,51 @@ let storeLogo = '' ;
         
         <View style={{padding: 5,  flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center'}}> 
 
-            {productData.length > 0 ? <Image id="saleImage" source={productImageUrl} style={[styles2.icon,  { }]} /> : null}
-            {productData.length > 0 ?  <Text>{productName}</Text>  : null}
-            {productData.length > 0 ? <Image id="saleImage" source={storeLogo} style={[styles2.icon,  { }]} /> : null}
-            {productData.length > 0 ?  <Text>{productPrice}</Text>  : null}
-            {productData.length > 0 ?  <Text>{productDiscount}</Text>  : null}
-            {productData.length > 0 ?  <Text>{productSaleEndDate}</Text>  : null}
-            {productData.length > 0 ?  <Text>{productName}</Text>  : null}
+          <ScrollView >
+
+
+
+          <Rating
+          showRating
+          type="star"
+          fractions={1}
+          startingValue={3.6}
+          readonly
+          imageSize={20}
+          onFinishRating={ratingCompleted}
+          style={{ paddingVertical: 10 }} />
+
+          <View style={{flexDirection: 'col', justifyContent: 'space-between', alignItems: 'center'}}>
+        
+            {productData?.length > 0 ? <Image source={productImageUrl} style={[styles2.icon,  { }]} /> : null}
+            {productData?.length > 0 ? <Text>{productName}</Text>  : null}
+            {productData?.length > 0 ? <Image  source={storeLogo} style={[styles2.icon,  { }]} /> : null}
+
+            <Image id="favoriteImage"
+                  source={
+                    productData[0]?.isFavorite ? require('./star.png') : require('./white-star.png')
+                  } style={styles2.star}
+            />
+
+            { productData[0]?.onSale ? <View style={{marginLeft: -28, zIndex: 2}}>
+              <Image id="saleImage" source={require('./discount-red.png')} style={styles2.icon2} /></View> 
+            : null}
+            
+                   
+            {productData.length > 0 ? <Text>{productPrice}</Text>  : null}
+            {productData.length > 0 ? <Text>{productDiscount}</Text>  : null}
+
+            
+          </View>
+
+
+          </ScrollView>
+
         
         </View>  
 
       </View>
+
     </Modal>
   );
 
@@ -80,9 +125,9 @@ let storeLogo = '' ;
 
 const styles2 = StyleSheet.create({
     modalContent: {
-      height: '25%',
+      height: '30%',
       width: '100%',
-      backgroundColor: '#25292e',
+      backgroundColor: 'white',
       borderTopRightRadius: 18,
       borderTopLeftRadius: 18,
       position: 'absolute',
@@ -108,4 +153,18 @@ const styles2 = StyleSheet.create({
       marginRight: 5,
       marginTop: 5,
     },
+
+    icon2: {
+      width: 35,
+      height: 35,
+      marginRight: 5,
+      marginTop: 5,
+    },
+    star: {
+      width: 30,
+      height: 30,
+      marginRight: 5,
+      marginTop: 5,
+     
+    }
   });

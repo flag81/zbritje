@@ -221,14 +221,21 @@ app.get("/products", (req, res) => {
     storeId = 0;
   } 
 
+  let categoryId = parseInt(req.query.categoryId, 10);
+  if (isNaN(categoryId) || categoryId < 0) {
+    categoryId = 0;
+  } 
+
 
 
 
 
   console.log("offset1:", offset1);
 
-  console.log("storeId", storeId)
+  console.log("storeId", storeId);
 
+
+  console.log("categoryId", categoryId);
   //offset1 = parseInt(offset1);
 
   //console.log("valuessssss")
@@ -275,6 +282,15 @@ app.get("/products", (req, res) => {
     WHEN ${storeId} > 0 THEN products.storeId = ${storeId}
     ELSE true
   END
+
+  and 
+
+    CASE 
+    WHEN ${categoryId} > 0 THEN products.categoryId = ${categoryId}
+    ELSE true
+  END
+
+
 
   order by isFavorite DESC,sales.saleEndDate DESC limit 10 OFFSET ${offset1} `;
 

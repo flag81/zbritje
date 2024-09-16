@@ -8,11 +8,11 @@ import EmojiPicker from "./EmojiPicker";
 import * as Device from 'expo-device';
 import useStore from './useStore';
 import React, { useState, useEffect , useRef, useCallback } from 'react';
-import { View,Text,Button, TouchableOpacity,Image,StyleSheet,SafeAreaView,ScrollView,RefreshControl,Dimensions
+import { View,Text,Button, TouchableOpacity,Image, ImageBackground, StyleSheet,SafeAreaView,ScrollView,RefreshControl,Dimensions
+
 
 
 } from 'react-native';
-
 
 
 import messaging from '@react-native-firebase/messaging';
@@ -25,8 +25,9 @@ import UserNamePicker from './UserNamePicker'; //
 import { AutocompleteDropdown } from 'react-native-autocomplete-dropdown';
 import Toast from 'react-native-root-toast';
 import StoreFilter from './StoreFilter';
-import { all } from 'axios';
+
 //import useFetchData from './useFetchData';
+
 
 
 
@@ -172,21 +173,8 @@ async function getLocalUsername(key) {
 
   useEffect(() => {
 
-    //console.log("storeId changed>>>>>:",storeId)
-    //onStoreFilterChange();
 
    const returnData =  applyStoreFilters();
-
-   //console.log("returnData from applyStoreFilters:",returnData);
-
-   // if storeId is greater that 0 then apply the store filters
-    // if storeId is 0 then apply the other filters
-    // if storeId is 0 and onSale is true then apply the onSale filter
-    // if storeId is 0 and isFavorite is true then apply the isFavorite filter
-    // if storeId is 0 and categoryId is greater than 0 then apply the category filter
-    // if storeId is 0 and subCategoryId is greater than 0 then apply the subCategory filter
-
-
 
    setFilteredProducts(returnData); //onendreached and it fires, to prevent 
 
@@ -502,9 +490,6 @@ async function getLocalUsername(key) {
   function addIsFavoriteKey(allProducts, favorites) {
     //write code here
 
-    //console.log("allProducts:",allProducts);
-    //console.log("favoritesssssssssssssssssssssssssss:",favorites);
-
     let newProducts = allProducts.map(product => {
         let isFavorite = favorites.some(favorite => favorite.productId === product.productId);
         let isOnSale = new Date() >= new Date(product.saleStartDate) && new Date() <= new Date(product.saleEndDate);
@@ -534,6 +519,7 @@ useInfiniteQuery({
 // how to trigger useinfinitequery
 
 
+
 const params = { admin:admin, storeId:storeId };
 
 
@@ -548,8 +534,8 @@ function useCustomInfiniteQuery(params) {
     fetchNextPage,
     allPages
   } = useInfiniteQuery({
-    queryKey: ['getData', params.admin ,params.storeId],
-    queryFn: ({ pageParam = 1 }) => getData(params.admin, pageParam, params.storeId),
+    queryKey: ['getData', params.admin ,storeId, categoryId],
+    queryFn: ({ pageParam = 1 }) => getData(params.admin, pageParam, storeId, categoryId, subCategoryId, isFavorite, onSale),
     getNextPageParam: (lastPage, allPages) => {
       if (lastPage?.length === 0) return undefined;
       return allPages.length + 1;
@@ -596,17 +582,13 @@ useEffect
 
 //console.log("dataArray:",dataArray);
 
-  async function getData(userId,page, storeId) {
+  async function getData(userId,page, storeId, categoryId, subCategoryId, isFavorite, onSale) {
     try
     {
 
-
-
-
       //console.log("pageParam:",page);
 
-
-      const resp = await fetch(`${url}/products?limit=10&userId=${userId}&offset=${page}&storeId=${storeId}`,  {
+      const resp = await fetch(`${url}/products?limit=10&userId=${userId}&offset=${page}&storeId=${storeId}&categoryId=${categoryId}`,  {
         method: 'GET',       
         headers: {"Content-Type": "application/json"}
       });
@@ -1048,11 +1030,6 @@ const LoadingPlaceholder = () => (
 
       // 
 
-  /*
-
-  
-
-  */
 
       let logo = ''; 
       let oldPrice = '';
@@ -1088,15 +1065,24 @@ const LoadingPlaceholder = () => (
 
         <View style={{ flexDirection: 'col',  alignItems: 'center'}}>
         <View style={{ flexDirection: 'row' , alignItems: 'center'}}>
+          
 
+          
         <View style={{ zIndex: 1 }}><TouchableOpacity onPress={() => onModalOpen(item)}>
             <Image id="productImage" source={imageUrl} style={styles.image} />
 
            
             </TouchableOpacity></View>
-            
-              {item.onSale ? <View style={{marginLeft: -15, zIndex: 3 }}><Text style={{ fontSize: 12 , color:'black', fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle',  }}>{`-${discountPercentage}%`}</Text></View> : null}
-              {item.onSale ? <View style={{marginLeft: -28, zIndex: 2}}><Image id="saleImage" source={require('./discount-red.png')} style={styles.icon} /></View> : null}
+
+  
+
+              {item.onSale ? <View style={{
+  borderColor:'red', borderWidth: 0}}>
+    
+    <ImageBackground id="saleImage" source={require('./discount-red.png')} style={{justifyContent: 'center', 
+    alignItems: 'center', width:35, height:35}} >
+
+<Text style= {{textAlign: 'center', textAlignVertical: 'center' }}>-23%</Text></ImageBackground></View> : null}
             
             </View>
             </View>
@@ -1138,6 +1124,7 @@ const LoadingPlaceholder = () => (
 return (
 
 <SafeAreaView style={styles.container}>
+
 
 <View style={{ padding: 10, flexDirection:'col'}}>
    <View>
@@ -1225,9 +1212,7 @@ return (
             onEndReachedThreshold={0.9} 
             
 
-
           />
-
 
 
       </View>
@@ -1251,6 +1236,7 @@ return (
 
   );
 };
+
 
 
 const styles = StyleSheet.create({
