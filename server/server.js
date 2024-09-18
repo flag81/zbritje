@@ -227,15 +227,23 @@ app.get("/products", (req, res) => {
   } 
 
 
-
-
-
   console.log("offset1:", offset1);
 
   console.log("storeId", storeId);
 
-
   console.log("categoryId", categoryId);
+
+
+  let searchText = db.escape(req.query.searchText);
+
+//get length of the string and console.log it
+console.log("searchText", searchText);
+
+  console.log("searchText length", searchText.length);
+
+
+
+
   //offset1 = parseInt(offset1);
 
   //console.log("valuessssss")
@@ -243,13 +251,6 @@ app.get("/products", (req, res) => {
 
 // change the query so if storeId is greater than 0 then it will filter by storeId
 // if storeId is 0 then it will return all products
-
-
-
-
-
-
-
 
 
   const q = 
@@ -285,8 +286,17 @@ app.get("/products", (req, res) => {
 
   and 
 
-    CASE 
+  CASE 
     WHEN ${categoryId} > 0 THEN products.categoryId = ${categoryId}
+    ELSE true
+  END
+
+    and 
+
+  CASE 
+    WHEN ${searchText.length} > 0 THEN  INSTR(products.productName, ${searchText}) > 0
+
+   
     ELSE true
   END
 
@@ -297,6 +307,8 @@ app.get("/products", (req, res) => {
 
   //LIMIT ${req.query.limit} OFFSET ${req.query.offset}
   const userId= req.query.userId;
+
+  console.log("q",q);
 
 
 

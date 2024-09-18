@@ -12,6 +12,7 @@ const useStore = create((set) => ({
   storeId: 0,
   isFavorite: false,
   onSale: false,
+  searchText: '',
   setMyUserName: (userData) => set((state) => ({ myUserName: userData })),
   increment: () => set((state) => ({ count: state.count + 1 })),
   decrement: () => set((state) => ({ count: state.count - 1 })),
@@ -20,6 +21,9 @@ const useStore = create((set) => ({
   setStoreId: (storeId) => set(() => ({ storeId: storeId })),
   setIsFavorite: (isFavorite) => set(() => ({ isFavorite: isFavorite })),
   setOnSale: (onSale) => set(() => ({ onSale: onSale })),
+  
+  //write a function to set the onSearchFilterIdList with an array of productIds
+  setSearchText: (searchText) => set(() => ({ searchText: searchText })),
 
 }));
 

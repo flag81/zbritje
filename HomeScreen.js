@@ -64,7 +64,8 @@ const HomeScreen = () => {
   const [storedUserName, setStoredUserName] = useState("");
   const [showUserNamePicker, setShowUserNamePicker] = useState(false);
 
-  const { count, increment ,myUserName, setMyUserName, storeId, onSale, categoryId, subCategoryId, isFavorite } = useStore();
+  const { count, increment ,myUserName, setMyUserName, storeId, onSale, categoryId, 
+    subCategoryId, isFavorite, searchText ,setSearchText } = useStore();
 
 
   //const first = useFetchData();
@@ -534,8 +535,8 @@ function useCustomInfiniteQuery(params) {
     fetchNextPage,
     allPages
   } = useInfiniteQuery({
-    queryKey: ['getData', params.admin ,storeId, categoryId],
-    queryFn: ({ pageParam = 1 }) => getData(params.admin, pageParam, storeId, categoryId, subCategoryId, isFavorite, onSale),
+    queryKey: ['getData', params.admin ,storeId, categoryId, searchText],
+    queryFn: ({ pageParam = 1 }) => getData(params.admin, pageParam, storeId, categoryId, subCategoryId, isFavorite, onSale, searchText),
     getNextPageParam: (lastPage, allPages) => {
       if (lastPage?.length === 0) return undefined;
       return allPages.length + 1;
@@ -544,6 +545,8 @@ function useCustomInfiniteQuery(params) {
 
   return { data, isLoading, refetch, hasNextPage, fetchNextPage, allPages, error };
 }
+
+
 
 
 
@@ -579,16 +582,15 @@ useEffect
 
 
 
-
 //console.log("dataArray:",dataArray);
 
-  async function getData(userId,page, storeId, categoryId, subCategoryId, isFavorite, onSale) {
+  async function getData(userId,page, storeId, categoryId, subCategoryId, isFavorite, onSale, searchText) {
     try
     {
 
       //console.log("pageParam:",page);
 
-      const resp = await fetch(`${url}/products?limit=10&userId=${userId}&offset=${page}&storeId=${storeId}&categoryId=${categoryId}`,  {
+      const resp = await fetch(`${url}/products?limit=10&userId=${userId}&offset=${page}&storeId=${storeId}&categoryId=${categoryId}&searchText=${searchText}`,  {
         method: 'GET',       
         headers: {"Content-Type": "application/json"}
       });
@@ -596,7 +598,6 @@ useEffect
     const data = await resp.json();
 
     //console.log(" data length------------------------------------------------:",data.length);
-
 
 
 
@@ -620,6 +621,7 @@ useEffect
     }
 
   }
+
 
   
   async function getCategories(userId) {
@@ -767,7 +769,7 @@ useEffect
 
       const data = await resp.json();
       
-      console.log("getProductsByIds data ------------------------------------------------:",data);
+      //console.log("getProductsByIds data ------------------------------------------------:",data);
       //console.log(data); 
       //setPrefetchedProductsData(data);
       setFilteredProducts(data);
@@ -873,6 +875,10 @@ useEffect(() => {
 
 
 useEffect(() => {
+  console.log("searchText changed-------:", searchText)
+}, [searchText]);
+
+useEffect(() => {
   //console.log("prefetchedProductsData changed-------:", prefetchedProductsData)
 }, [prefetchedProductsData]);
 
@@ -910,7 +916,7 @@ const getSuggestions = (q) => {
     // write the code to extract the id from suggestionsList array into an new array of ids
 
   
-    if(productId)
+      if(productId)
       {
         const productSearchById = getProductsByIds(admin, productId);
       }
@@ -923,27 +929,35 @@ const onSubmitSearch = (searchText) => {
   console.log("searchText:",searchText);
   // write the code to extract the id from suggestionsList array into an new array of ids
 
+  //
+  if(searchText?.length >  2) setSearchText(searchText);
 
 
+  console.log("searchText length:",searchText.length);
 
-  console.log("suggestionsList:",suggestionsList);
+  
+  //console.log("suggestionsList:",suggestionsList);
 
-  if(suggestionsList)
+    if(suggestionsList)
     {
-      const suggestionsListIds = suggestionsList.length > 0 ? suggestionsList.map(obj => obj.id) : [];
-      console.log("suggestionsListIds:",suggestionsListIds);
-      const paramsString = suggestionsListIds.join(',');
-      console.log("paramsString:",paramsString  );
-      const productListSearch = getProductsByIds(admin, paramsString);
-    }
+      //const suggestionsListIds = suggestionsList.length > 0 ? suggestionsList.map(obj => obj.id) : [];
+      //console.log("suggestionsListIds:",suggestionsListIds);
+      //const paramsString = suggestionsListIds.join(',');
+      //console.log("paramsString:",paramsString  );
+      //const productListSearch = getProductsByIds(admin, paramsString);
 
+      // copy suggestionsListIds to the onSearchFilterIdList in the store IF THE LENGTH IS GREATER THAN 0      
+
+    }
 
 }
 
 
+
 const onClearPress = useCallback(() => {
   setSuggestionsList(null);
-  setFilteredProducts(originalData);
+  //setFilteredProducts(originalData);
+  setSearchText('');
 
 }, []);
 
@@ -1020,13 +1034,13 @@ const LoadingPlaceholder = () => (
   const renderItem = ({ item }) => 
   {
 
-      const imageUrl = {uri:item.imageUrl};
-      const favoriteProduct = favoritesData.some((obj) => obj.productId === item.productId);
+      const imageUrl = {uri:item?.imageUrl};
+      const favoriteProduct = favoritesData.some((obj) => obj?.productId === item?.productId);
       //const isOnSale = isWithinDateRange(item.saleStartDate, item.saleEndDate);
-      const onSaleProduct = saleData.some((obj) => obj.productId === item.productId);
-      const saleProductsDetails = saleData.filter(product => product.productId === item.productId);
+      const onSaleProduct = saleData.some((obj) => obj?.productId === item?.productId);
+      const saleProductsDetails = saleData.filter(product => product?.productId === item?.productId);
       //const storeLogo = saleProductsDetails[0]; 
-      const storeLogo = {uri:`${url}/images/${item.storeLogo}`};
+      const storeLogo = {uri:`${url}/images/${item?.storeLogo}`};
 
       // 
 
@@ -1044,11 +1058,11 @@ const LoadingPlaceholder = () => (
 
 
 
-    oldPrice = item.oldPrice;
-    discountPrice = item.discountPrice;
-    discountPercentage = getPercentageChange(item.oldPrice, item.discountPrice);
+    oldPrice = item?.oldPrice;
+    discountPrice = item?.discountPrice;
+    discountPercentage = getPercentageChange(item?.oldPrice, item?.discountPrice);
 
-    endDate = item.saleEndDate;
+    endDate = item?.saleEndDate;
     const date = new Date(endDate);
     const formatter = new Intl.DateTimeFormat('en-GB', { dateStyle: 'short' });
     formattedEndDate = formatter.format(date);
@@ -1075,7 +1089,6 @@ const LoadingPlaceholder = () => (
             </TouchableOpacity></View>
 
   
-
               {item.onSale ? <View style={{
   borderColor:'red', borderWidth: 0}}>
     
