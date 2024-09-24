@@ -195,7 +195,7 @@ export default function Settings() {
     return (
     <SafeAreaView style={styles.container}>
 
-<View style={{ padding: 5, flexDirection: 'col', position: 'relative', justifyContent: 'space-between' }}>
+<View style={{ padding: 5, flexDirection: 'col', position: 'relative', justifyContent: 'space-between', backgroundColor:'white', borderRadius: 20 }}>
 <View>
         <Text style={{ fontSize: 15, fontWeight: 'bold'}}>
           Username: {myUserName}

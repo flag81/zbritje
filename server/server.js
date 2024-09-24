@@ -8,6 +8,8 @@ import cookieParser from "cookie-parser";
 
 import path from 'path';
 
+import jwt from 'jsonwebtoken';
+
 import {fileURLToPath} from 'url';
 
 import basicAuth from 'express-basic-auth';
@@ -15,6 +17,8 @@ import basicAuth from 'express-basic-auth';
 const __filename = fileURLToPath(import.meta.url);
 
 export const app = express();
+
+import 'dotenv/config';
 
 
 //const ts = require('./order')
@@ -85,6 +89,37 @@ app.get('/get-data', (req, res) => {
   } else {
     res.end();
   }
+});
+
+
+
+const verifyToken = (req, res, next) => {
+  const token = req.headers['authorization'];
+  if (!token) {
+    return res.status(403).send('A token is required for authentication');
+  }
+  try {
+    const decoded = jwt.verify(token.split(' ')[1], process.env.TOKEN_SECRET);
+    req.user = decoded;
+  } catch (err) {
+    return res.status(401).send('Invalid Token');
+  }
+  return next();
+};
+
+
+
+app.post('/auth', (req, res) => {
+  // Mock user authentication
+  const user = { username: req.body.username};
+
+  console.log("username:", req.body.username);
+
+  console.log("process.env.TOKEN_SECRET", process.env.TOKEN_SECRET);
+
+  // Generate a token
+  const token = jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '24h' });
+  res.json({ token });
 });
 
 
@@ -203,7 +238,7 @@ app.get("/getProductsByIds", (req, res) => {
   }
   );
 
-app.get("/products", (req, res) => {
+app.get("/products",verifyToken, (req, res) => {
 
 
   let offset1 = parseInt(req.query.offset, 10);
@@ -235,6 +270,11 @@ app.get("/products", (req, res) => {
 
 
   let searchText = db.escape(req.query.searchText);
+
+  let onSale = req.query.onSale;
+
+  let isFavorite = req.query.isFavorite;
+
 
 //get length of the string and console.log it
 console.log("searchText", searchText);
@@ -294,11 +334,25 @@ console.log("searchText", searchText);
     and 
 
   CASE 
-    WHEN ${searchText.length} > 0 THEN  INSTR(products.productName, ${searchText}) > 0
+
+  WHEN ${onSale} = 1 THEN CURRENT_DATE() between sales.saleStartDate and sales.saleEndDate 
+    ELSE true
+  END
+
+    and 
+
+  CASE 
+    WHEN ${searchText.length} > 2 THEN  INSTR(products.productName, ${searchText}) > 0
 
    
     ELSE true
   END
+
+  and 
+    (CASE 
+        WHEN ${isFavorite} = 1 THEN f.id IS NOT NULL
+        ELSE true
+    END)
 
 
 
@@ -308,7 +362,7 @@ console.log("searchText", searchText);
   //LIMIT ${req.query.limit} OFFSET ${req.query.offset}
   const userId= req.query.userId;
 
-  console.log("q",q);
+  //console.log("q",q);
 
 
 
@@ -790,6 +844,6 @@ app.put("/update/:id", (req, res) => {
   });
 });
 
-app.listen(8800, () => {
-  //console.log("Connected to backend.");
+app.listen(process.env.PORT, () => {
+  console.log("Connected to backend.");
 });

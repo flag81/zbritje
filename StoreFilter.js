@@ -24,7 +24,7 @@ const StoreFilter = ({ data}) => {
       });
 
         const data = await resp.json();
-        console.log("all stores ----------------",data);
+        //console.log("all stores ----------------",data);
         setStoresData(data);
         return data;
 
@@ -45,7 +45,7 @@ const StoreFilter = ({ data}) => {
 
 
     useEffect(() => {
-        console.log("storesData changed", storesData);
+        //console.log("storesData changed", storesData);
     }, [storesData]);
 
 

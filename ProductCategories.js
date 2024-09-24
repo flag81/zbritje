@@ -27,7 +27,8 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData}) 
     const categories = data;
     const subCategories = subData;
 
-    const { admin, url, onSale, setOnSale, isFavorite, setIsFavorite, categoryId, setCategoryId, subCategoryId, selectedSubCategoriyId} = useStore();
+    const { admin, url, onSale, setOnSale, isFavorite, setIsFavorite, 
+        categoryId, setCategoryId, subCategoryId, selectedSubCategoriyId} = useStore();
 
 
     useEffect(() => {

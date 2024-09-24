@@ -32,7 +32,7 @@ import StoreFilter from './StoreFilter';
 const queryClient = new QueryClient();
 
 
-const HomeScreen = () => {
+const HomeScreen2 = () => {
 
 
   const [allProducts, setAllProducts] = useState([]);
@@ -67,7 +67,7 @@ const HomeScreen = () => {
     
 
 
-    const [isConditionMet, setIsConditionMet] = useState(false);
+    const [isConditionMet, setIsConditionMet] = useState(true);
 
   //const first = useFetchData();
 
@@ -107,7 +107,7 @@ async function getLocalUsername(key) {
   };
 
   //const url = 'http://10.12.13.197:8800';
-  const url = 'https://nodejs-production-18ad6.up.railway.app';
+  const url = 'http://nodejs-production-18ad6.up.railway.app';
   const admin = 1 ;
 
   
@@ -285,12 +285,9 @@ async function getLocalUsername(key) {
   }, []);
 
 
-
-
    async function auth()  {
 
     console.log("myUserName:",myUserName);
-    console.log("url:",`${url}/auth`);
 
     const resp = await fetch(`${url}/auth`,  {
       method: 'POST',       
@@ -311,7 +308,6 @@ async function getLocalUsername(key) {
   }
 
 
-  
     const data = await resp.json();
 
     console.log("auth data:",data.token);
@@ -460,13 +456,11 @@ async function getLocalUsername(key) {
 
 
 
-
   function applyStoreFilters() {
     
     //write code here
 
     console.log("Store filters changed to storeId:",storeId);
-    console.log("Store filters changed to onSale:",onSale);
 
     let filteredProducts = allProducts?.filter(product => {
         return (subCategoryId === 0 || product?.subCategoryId == subCategoryId) &&
@@ -615,11 +609,13 @@ console.log("params:",params);
 
 console.log("isConditionMet:",isConditionMet);
 
-
+/*
 const { data: user } = useQuery({
   queryKey: ['auth'],
   queryFn: auth,
 });
+
+*/
 
 
 
@@ -636,10 +632,10 @@ function useCustomInfiniteQuery(params) {
     
 
     {
-    queryKey: ['getData', params.admin ,storeId, categoryId, searchText, isConditionMet, onSale, isFavorite],
+    queryKey: ['getData', params.admin ,storeId, categoryId, searchText],
     queryFn: ({ pageParam = 1 }) => getData(params.admin, pageParam, storeId, categoryId, subCategoryId, isFavorite, onSale, searchText),
     
-    enabled: isConditionMet,
+  
 
 
     getNextPageParam: (lastPage, allPages) => {
@@ -685,6 +681,8 @@ useEffect
 }, [data]);
 
 
+
+
 //console.log("dataArray:",dataArray);
 
   async function getData(userId,page, storeId, categoryId, subCategoryId, isFavorite, onSale, searchText) {
@@ -693,17 +691,18 @@ useEffect
 
       console.log("getData:::::::::::::::::");
 
-      const resp = await fetch(`${url}/products?limit=10&userId=${userId}&offset=${page}&storeId=${storeId}&categoryId=${categoryId}&isFavorite=${isFavorite}&onSale=${onSale}&searchText=${searchText}`,  {
+      const resp = await fetch(`${url}/products?limit=10&userId=${userId}&offset=${page}&storeId=${storeId}&categoryId=${categoryId}&searchText=${searchText}`,  {
         method: 'GET',       
         headers: {
         "Content-Type": "application/json",
-        'Authorization': `Bearer ${authToken}`
+       // 'Authorization': `Bearer ${authToken}`
         }
       });
 
 
 
 
+      console.log("resp",resp);
 
 
     const data = await resp.json();
@@ -985,8 +984,6 @@ useEffect(() => {
 }, [suggestionsList]);
 
 
-
-
 useEffect(() => {
   console.log("searchText changed-------:", searchText)
 }, [searchText]);
@@ -994,11 +991,6 @@ useEffect(() => {
 useEffect(() => {
   //console.log("prefetchedProductsData changed-------:", prefetchedProductsData)
 }, [prefetchedProductsData]);
-
-useEffect(() => {
-  console.log("filteredProducts changed-------:", filteredProducts)
-}, [filteredProducts]);
-
 
 
 const getSuggestions = (q) => {
@@ -1115,7 +1107,7 @@ const updateIsFavorite = (productId) => {
 
       const imageUrl = {uri:item?.imageUrl};
 
-      //console.log("imageUrl:",imageUrl);
+      console.log("imageUrl:",imageUrl);
 
       //const storeLogo = saleProductsDetails[0]; 
       //const storeLogo = {uri:`${url}/images/${item?.storeLogo}`};
@@ -1280,13 +1272,13 @@ return (
 
       <View style={{ flex:1, width: Dimensions.get("window").width * 0.95}}>
 
-            <View ><Text>Numri i produkteve: {listLength}</Text></View>
+            <View ><Text>Numri i producteve: {listLength}</Text></View>
 
 
           <MasonryFlashList
             data={filteredProducts}
             numColumns={2}
-            renderItem={filteredProducts?.length > 0 ? renderItem : null}
+            renderItem={renderItem}
             estimatedItemSize={20}
             contentContainerStyle={{padding: 5}}
             extraData={extraData}
@@ -1386,4 +1378,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default HomeScreen;
+export default HomeScreen2;
