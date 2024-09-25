@@ -462,9 +462,28 @@ app.get("/getCategories", (req, res) => {
 app.get("/getAllStores", (req, res) => {
 
   //const q = "SELECT tableid,  users.id  FROM orders join users on orders.userid = users.id WHERE orders.status = 0 ";
-    const q = `SELECT * FROM store`;
+
+  const userId=  parseInt(req.query.userId);
+
+
   
-    const userId=  parseInt(req.query.userId);
+    const q = `SELECT store.storeId, store.storeName, store.storeLogoUrl, storefavorites.userId ,
+
+
+       CASE 
+        WHEN storefavorites.userId=${userId} THEN true 
+        ELSE false 
+        END AS isFavorite
+
+    FROM store
+    
+    left join storefavorites on store.storeId = storefavorites.storeId
+
+    
+    
+    `;
+  
+    //const userId=  parseInt(req.query.userId);
   
     db.query(q, [userId], (err, data) => {
   
@@ -478,10 +497,49 @@ app.get("/getAllStores", (req, res) => {
   });
 
 
+  app.get("/getAllBrands", (req, res) => {
+
+    //const q = "SELECT tableid,  users.id  FROM orders join users on orders.userid = users.id WHERE orders.status = 0 ";
+  
+    const userId=  parseInt(req.query.userId);
+  
+  
+    
+      const q = `SELECT brands.brandId, brands.brandName, brands.brandLogoUrl, brandfavorites.userId ,
+  
+  
+         CASE 
+          WHEN brandfavorites.userId=${userId} THEN true 
+          ELSE false 
+          END AS isFavorite
+  
+      FROM brands
+      
+      left join brandfavorites on brands.brandId = brandfavorites.brandId
+    
+      `;
+    
+      //const userId=  parseInt(req.query.userId);
+    
+      db.query(q, [userId], (err, data) => {
+    
+        if (err) {
+          console.log(err);
+          return res.json(err);
+        }
+    
+        return res.json(data);
+      });
+    });
+
   app.get("/getUserFavoriteStores", (req, res) => {
 
     //const q = "SELECT tableid,  users.id  FROM orders join users on orders.userid = users.id WHERE orders.status = 0 ";
-      const q = `SELECT userId, storeId FROM storeFavorites WHERE userId = ?`;
+      const q = `SELECT userId, storeId FROM storeFavorites 
+      
+      
+
+      WHERE userId = ?`;
     
       const userId=  parseInt(req.query.userId);
     
@@ -495,6 +553,25 @@ app.get("/getAllStores", (req, res) => {
         return res.json(data);
       });
     });
+
+
+    app.get("/getUserFavoriteBrands", (req, res) => {
+
+      //const q = "SELECT tableid,  users.id  FROM orders join users on orders.userid = users.id WHERE orders.status = 0 ";
+        const q = `SELECT userId, storeId FROM brands WHERE userId = ?`;
+      
+        const userId=  parseInt(req.query.userId);
+      
+        db.query(q, [userId], (err, data) => {
+      
+          if (err) {
+            console.log(err);
+            return res.json(err);
+          }
+      
+          return res.json(data);
+        });
+      });
 
 
 app.get("/getSubCategories", (req, res) => {

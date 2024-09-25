@@ -6,6 +6,7 @@ const useStore = create((set) => ({
   count: 0,
   myUserName: '',
   url : 'http://10.12.13.197:8800',
+  //url : 'https://nodejs-production-18ad6.up.railway.app',
   admin: 1,
   subCategoryId: 0,
   categoryId: 0,

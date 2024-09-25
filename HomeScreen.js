@@ -14,8 +14,6 @@ import { View,Text,Button, TouchableOpacity,Image, ImageBackground, StyleSheet,S
 
 } from 'react-native';
 
-
-
 import messaging from '@react-native-firebase/messaging';
 import {PermissionsAndroid} from 'react-native';
 import {QueryClient, useInfiniteQuery, useQuery} from '@tanstack/react-query'
@@ -106,8 +104,8 @@ async function getLocalUsername(key) {
   
   };
 
-  //const url = 'http://10.12.13.197:8800';
-  const url = 'https://nodejs-production-18ad6.up.railway.app';
+  const url = 'http://10.12.13.197:8800';
+  //const url = 'https://nodejs-production-18ad6.up.railway.app';
   const admin = 1 ;
 
   
@@ -203,7 +201,7 @@ async function getLocalUsername(key) {
 
   useEffect(() => {
 
-    console.log("filteredProducts changed>>>>>:",filteredProducts?.length)
+    //console.log("filteredProducts changed>>>>>:",filteredProducts?.length)
     setListLength(filteredProducts?.length);
 
   }, [filteredProducts]);
@@ -711,8 +709,6 @@ useEffect
     console.log(" data length------------------------------------------------:",data.length);
 
 
-
-
     //console.log(data);
     setOriginalData(...data);
     setOriginalDataBackup(data);
@@ -1118,7 +1114,7 @@ const updateIsFavorite = (productId) => {
       //console.log("imageUrl:",imageUrl);
 
       //const storeLogo = saleProductsDetails[0]; 
-      //const storeLogo = {uri:`${url}/images/${item?.storeLogo}`};
+      const storeLogo = {uri:`${url}/images/${item?.storeLogo}`};
 
       // 
  
@@ -1179,6 +1175,10 @@ const updateIsFavorite = (productId) => {
                   source={
                     item?.isFavorite ? require('./star.png') : require('./white-star.png')
                   }
+                  style={styles.star} />
+
+            <Image id="favoriteImage"
+                  source={storeLogo}
                   style={styles.star} />
             </TouchableOpacity>
             </View>
@@ -1304,7 +1304,6 @@ return (
          
             onEndReachedThreshold={0.9} 
             
-
           />
 
 

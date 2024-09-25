@@ -12,6 +12,7 @@ import { View,Text,Button, TouchableOpacity,Image,StyleSheet,SafeAreaView,Scroll
 
 
 
+
 import {PermissionsAndroid} from 'react-native';
 import {QueryClient} from '@tanstack/react-query'
 // debounce the sendQuery function
@@ -20,12 +21,17 @@ import * as SecureStore from 'expo-secure-store';
 import Toast from 'react-native-root-toast';
 
 
+
+
 const queryClient = new QueryClient();
 
 const Companies = () => {
 
+  const { admin , myUserName, url} = useStore();
+
 
     const [allStores, setAllStores] = useState([]);
+    const [allBrands, setAllBrands] = useState([]);
     const [favoriteStores, setFavoriteStores] = useState(null);
 
     const [saleData, setSaleData] = useState([]);
@@ -34,23 +40,7 @@ const Companies = () => {
     const [extraData, setExtraData] = useState(0);
 
 
-    const { myUserName, setMyUserName } = useStore();
 
-
-    async function getLocalUsername(key) {
-    let result = await SecureStore.getItemAsync(key);
-    if (result) {
-        //alert("🔐 Here's your value 🔐 \n" + result);
-        return result;
-    } else {
-        //alert('No values stored under that key.');
-        return false;
-    }
-    }
-
-
-    const url = 'http://10.12.13.197:8800';
-    const admin = 1 ;
 
     const prefetchAllStores = async (admin) => {
         // The results of this query will be cached like a normal query
@@ -60,40 +50,29 @@ const Companies = () => {
         })
     }
 
-
-
-
     useEffect(() => {
 
-            setAllStores([]);
-            setFavoriteStores([]);
 
+
+
+            setAllStores([]);
+            setAllBrands([]);
+
+            setFavoriteStores([]);
             //getData(admin);
             getAllStores(admin);
-            getUserFavoriteStores(admin);
+            getAllBrands(admin);
+            //getUserFavoriteStores(admin);
             //getCategories(admin);
-
-
-            
-            console.log("*************************************************************************************************")
+            console.log(" Companies start *****************************")
             //filterSaleData();
 
     }, []);
 
-
   useEffect(() => {
     //console.log("favoritesData:",favoritesData)
     //const favoritesOnSale = filterSaleData();
-    //setExtraData(extraData + 1);
-
     console.log("favorites stores changed :",favoriteStores)
-
-  }, [favoriteStores]);
-
-
-  useEffect(() => {
-    //console.log("favoritesData:",favoritesData)
-    //const favoritesOnSale = filterSaleData();
     setExtraData(extraData + 1);
 
   }, [favoriteStores]);
@@ -230,7 +209,6 @@ const Companies = () => {
 
 
  
-
   async function getAllStores(userId) {
 
     try
@@ -244,7 +222,6 @@ const Companies = () => {
         console.log("all stores ----------------",data);
         setAllStores(data);
         return data;
-
     }
     catch(e)
     {
@@ -252,6 +229,29 @@ const Companies = () => {
     }
 
   }
+
+
+  async function getAllBrands(userId) {
+
+    try
+    {
+      const resp = await fetch(`${url}/getAllBrands?userId=${userId}`,  {
+        method: 'GET',       
+        headers: {"Content-Type": "application/json"}
+      });
+
+        const data = await resp.json();
+        console.log("all brands ----------------",data);
+        setAllBrands(data);
+        return data;
+    }
+    catch(e)
+    {
+      console.log(e);
+    }
+
+  }
+
 
   async function getUserFavoriteStores(userId) {
 
@@ -276,27 +276,125 @@ const Companies = () => {
 
   }
 
+  async function getUserFavoriteBrands(userId) {
 
+    try
+    {
+      const resp = await fetch(`${url}/getUserFavoriteStores?userId=${userId}`,  {
+        method: 'GET',       
+        headers: {"Content-Type": "application/json"}
+      });
+
+
+        const data = await resp.json();
+        console.log("fav user stores----------------",data);
+        setFavoriteStores(data);
+        return data;
+
+    }
+    catch(e)
+    {
+      console.log(e);
+    }
+
+  }
+
+
+  // for every object in allbrands, write a view with the brand logo and name and display them in rows of 2
+
+  // for every object in allstores, write a view with the store logo and name and display them in rows of 2
+  // when a store is clicked, add it to the favorite stores list
+
+
+  //give me code to display the stores and brands in a grid of 2
+  // when a store is clicked, add it to the favorite stores list
+
+ // build a component so for every object in allbrands array,  it displays a view with the brand logo and name and display them in rows of 2s.
+
+
+
+// // create a component so for every object in allbrands array,  it displays a view with the brand logo and name and display them in rows of 2 , as a seprate component by looping through the allbrands array,
+
+
+
+
+
+
+
+
+  const renderBrandItem = ({ item }) => 
+    {
+  
+        const imageUrl = {uri:item?.brandLogoUrl};
+        //console.log("favoriteStores length:", favoriteStores.length);
+  
+        //let favoriteUserStore = false;
+  
+       // favoriteUserStore = favoriteStores.some((obj) => obj.storeId === item.storeId);
+        //console.log("favoriteStore:",favoriteUserStore, item.storeId);
+  
+        const storeId = item?.brandId;
+  
+  
+    return (
+      <ScrollView >
+        <View 
+        style={{ padding: 5, borderColor: 'gray', 
+        borderWidth:0, borderRadius:15, backgroundColor:'white', margin:5, height:150}}>
+          
+          <View style={{ padding: 5, flexDirection: 'row', position: 'relative', justifyContent: 'space-between', alignItems: 'center' }}>
+  
+          <View style={{ flexDirection: 'col',  alignItems: 'center'}}>
+          <View style={{ flexDirection: 'row' , alignItems: 'center'}}>
+  
+              <View style={{ zIndex: 1 }}><TouchableOpacity>
+                  <Image id="storeImage" source={imageUrl} style={styles.image} />
+                  </TouchableOpacity>
+              </View>
+              
+  
+          </View>
+          </View>
+  
+              <View style={{ flexDirection: 'col',  alignItems: 'center'}}>
+  
+  
+                <TouchableOpacity onPress={() => handleStoreFavorites(item)}>
+              <Image id="favoriteImage"
+                    source={
+                      item?.isFavorite ? require('./star.png') : require('./white-star.png')
+                    }
+                    style={styles.star} />
+            </TouchableOpacity>
+              </View>
+          
+            </View>
+  
+          <View style={{ flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center'}}>
+  
+          <Text style={{ fontSize: 15, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle' }}>{item.brandName}</Text>
+  
+  
+        </View>
+  
+        </View>
+      </ScrollView>
+    )
+  
+  };
+  
 
 
   const renderItem = ({ item }) => 
   {
 
-
-      const imageUrl = {uri:`${url}/images/${item.storeLogo}`};
-      //const favoriteProduct = favoritesData.some((obj) => obj.productId === item.productId);
-      
-      //const favoriteStoresCount = favoriteStores.length;
-
+      const imageUrl = {uri:item?.storeLogoUrl};
       console.log("favoriteStores length:", favoriteStores.length);
-
 
       let favoriteUserStore = false;
 
-
       favoriteUserStore = favoriteStores.some((obj) => obj.storeId === item.storeId);
-      console.log("favoriteStore:",favoriteUserStore, item.storeId);
-
+      //console.log("favoriteStore:",favoriteUserStore, item.storeId);
 
       const storeId = item.storeId;
 
@@ -327,7 +425,7 @@ const Companies = () => {
               <TouchableOpacity onPress={() => handleStoreFavorites(item)}>
             <Image id="favoriteImage"
                   source={
-                    favoriteUserStore ? require('./star.png') : require('./white-star.png')
+                    item?.isFavorite ? require('./star.png') : require('./white-star.png')
                   }
                   style={styles.star} />
           </TouchableOpacity>
@@ -347,8 +445,6 @@ const Companies = () => {
   )
 
 };
-
-
 
 
 return (
@@ -372,7 +468,21 @@ return (
             showsVerticalScrollIndicator={false}
             marginBottom={60}
             
-          />
+          /> 
+
+        <MasonryFlashList
+            data={allBrands}
+            numColumns={2}
+            renderItem={renderBrandItem}
+            estimatedItemSize={20}
+            contentContainerStyle={{padding: 5}}
+            extraData={extraData}
+            showsVerticalScrollIndicator={false}
+            marginBottom={60}
+            
+          /> 
+
+
 
 
       </View>
