@@ -469,6 +469,11 @@ app.get("/getAllStores", (req, res) => {
   
     const q = `SELECT store.storeId, store.storeName, store.storeLogoUrl, storefavorites.userId ,
 
+        store.storeFacebookUrl,
+        store.storeInstagramUrl,
+        store.storePhone,
+        store.storeAddress,
+        store.storeWebsite,
 
        CASE 
         WHEN storefavorites.userId=${userId} THEN true 
@@ -495,6 +500,44 @@ app.get("/getAllStores", (req, res) => {
       return res.json(data);
     });
   });
+
+
+  app.get("/getStoreData", (req, res) => {
+
+    //const q = "SELECT tableid,  users.id  FROM orders join users on orders.userid = users.id WHERE orders.status = 0 ";
+  
+    const userId=  parseInt(req.query.userId);
+    const storeId=  parseInt(req.query.storeId);
+  
+  
+    
+      const q = `SELECT store.storeId, store.storeName, store.storeLogoUrl, storefavorites.userId ,
+  
+                  CASE 
+                    WHEN storefavorites.userId=${userId} THEN true 
+                    ELSE false 
+                    END AS isFavorite
+            
+                FROM store
+                
+                left join storefavorites on store.storeId = storefavorites.storeId
+  
+      
+      
+      `;
+    
+      //const userId=  parseInt(req.query.userId);
+    
+      db.query(q, [userId], (err, data) => {
+    
+        if (err) {
+          console.log(err);
+          return res.json(err);
+        }
+    
+        return res.json(data);
+      });
+    });
 
 
   app.get("/getAllBrands", (req, res) => {

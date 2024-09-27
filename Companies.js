@@ -19,6 +19,7 @@ import {QueryClient} from '@tanstack/react-query'
 
 import * as SecureStore from 'expo-secure-store';
 import Toast from 'react-native-root-toast';
+import StoreModal from './StoreModal';
 
 
 
@@ -30,16 +31,30 @@ const Companies = () => {
   const { admin , myUserName, url} = useStore();
 
 
+
     const [allStores, setAllStores] = useState([]);
     const [allBrands, setAllBrands] = useState([]);
     const [favoriteStores, setFavoriteStores] = useState(null);
 
-    const [saleData, setSaleData] = useState([]);
+    const [storeData, setStoreData] = useState([]);
 
     const [favoritesData, setFavoritesData] = useState([]);
     const [extraData, setExtraData] = useState(0);
 
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    // ...rest of the code remains same
+  
+    const onModalOpen = (item) => {
+      // setProductData([]);
 
+      console.log("item:------------------------",item);
+      setStoreData([item]);
+      setIsModalVisible(true);
+    };
+  
+    const onModalClose = () => {
+      setIsModalVisible(false);
+    };
 
 
     const prefetchAllStores = async (admin) => {
@@ -388,6 +403,10 @@ const Companies = () => {
   const renderItem = ({ item }) => 
   {
 
+
+    //console.log("item:",item);
+
+
       const imageUrl = {uri:item?.storeLogoUrl};
       console.log("favoriteStores length:", favoriteStores.length);
 
@@ -397,6 +416,8 @@ const Companies = () => {
       //console.log("favoriteStore:",favoriteUserStore, item.storeId);
 
       const storeId = item.storeId;
+
+
 
 
   return (
@@ -410,7 +431,7 @@ const Companies = () => {
         <View style={{ flexDirection: 'col',  alignItems: 'center'}}>
         <View style={{ flexDirection: 'row' , alignItems: 'center'}}>
 
-            <View style={{ zIndex: 1 }}><TouchableOpacity>
+            <View style={{ zIndex: 1 }}><TouchableOpacity onPress={() => onModalOpen(item)}>
                 <Image id="storeImage" source={imageUrl} style={styles.image} />
                 </TouchableOpacity>
             </View>
@@ -456,6 +477,10 @@ return (
       <Text>Username: {myUserName}</Text>
     </View>
 
+    <View style={{justifyContent: 'space-between', alignItems: 'center'}}>
+            <Text>Zgjedheni te preferuarat e juaja</Text>
+        </View>
+
       <View style={{ flex:1, width: Dimensions.get("window").width * 0.95}}>
 
           <MasonryFlashList
@@ -482,7 +507,11 @@ return (
             
           /> 
 
-
+<View>
+        <StoreModal isVisible={isModalVisible} onClose={onModalClose} storeDataPassed={storeData}>
+          {/* Details Screen */}
+        </StoreModal>
+      </View>
 
 
       </View>
