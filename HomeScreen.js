@@ -1134,7 +1134,7 @@ const updateIsFavorite = (productId) => {
     const formatter = new Intl.DateTimeFormat('en-GB', { dateStyle: 'short' });
     formattedEndDate = formatter?.format(date);
 
-    
+
 
   return (
     <TouchableOpacity onPress={()=> handleBottomSheet(true, item) }>
@@ -1202,6 +1202,9 @@ const updateIsFavorite = (productId) => {
 
 
 };
+
+
+
 
 
 

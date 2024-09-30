@@ -1,8 +1,14 @@
-import { Modal, View, Text, Pressable, StyleSheet, Image, ScrollView } from 'react-native';
+import { Modal, View, Text, Pressable, StyleSheet, Image, ScrollView, Platform, Linking, Button } from 'react-native';
 
 import { Rating, RatingProps } from '@rneui/themed';
 
 export default function StoreModal({ isVisible, children, onClose, storeDataPassed }) {
+
+    const openPlayStore = () => {
+        const appId = 'com.zs.vivafresh'; // Replace with your app's package name
+        const url = `https://play.google.com/store/apps/details?id=${appId}`;
+        Linking.openURL(url).catch(err => console.error("Failed to open URL:", err));
+      };
 
 
 //const [storeDataPassed, setstoreDataPassed] = useState([]);
@@ -126,6 +132,14 @@ let storeEmail = '' ;
 
             
           </View>
+
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+
+      <Button title="Download Viva App" onPress={openPlayStore} />
+        {Platform.OS === 'android' ?
+            <Button title="Download Viva" onPress={openPlayStore} />
+            : null}
+        </View>
 
 
           </ScrollView>

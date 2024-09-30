@@ -23,13 +23,11 @@ import StoreModal from './StoreModal';
 
 
 
-
 const queryClient = new QueryClient();
 
 const Companies = () => {
 
   const { admin , myUserName, url} = useStore();
-
 
 
     const [allStores, setAllStores] = useState([]);

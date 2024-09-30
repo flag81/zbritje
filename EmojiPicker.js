@@ -1,14 +1,23 @@
-import { Modal, View, Text, Pressable, StyleSheet, Image, ScrollView } from 'react-native';
+import { Modal, View, Text, Pressable, StyleSheet, Image, ScrollView, Linking , TouchableOpacity} from 'react-native';
 
-import { Rating, RatingProps } from '@rneui/themed';
+import { Rating, AirbnbRating } from 'react-native-ratings';
 
 export default function EmojiPicker({ isVisible, children, onClose, productData }) {
 
 
   const ratingCompleted = (rating) => {
+
     console.log('Rating is: ' + rating);
   };
 
+
+
+
+  const openUrl = (url) => {
+    //const appId = 'com.zs.vivafresh'; // Replace with your app's package name
+    //const url = `https://play.google.com/store/apps/details?id=${appId}`;
+    Linking.openURL(url).catch(err => console.error("Failed to open URL:", err));
+  };
 
   // productdata is passed from the parent component and is an array of objects and i need to reference the first object in the array and then the key value pair of productPic
 // write code for the above
@@ -29,6 +38,7 @@ let productSaleStartDate = '' ;
 let productSaleEndDate = '' ;
 let productSalePercentage = '' ;
 let storeLogo = '' ;
+let productUrl = '' ;
 
 
 //productData sample data : {"categoryId": "1", "discountPercentage": null, "discountPrice": "10", "oldPrice": "12", "productId": 4, "productName": "Nutella", "productPic": "nutella.png", "productSize": null, "saleEndDate": "2024-07-29T22:00:00.000Z", "saleId": 1, "saleStartDate": "2024-07-09T22:00:00.000Z", "storeId": "3", "storeLogo": "meridian.png", "subCategoryId": "10"}s
@@ -49,9 +59,14 @@ let storeLogo = '' ;
     productSaleStartDate = productData[0].productSaleStartDate;
     productSaleEndDate = productData[0].saleEndDate;
     productSalePercentage = productData[0].productSalePercentage;
+    productUrl = productData[0].productUrl;
+
+
 
   }
 
+
+console.log(productUrl);
 
   const imageUrl = {uri:`${url}/images/${productImageUrl}`};
 
@@ -80,17 +95,24 @@ let storeLogo = '' ;
           showRating
           type="star"
           fractions={1}
-          startingValue={3.6}
-          readonly
+          startingValue={2.5}
+
           imageSize={20}
           onFinishRating={ratingCompleted}
-          style={{ paddingVertical: 10 }} />
 
-          <View style={{flexDirection: 'col', justifyContent: 'space-between', alignItems: 'center'}}>
+          style={{ paddingVertical: 0 }} />
+
+          <View style={{flexDirection: 'col', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 5}}>
+
+          <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 5}}>
+
+          <View style={{flexDirection: 'col', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 5}}>
         
             {productData?.length > 0 ? <Image source={productImageUrl} style={[styles2.icon,  { }]} /> : null}
             {productData?.length > 0 ? <Text>{productName}</Text>  : null}
-            {productData?.length > 0 ? <Image  source={storeLogo} style={[styles2.icon,  { }]} /> : null}
+          </View>
+
+            {productData?.length > 0 ? <Image  source={storeLogo} style={[styles2.storeIcon,  { }]} /> : null}
 
             <Image id="favoriteImage"
                   source={
@@ -98,13 +120,35 @@ let storeLogo = '' ;
                   } style={styles2.star}
             />
 
-            { productData[0]?.onSale ? <View style={{marginLeft: -28, zIndex: 2}}>
-              <Image id="saleImage" source={require('./discount-red.png')} style={styles2.icon2} /></View> 
+      
+
+            { productData[0]?.onSale ? <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+
+
+              <Image id="saleImage" source={require('./discount-red.png')} style={styles2.icon2} />
+
+
+              { productData[0]?.productUrl != null ?
+
+              <TouchableOpacity onPress={() => openUrl(productUrl)} style={styles2.category} >
+
+              <Text style={{fontSize: 20, textAlign: 'center', verticalAlign:'middle' }}>Buy Online</Text>
+
+
+              </TouchableOpacity> : null}
+              
+              
+              </View> 
             : null}
             
+              </View>
                    
-            {productData.length > 0 ? <Text>{productPrice}</Text>  : null}
-            {productData.length > 0 ? <Text>{productDiscount}</Text>  : null}
+            <View style={{flexDirection: 'col', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 20}} />
+       
+         
+          
+
+         
 
             
           </View>
@@ -132,6 +176,7 @@ const styles2 = StyleSheet.create({
       borderTopLeftRadius: 18,
       position: 'absolute',
       bottom: 0,
+
     },
     titleContainer: {
       height: '16%',
@@ -153,6 +198,12 @@ const styles2 = StyleSheet.create({
       marginRight: 5,
       marginTop: 5,
     },
+    storeIcon: {
+      width: 70,
+      height: 70,
+      marginRight: 5,
+      marginTop: 5,
+    },
 
     icon2: {
       width: 35,
@@ -166,5 +217,12 @@ const styles2 = StyleSheet.create({
       marginRight: 5,
       marginTop: 5,
      
-    }
+    },
+    category: {
+      margin: 3,
+      borderRadius: 15,
+      borderWidth: 2,
+      padding: 5,
+      paddingHorizontal: 10,
+  },
   });

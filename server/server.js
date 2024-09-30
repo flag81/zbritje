@@ -296,7 +296,7 @@ console.log("searchText", searchText);
   const q = 
   
   `SELECT products.productId, products.productName, products.productPic, products.categoryId, 
-  products.productSize , products.subCategoryId, products.storeId, products.imageUrl,
+  products.productSize , products.subCategoryId, products.storeId, products.imageUrl,products.productUrl,products.productRating,
     sales.saleId, sales.saleStartDate,sales.saleEndDate,sales.storeLogo, sales.oldPrice, sales.discountPrice,
     sales.discountPercentage, store.storeLogo as storeLogo,
 
