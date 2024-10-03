@@ -1,12 +1,25 @@
-import { Modal, View, Text, Pressable, StyleSheet, Image, ScrollView, Platform, Linking, Button } from 'react-native';
-
+import { Modal, View, Text, Pressable, StyleSheet, Image, ScrollView, Platform, Linking, Button, TouchableOpacity } from 'react-native';
 import { Rating, RatingProps } from '@rneui/themed';
+
 
 export default function StoreModal({ isVisible, children, onClose, storeDataPassed }) {
 
     const openPlayStore = () => {
         const appId = 'com.zs.vivafresh'; // Replace with your app's package name
         const url = `https://play.google.com/store/apps/details?id=${appId}`;
+        Linking.openURL(url).catch(err => console.error("Failed to open store:", err));
+      };
+
+
+      const openPhone = (phoneNumber) => {
+        const url = `tel:${phoneNumber}`; // Replace with your app's package name
+        //const url = `https://play.google.com/store/apps/details?id=${appId}`;
+        Linking.openURL(url).catch(err => console.error("Failed to open phone:", err));
+      };
+
+      const openWeb = (weburl) => {
+        const url = weburl; // Replace with your app's package name
+        //const url = `https://play.google.com/store/apps/details?id=${appId}`;
         Linking.openURL(url).catch(err => console.error("Failed to open URL:", err));
       };
 
@@ -21,8 +34,6 @@ export default function StoreModal({ isVisible, children, onClose, storeDataPass
   };
 
 
-  // storeDataPassed is passed from the parent component and is an array of objects and i need to reference the first object in the array and then the key value pair of storePic
-// write code for the above
 
 //console.log("storeDataPassed",storeDataPassed);
 
@@ -36,8 +47,6 @@ const url = 'http://10.12.13.197:8800';
 
 
 
-
-
 let storeName = '' ;
 let storeImageUrl = '' ;
 let storePrice = '' ;
@@ -47,7 +56,6 @@ let storePhone = '' ;
 let storeAddress = '' ;
 let storeWebsite = '' ;
 let storeEmail = '' ;
-
 
 
 //storeDataPassed sample data : {"categoryId": "1", "discountPercentage": null, "discountPrice": "10", "oldPrice": "12", "storeId": 4, "storeName": "Nutella", "storePic": "nutella.png", "storeSize": null, "saleEndDate": "2024-07-29T22:00:00.000Z", "saleId": 1, "saleStartDate": "2024-07-09T22:00:00.000Z", "storeId": "3", "storeLogo": "meridian.png", "subCategoryId": "10"}s
@@ -89,12 +97,13 @@ let storeEmail = '' ;
           </Pressable>
         </View>
         
-        <View style={{padding: 5,  flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center'}}> 
+        <View style={{padding: 5,  flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center', marginBottom:10}}> 
 
-          <ScrollView >
+          <ScrollView style={{flex:1}} contentContainerStyle={{ paddingBottom: 30 }}>
 
         <View style={{justifyContent: 'space-between', alignItems: 'center'}}>
             <Text>Sa jeni te kenaqur me kete kompani</Text>
+
         </View>
 
           <Rating
@@ -110,19 +119,20 @@ let storeEmail = '' ;
 
           <View style={{flexDirection: 'col', justifyContent: 'space-between', alignItems: 'center'}}>
         
-            {storeDataPassed?.length > 0 ? <Image source={{uri: storeLogoUrl}} style={[styles2.icon,  { }]} /> : null}
+
+            <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                {storeDataPassed?.length > 0 ? <Image source={{uri: storeLogoUrl}} style={[styles2.icon,  { paddingHorizontal:10}]} /> : null}
+                <Image id="favoriteImage"
+                    source={
+                        storeDataPassed[0]?.isFavorite ? require('./star.png') : require('./white-star.png')
+                    } style={styles2.star}
+                />
+            </View>
+
             {storeDataPassed?.length > 0 ? <Text>{storeName}</Text>  : null}
-            {storeDataPassed?.length > 0 ? <Text>{storePhone}</Text>  : null}
             {storeDataPassed?.length > 0 ? <Text>{storeEmail}</Text>  : null}
-            {storeDataPassed?.length > 0 ? <Text>{storeWebsite}</Text>  : null}
             {storeDataPassed?.length > 0 ? <Text>{storeAddress}</Text>  : null}
         
-
-            <Image id="favoriteImage"
-                  source={
-                    storeDataPassed[0]?.isFavorite ? require('./star.png') : require('./white-star.png')
-                  } style={styles2.star}
-            />
 
             { storeDataPassed[0]?.onSale ? <View style={{marginLeft: -28, zIndex: 2}}>
               <Image id="saleImage" source={require('./discount-red.png')} style={styles2.icon2} /></View> 
@@ -133,12 +143,27 @@ let storeEmail = '' ;
             
           </View>
 
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ flex: 1, flexDirection :'row' ,justifyContent: 'center', alignItems: 'center' }}>
 
-      <Button title="Download Viva App" onPress={openPlayStore} />
-        {Platform.OS === 'android' ?
-            <Button title="Download Viva" onPress={openPlayStore} />
-            : null}
+
+                <TouchableOpacity onPress={()=>openPhone('123456')} style={styles2.category}>
+                            
+                            <Text>Telefono</Text>
+                            
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={openPlayStore} style={styles2.category}>
+                            
+                            <Text>Website</Text>
+                            
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={openPlayStore} style={styles2.category}>
+                            
+                        <Text> Download Viva App </Text>
+                        
+                </TouchableOpacity>
+
         </View>
 
 
@@ -198,5 +223,12 @@ const styles2 = StyleSheet.create({
       marginRight: 5,
       marginTop: 5,
      
-    }
+    },
+    category: {
+        margin: 3,
+        borderRadius: 15,
+        borderWidth: 2,
+        padding: 5,
+        paddingHorizontal: 10,
+    },
   });

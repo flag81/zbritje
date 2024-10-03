@@ -65,6 +65,7 @@ const HomeScreen = () => {
     
 
 
+
     const [isConditionMet, setIsConditionMet] = useState(false);
 
   //const first = useFetchData();
@@ -1152,6 +1153,7 @@ const updateIsFavorite = (productId) => {
         <View style={{ zIndex: 1 }}><TouchableOpacity onPress={() => onModalOpen(item)}>
             <Image id="productImage" source={imageUrl} style={styles.image} />
 
+
            
             </TouchableOpacity></View>
 
@@ -1207,7 +1209,6 @@ const updateIsFavorite = (productId) => {
 
 
 
-
 return (
 
 <SafeAreaView style={styles.container}>
@@ -1215,8 +1216,7 @@ return (
 
 <View style={{ padding: 10, flexDirection:'col'}}>
    <View>
-      <Text>Emri i telefonit: {Device.deviceName}</Text>
-      <Text>Username: {myUserName}</Text>
+      <Text>Telefonit: {Device.deviceName}</Text>
     </View>
 
 

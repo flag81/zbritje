@@ -14,6 +14,7 @@ const useStore = create((set) => ({
   isFavorite: false,
   onSale: false,
   searchText: '',
+  userId:0,
   setMyUserName: (userData) => set((state) => ({ myUserName: userData })),
   increment: () => set((state) => ({ count: state.count + 1 })),
   decrement: () => set((state) => ({ count: state.count - 1 })),

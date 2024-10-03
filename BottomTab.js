@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Platform } from 'react-native';
+import { View, Text, StyleSheet, Platform, TouchableOpacity } from 'react-native';
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from './HomeScreen';
@@ -6,16 +6,43 @@ import Chats from './Chats';
 import Settings from './Settings';
 import Account from './Account';
 import Companies from './Companies';
+import Brands from './Brands';
 import { AntDesign } from '@expo/vector-icons';
+import useStore from './useStore';
+import { NavigationContainer } from '@react-navigation/native';
+
 
 const BottomTabNavigator = createBottomTabNavigator();
 
+
+
 export default function BottomTab() {
   //   const tabBarHeight = useBottomTabBarHeight();
+
+  const { admin , myUserName, url} = useStore();
+
   return (
     <BottomTabNavigator.Navigator
-      screenOptions={{
+
+    
+      screenOptions={({ navigation }) => ({
         tabBarLabelStyle: styles.label,
+
+        headerRight: ({ focused }) => (
+          <TouchableOpacity onPress={() => navigation.navigate('Profili')}>
+            <View style={{ padding: 10 }}>
+              <AntDesign
+                name="user"
+                size={22}
+                color={focused ? '#0071ff' : 'gray'}
+              />
+              <Text>{myUserName}</Text>
+            </View>
+          </TouchableOpacity>
+        ),
+        
+
+
         tabBarStyle: [
           styles.tabContainer,
           Platform.OS === 'ios' && {
@@ -29,16 +56,15 @@ export default function BottomTab() {
         },
         tabBarInactiveTintColor: 'gray',
         tabBarActiveTintColor: '#0071ff',
-      }}
-      safeAreaInsets={{
-        bottom: 0,
-      }}
+      })}
+   
     >
       <BottomTabNavigator.Screen
         name="home"
         component={HomeScreen}
         options={{
-          headerTitle: 'MyHome',
+          headerTitle: 'Home',
+
           headerTransparent: false,
           tabBarIcon: ({ focused }) => (
             <AntDesign
@@ -62,6 +88,22 @@ export default function BottomTab() {
         name="Kompanite"
         component={Companies}
       />
+
+      <BottomTabNavigator.Screen
+        options={{
+          tabBarIcon: ({ focused }) => (
+            <AntDesign
+              name="tags"
+              size={21}
+              color={focused ? '#0071ff' : 'gray'}
+            />
+          ),
+        }}
+        name="Brendet"
+        component={Brands}
+      />
+
+
       <BottomTabNavigator.Screen
         name="Konfigurimet"
         component={Settings}

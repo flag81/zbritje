@@ -25,16 +25,16 @@ import StoreModal from './StoreModal';
 
 const queryClient = new QueryClient();
 
-const Companies = () => {
+const Brands = () => {
 
   const { admin , myUserName, url} = useStore();
 
 
-    const [allStores, setAllStores] = useState([]);
-    const [allBrands, setAllBrands] = useState([]);
-    const [favoriteStores, setFavoriteStores] = useState(null);
 
-    const [storeData, setStoreData] = useState([]);
+    const [allBrands, setAllBrands] = useState([]);
+    const [favoriteBrands, setFavoriteBrands] = useState(null);
+
+    const [brandData, setBrandData] = useState([]);
 
     const [favoritesData, setFavoritesData] = useState([]);
     const [extraData, setExtraData] = useState(0);
@@ -46,7 +46,7 @@ const Companies = () => {
       // setProductData([]);
 
       console.log("item:------------------------",item);
-      setStoreData([item]);
+      setBrandData([item]);
       setIsModalVisible(true);
     };
   
@@ -68,16 +68,16 @@ const Companies = () => {
 
 
 
-            setAllStores([]);
             setAllBrands([]);
+            //setAllBrands([]);
 
-            setFavoriteStores([]);
+            setFavoriteBrands([]);
             //getData(admin);
-            getAllStores(admin);
+            //getAllStores(admin);
             getAllBrands(admin);
             //getUserFavoriteStores(admin);
             //getCategories(admin);
-            console.log(" Companies start *****************************")
+            console.log(" brands start *****************************")
             //filterSaleData();
 
     }, []);
@@ -114,7 +114,7 @@ const Companies = () => {
 
   const handleAddStore = (item) => {
 
-    const storeObject = { userId: admin, storeId: item.storeId };
+    const storeObject = { userId: admin, storeId: item.brandId };
 
     setFavoriteStores((prevData) => [...prevData, storeObject]);
     
@@ -124,15 +124,15 @@ const Companies = () => {
 
 
   const handleRemoveFavorites= (item) => {
-    setFavoriteStores((prevFavorites) =>
-      prevFavorites.filter((product) => product.storeId !== item.storeId)
+    setFavoriteBrands((prevFavorites) =>
+      prevFavorites.filter((product) => product.brandId !== item.brandsId)
     );
     
   };
 
 
   async function handleStoreFavorites2(item) {
-    const result = await isStoreFavorite(admin, item.storeId);
+    const result = await isBrandFavorite(admin, item.BrandId);
 
     console.log("cnt", result[0].cnt)
 
@@ -143,7 +143,7 @@ const Companies = () => {
       if(cnt > 0 )
         {
           handleRemoveFavorites(item);
-          await removeStoreFromFavorites(item.storeId, item.storeName);
+          await removeBrandFromFavorites(item.brandId, item.brandName);
           console.log("-----removing store.....", result);
 
           await getAllStores(admin);
@@ -153,7 +153,7 @@ const Companies = () => {
           {
 
             handleAddStore(item);
-            await addStoreToFavorites(item.storeId, item.storeName);
+            await addStoreToFavorites(item.brandId, item.brandName);
             console.log("-----adding store.....", result);
             await getAllStores(admin);
 
@@ -165,29 +165,27 @@ const Companies = () => {
   }
 
 
-  const handleStoreFavorites = (item) => {
+  const handleBrandFavorites = (item) => {
     //setSelectedProduct(productId);
 
-      const result =  favoriteStores.some((element) => element.storeId === item.storeId);
+      const result =  favoriteBrands.some((element) => element.brandId === item.brandId);
       //console.log(result)
-
-
 
       if(result)
       {
         handleRemoveFavorites(item);
-        removeStoreFromFavorites(item.storeId, item.storeName);
+        removeBrandFromFavorites(item.brandId, item.brandName);
 
         console.log("removing store.....");
       }
       else{
-        handleAddStore(item);
+        handleAddBrand(item);
   
       // getAllFavoriteStores
 
       
 
-        addStoreToFavorites(item.storeId, item.storeName);
+        addBrandToFavorites(item.brandId, item.brandName);
         console.log("adding store.....");
       }
 
@@ -195,7 +193,7 @@ const Companies = () => {
 
 
 
-  async function addStoreToFavorites(storeId, storeName) {
+  async function addBrandToFavorites(storeId, storeName) {
 
 
     const userId = admin;
@@ -218,7 +216,7 @@ const Companies = () => {
       headers: {"Content-Type": "application/json"}
     });
 
-    showToast(`Produkti ${storeName} u shtua ne te preferuarat tuaja.`);
+    showToast(`Brendi ${storeName} u shtua ne te preferuarat tuaja.`);
 
     }
     catch(e)
@@ -229,7 +227,7 @@ const Companies = () => {
   }
 
 
-  async function removeStoreFromFavorites(storeId, storeName) {
+  async function removeBrandFromFavorites(storeId, storeName) {
 
     //const queryParams = new URLSearchParams({ userId: userId, productId:productId });
     const userId = admin;
@@ -237,7 +235,7 @@ const Companies = () => {
     console.log("removeFavorite");
     try
     {
-        const resp = await fetch(`${url}/removeStoreFromFavorites/${userId}/${storeId}`,
+        const resp = await fetch(`${url}/removeBrandFromFavorites/${userId}/${storeId}`,
     
         {
           method: 'DELETE',
@@ -263,7 +261,7 @@ const Companies = () => {
   }
 
 
-  async function isStoreFavorite(userId,storeId) {
+  async function isBrandFavorite(userId,storeId) {
 
     try
     {
@@ -284,27 +282,7 @@ const Companies = () => {
 
   }
 
- 
-  async function getAllStores(userId) {
 
-    try
-    {
-      const resp = await fetch(`${url}/getAllStores?userId=${userId}`,  {
-        method: 'GET',       
-        headers: {"Content-Type": "application/json"}
-      });
-
-        const data = await resp.json();
-        console.log("all stores ----------------",data);
-        setAllStores(data);
-        return data;
-    }
-    catch(e)
-    {
-      console.log(e);
-    }
-
-  }
 
 
   async function getAllBrands(userId) {
@@ -341,7 +319,7 @@ const Companies = () => {
 
         const data = await resp.json();
         console.log("fav user stores----------------",data);
-        setFavoriteStores(data);
+        setFavoriteBrands(data);
         return data;
 
     }
@@ -364,7 +342,7 @@ const Companies = () => {
 
         const data = await resp.json();
         console.log("fav user stores----------------",data);
-        setFavoriteStores(data);
+        setFavoriteBrands(data);
         return data;
 
     }
@@ -406,8 +384,8 @@ const Companies = () => {
   
         //let favoriteUserStore = false;
   
-       // favoriteUserStore = favoriteStores.some((obj) => obj.storeId === item.storeId);
-        //console.log("favoriteStore:",favoriteUserStore, item.storeId);
+       // favoriteUserStore = favoriteStores.some((obj) => obj.storeId === item.brandId);
+        //console.log("favoriteStore:",favoriteUserStore, item.brandId);
   
         const storeId = item?.brandId;
   
@@ -476,10 +454,10 @@ const Companies = () => {
 
       let favoriteUserStore = false;
 
-      favoriteUserStore = favoriteStores.some((obj) => obj.storeId === item.storeId);
-      //console.log("favoriteStore:",favoriteUserStore, item.storeId);
+      favoriteUserStore = favoriteStores.some((obj) => obj.storeId === item.brandId);
+      //console.log("favoriteStore:",favoriteUserStore, item.brandId);
 
-      const storeId = item.storeId;
+      const storeId = item.brandId;
 
 
 
@@ -520,7 +498,7 @@ const Companies = () => {
 
         <View style={{ flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center'}}>
 
-        <Text style={{ fontSize: 15, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle' }}>{item.storeName}</Text>
+        <Text style={{ fontSize: 15, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle' }}>{item.brandName}</Text>
 
 
       </View>
@@ -547,21 +525,10 @@ return (
 
       <View style={{ flex:1, width: Dimensions.get("window").width * 0.95}}>
 
-          <MasonryFlashList
-          
-            data={allStores}
-            numColumns={2}
-            renderItem={renderItem}
-            estimatedItemSize={20}
-            contentContainerStyle={{padding: 5}}
-            showsVerticalScrollIndicator={false}
-            marginBottom={60}
-            extraData={extraData}
-            
-          /> 
 
-     {
-        /*
+
+     
+
         <MasonryFlashList
                     data={allBrands}
                     numColumns={2}
@@ -573,9 +540,7 @@ return (
                     
                   /> 
 
-        */
 
-     }   
 
 <View>
         <StoreModal isVisible={isModalVisible} onClose={onModalClose} storeDataPassed={storeData}>
@@ -647,4 +612,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default Companies;
+export default Brands;
