@@ -1208,7 +1208,6 @@ const updateIsFavorite = (productId) => {
 
 
 
-
 return (
 
 <SafeAreaView style={styles.container}>

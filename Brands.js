@@ -12,7 +12,6 @@ import { View,Text,Button, TouchableOpacity,Image,StyleSheet,SafeAreaView,Scroll
 
 
 
-
 import {PermissionsAndroid} from 'react-native';
 import {QueryClient} from '@tanstack/react-query'
 // debounce the sendQuery function
@@ -58,8 +57,8 @@ const Brands = () => {
     const prefetchAllStores = async (admin) => {
         // The results of this query will be cached like a normal query
         await queryClient.prefetchQuery({
-        queryKey: ['getAllStores'],
-        queryFn: getAllStores,
+        queryKey: ['getAllBrands'],
+        queryFn: getAllBrands,
         })
     }
 
@@ -85,11 +84,11 @@ const Brands = () => {
   useEffect(() => {
     //console.log("favoritesData:",favoritesData)
     //const favoritesOnSale = filterSaleData();
-    console.log("favorites stores changed :",favoriteStores)
+    console.log("favorites stores changed :",favoriteBrands)
     setExtraData(extraData + 1);
     //getAllStores(admin);
 
-  }, [favoriteStores]);
+  }, [favoriteBrands]);
 
 
 
@@ -112,11 +111,11 @@ const Brands = () => {
 
 
 
-  const handleAddStore = (item) => {
+  const handleAddBrand = (item) => {
 
-    const storeObject = { userId: admin, storeId: item.brandId };
+    const brandObject = { userId: admin, brandId: item.brandId };
 
-    setFavoriteStores((prevData) => [...prevData, storeObject]);
+    setFavoriteBrands((prevData) => [...prevData, brandObject]);
     
   };
 
@@ -131,7 +130,7 @@ const Brands = () => {
   };
 
 
-  async function handleStoreFavorites2(item) {
+  async function handleBrandFavorites2(item) {
     const result = await isBrandFavorite(admin, item.BrandId);
 
     console.log("cnt", result[0].cnt)
@@ -144,18 +143,18 @@ const Brands = () => {
         {
           handleRemoveFavorites(item);
           await removeBrandFromFavorites(item.brandId, item.brandName);
-          console.log("-----removing store.....", result);
+          console.log("-----removing brand.....", result);
 
-          await getAllStores(admin);
+          await getAllBrands(admin);
 
         }
         else if(cnt == 0)
           {
 
-            handleAddStore(item);
-            await addStoreToFavorites(item.brandId, item.brandName);
-            console.log("-----adding store.....", result);
-            await getAllStores(admin);
+            handleAddBrand(item);
+            await addBrandToFavorites(item.brandId, item.brandName);
+            console.log("-----adding brand.....", result);
+            await getAllBrands(admin);
 
           }
 
@@ -186,7 +185,7 @@ const Brands = () => {
       
 
         addBrandToFavorites(item.brandId, item.brandName);
-        console.log("adding store.....");
+        console.log("adding brand.....");
       }
 
   };
@@ -307,7 +306,7 @@ const Brands = () => {
   }
 
 
-  async function getUserFavoriteStores(userId) {
+  async function getUserFavoriteBrands(userId) {
 
     try
     {
@@ -354,39 +353,11 @@ const Brands = () => {
   }
 
 
-  // for every object in allbrands, write a view with the brand logo and name and display them in rows of 2
-
-  // for every object in allstores, write a view with the store logo and name and display them in rows of 2
-  // when a store is clicked, add it to the favorite stores list
-
-
-  //give me code to display the stores and brands in a grid of 2
-  // when a store is clicked, add it to the favorite stores list
-
- // build a component so for every object in allbrands array,  it displays a view with the brand logo and name and display them in rows of 2s.
-
-
-
-// // create a component so for every object in allbrands array,  it displays a view with the brand logo and name and display them in rows of 2 , as a seprate component by looping through the allbrands array,
-
-
-
-
-
-
-
-
   const renderBrandItem = ({ item }) => 
     {
   
         const imageUrl = {uri:item?.brandLogoUrl};
-        //console.log("favoriteStores length:", favoriteStores.length);
-  
-        //let favoriteUserStore = false;
-  
-       // favoriteUserStore = favoriteStores.some((obj) => obj.storeId === item.brandId);
-        //console.log("favoriteStore:",favoriteUserStore, item.brandId);
-  
+
         const storeId = item?.brandId;
   
   
@@ -402,7 +373,7 @@ const Brands = () => {
           <View style={{ flexDirection: 'row' , alignItems: 'center'}}>
   
               <View style={{ zIndex: 1 }}><TouchableOpacity>
-                {imageUrl ? <Image id="storeImage" source={imageUrl} style={styles.image} /> : null }
+                {imageUrl ? <Image id="brandImage" source={imageUrl} style={styles.image} /> : null }
                 
                   </TouchableOpacity>
               </View>
@@ -412,15 +383,14 @@ const Brands = () => {
           </View>
   
               <View style={{ flexDirection: 'col',  alignItems: 'center'}}>
-  
-  
-                <TouchableOpacity onPress={() => handleStoreFavorites(item)}>
-              <Image id="favoriteImage"
-                    source={
-                      item?.isFavorite ? require('./star.png') : require('./white-star.png')
-                    }
-                    style={styles.star} />
-            </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => handleBrandFavorites2(item)}>
+                    <Image id="favoriteImage"
+                            source={
+                            item?.isFavorite ? require('./star.png') : require('./white-star.png')
+                            }
+                            style={styles.star} />
+                </TouchableOpacity>
               </View>
           
             </View>
@@ -428,8 +398,7 @@ const Brands = () => {
           <View style={{ flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center'}}>
   
           <Text style={{ fontSize: 15, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle' }}>{item.brandName}</Text>
-  
-  
+   
         </View>
   
         </View>
@@ -438,76 +407,6 @@ const Brands = () => {
   
   };
   
-
-
-  const renderItem = ({ item }) => 
-  {
-
-
-    //console.log("item:",item);
-
-
-
-      const imageUrl = {uri:item?.storeLogoUrl};
-     // console.log('imageUrl',imageUrl)
-      console.log("favoriteStores length:", favoriteStores?.length);
-
-      let favoriteUserStore = false;
-
-      favoriteUserStore = favoriteStores.some((obj) => obj.storeId === item.brandId);
-      //console.log("favoriteStore:",favoriteUserStore, item.brandId);
-
-      const storeId = item.brandId;
-
-
-
-
-  return (
-    <TouchableOpacity >
-      <View 
-      style={{ padding: 5, borderColor: 'gray', 
-      borderWidth:0, borderRadius:15, backgroundColor:'white', margin:5, height:150}}>
-        
-        <View style={{ padding: 5, flexDirection: 'row', position: 'relative', justifyContent: 'space-between', alignItems: 'center' }}>
-
-        <View style={{ flexDirection: 'col',  alignItems: 'center'}}>
-        <View style={{ flexDirection: 'row' , alignItems: 'center'}}>
-
-            <View style={{ zIndex: 1 }}><TouchableOpacity onPress={() => onModalOpen(item)}>
-               { item?.storeLogoUrl  ? <Image id="storeImage" source={imageUrl} style={styles.image} /> : null}
-                </TouchableOpacity>
-            </View>
-            
-
-        </View>
-        </View>
-
-            <View style={{ flexDirection: 'col',  alignItems: 'center'}}>
-
-
-              <TouchableOpacity onPress={() => handleStoreFavorites2(item)}>
-            <Image id="favoriteImage"
-                  source={
-                    item?.isFavorite ? require('./star.png') : require('./white-star.png')
-                  }
-                  style={styles.star} />
-          </TouchableOpacity>
-            </View>
-        
-          </View>
-
-        <View style={{ flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center'}}>
-
-        <Text style={{ fontSize: 15, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle' }}>{item.brandName}</Text>
-
-
-      </View>
-
-      </View>
-    </TouchableOpacity>
-  )
-
-};
 
 
 return (
@@ -519,17 +418,13 @@ return (
       <Text>Username: {myUserName}</Text>
     </View>
 
-    <View style={{justifyContent: 'space-between', alignItems: 'center'}}>
+        <View style={{justifyContent: 'space-between', alignItems: 'center'}}>
             <Text>Zgjedheni te preferuarat e juaja</Text>
         </View>
-
-      <View style={{ flex:1, width: Dimensions.get("window").width * 0.95}}>
-
+            <View style={{ flex:1, width: Dimensions.get("window").width * 0.95}}>
 
 
-     
-
-        <MasonryFlashList
+                <MasonryFlashList
                     data={allBrands}
                     numColumns={2}
                     renderItem={renderBrandItem}
@@ -538,18 +433,17 @@ return (
                     showsVerticalScrollIndicator={false}
                     marginBottom={60}
                     
-                  /> 
+                /> 
 
 
+                <View>
+                    <StoreModal isVisible={isModalVisible} onClose={onModalClose} storeDataPassed={brandData}>
+                    {/* Details Screen */}
+                    </StoreModal>
+                </View>
 
-<View>
-        <StoreModal isVisible={isModalVisible} onClose={onModalClose} storeDataPassed={storeData}>
-          {/* Details Screen */}
-        </StoreModal>
-      </View>
 
-
-      </View>
+            </View>
   </View>
 
   </SafeAreaView>
