@@ -1,3 +1,5 @@
+// for context use main.sql for database structure
+
 import express from "express";
 import cors from "cors";
 
@@ -459,38 +461,39 @@ app.get("/getCategories", (req, res) => {
   });
 });
 
+// create a new endpoint isBrandFavorite that takes userId and brandId as parameters and returns true if the brand is favorite for the user and false otherwise
 app.get("/isBrandFavorite", (req, res) => {
 
   //const q = "SELECT tableid,  users.id  FROM orders join users on orders.userid = users.id WHERE orders.status = 0 ";
 
   const userId=  parseInt(req.query.userId);
-  const storeId=  parseInt(req.query.storeId);
-
-
+  const brandId=  parseInt(req.query.brandId);
   
     const q = `SELECT count(userId) as cnt
 
-    FROM storefavorites 
-    
-    WHERE storefavorites.userId=${userId} 
-    AND
-    storefavorites.storeId=${storeId}
+    FROM brandfavorites
+      
+      WHERE brandfavorites.userId=${userId}
+      AND
+      brandfavorites.brandId=${brandId}
 
-     
-    `;
-  
+      `;
+
     //const userId=  parseInt(req.query.userId);
+
+    db.query(q, [userId, brandId], (err, data) => {
+        
+        if (err) {
+          console.log(err);
+          return res.json(err);
+        }
   
-    db.query(q, [userId, storeId], (err, data) => {
-  
-      if (err) {
-        console.log(err);
-        return res.json(err);
-      }
-  
-      return res.json(data);
-    });
-  });
+        return res.json(data);
+      });
+    }
+
+  );
+      
 
 
 app.get("/isStoreFavorite", (req, res) => {
@@ -913,6 +916,34 @@ const my = {errors:''}
 });
 
 
+// write a post endpoint addBrandToFavorites that takes userId and brandId as parameters and adds the brand to the user's favorite brands
+app.post("/addBrandToFavorites", (req, res) => {
+ 
+  const my = {errors:''}
+  
+      //console.log("valuessssss111111")
+    const q = "INSERT INTO brandfavorites( `userId`, `brandId`) VALUES (?)";
+  
+    const values = [
+      req.body.userId,
+      req.body.brandId
+    ];
+  
+    const userId = req.body.userId
+  
+    console.log(">>" + req.body.userId);
+    console.log(">>" + req.body.brandId);
+    console.log(">>--" + req.method);
+  
+  
+  
+    db.query(q, [values], (err, data) => {
+  
+      if (err) return res.send(err);
+      return res.json(data);
+    });
+  });
+
 app.post("/addStoreToFavorites", (req, res) => {
  
   const my = {errors:''}
@@ -961,7 +992,28 @@ app.post("/books", (req, res) => {
   });
 });
 
+//write a post endpoint addBrand that takes brandId and userId as parameters and removes the brand from the user's favorite brands
+app.delete("/removeBrandFromFavorites/:userId/:brandId", (req, res) => {
 
+//console.log("usersssss");
+
+const q = " DELETE FROM brandfavorites WHERE userId = ? and brandId = ? LIMIT 1";
+
+const userId = req.params.userId;
+const brandId = req.params.brandId;
+
+console.log("user",req.params.userId)
+
+db.query(q, [userId,brandId], (err, data) => {
+  if (err)
+  {
+    console.log("error",err)
+    return
+  }
+
+  return res.json(data);
+});
+});
 
 app.delete("/removeStoreFromFavorites/:userId/:storeId", (req, res) => {
 

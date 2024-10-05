@@ -205,7 +205,7 @@ const Brands = () => {
     console.log("data:" + data);
 
     try{
-      const resp = await fetch(`${url}/addStoreToFavorites`,  {
+      const resp = await fetch(`${url}/addBrandToFavorites`,  {
       method: 'POST',
       
       body: JSON.stringify({
@@ -215,7 +215,7 @@ const Brands = () => {
       headers: {"Content-Type": "application/json"}
     });
 
-    showToast(`Brendi ${storeName} u shtua ne te preferuarat tuaja.`);
+    showToast(`Brendi ${brandName} u shtua ne te preferuarat tuaja.`);
 
     }
     catch(e)
@@ -248,7 +248,7 @@ const Brands = () => {
         const data = await resp.json();
         //console.log(data);
 
-        showToast(`Marketi ${storeName} u largua nga te preferuarat tuaja.`);
+        showToast(`Brendi ${brandName} u largua nga te preferuarat tuaja.`);
 
         }
           catch(e)
@@ -260,17 +260,17 @@ const Brands = () => {
   }
 
 
-  async function isBrandFavorite(userId,storeId) {
+  async function isBrandFavorite(userId,brandId) {
 
     try
     {
-      const resp = await fetch(`${url}/isStoreFavorite?userId=${userId}&storeId=${storeId}`,  {
+      const resp = await fetch(`${url}/isBrandFavorite?userId=${userId}&brandId=${brandId}`,  {
         method: 'GET',       
         headers: {"Content-Type": "application/json"}
       });
 
         const data = await resp.json();
-        console.log("is store favorite  ----------------",data);
+        console.log("is brand favorite  ----------------",data);
         setAllStores(data);
         return data;
     }
@@ -310,14 +310,14 @@ const Brands = () => {
 
     try
     {
-      const resp = await fetch(`${url}/getUserFavoriteStores?userId=${userId}`,  {
+      const resp = await fetch(`${url}/getUserFavoriteBrands?userId=${userId}`,  {
         method: 'GET',       
         headers: {"Content-Type": "application/json"}
       });
 
 
         const data = await resp.json();
-        console.log("fav user stores----------------",data);
+        console.log("fav user brands----------------",data);
         setFavoriteBrands(data);
         return data;
 
@@ -329,28 +329,7 @@ const Brands = () => {
 
   }
 
-  async function getUserFavoriteBrands(userId) {
 
-    try
-    {
-      const resp = await fetch(`${url}/getUserFavoriteStores?userId=${userId}`,  {
-        method: 'GET',       
-        headers: {"Content-Type": "application/json"}
-      });
-
-
-        const data = await resp.json();
-        console.log("fav user stores----------------",data);
-        setFavoriteBrands(data);
-        return data;
-
-    }
-    catch(e)
-    {
-      console.log(e);
-    }
-
-  }
 
 
   const renderBrandItem = ({ item }) => 
