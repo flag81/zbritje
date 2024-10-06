@@ -4,12 +4,14 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import useStore from './useStore';
 import Toast from 'react-native-root-toast';
+import * as Device from 'expo-device';
 
 const Account = () => {
   const [email, setEmail] = useState('');
   const [isValid, setIsValid] = useState(true);
 
   const { admin , myUserName, url} = useStore();
+  
 
   useEffect(() => {
     // call getUserEmail and set the email from the response
@@ -135,12 +137,13 @@ const Account = () => {
   return (
     <View style={styles.container}>
 
+      
       <View style={{ fontSize: 15, fontWeight: 'bold', marginBottom: 20}}>
-        <Text>Username: {myUserName}</Text>
-      </View> 
+      <Text>Telefoni: {Device.deviceName}</Text>
+    </View>
 
       <View style={{ fontSize: 15, fontWeight: 'bold',  marginBottom: 20, }} >
-        <Text style={{ fontSize: 15, fontWeight: 'bold'}}>
+        <Text style={{ fontSize: 15}}>
           Email: {email}
         </Text>
       </View>  

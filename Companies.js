@@ -537,9 +537,7 @@ return (
 <SafeAreaView style={styles.container}>
 
 <View style={{ padding: 10, flexDirection:'col'}}>
-   <View>
-      <Text>Username: {myUserName}</Text>
-    </View>
+
 
     <View style={{justifyContent: 'space-between', alignItems: 'center'}}>
             <Text>Zgjedheni te preferuarat e juaja</Text>

@@ -1,89 +1,107 @@
 import { Modal, View, Text, Pressable, StyleSheet, Image, ScrollView, Platform, Linking, Button, TouchableOpacity } from 'react-native';
-
-
 import { Rating, AirbnbRating } from 'react-native-ratings';
 
+// in this file replace word brand with brand and Brand with Brand
 
-export default function StoreModal({ isVisible, children, onClose, storeDataPassed }) {
+
+
+
+export default function BrandModal({ isVisible, children, onClose, brandDataPassed }) {
 
     const openPlayStore = () => {
         const appId = 'com.zs.vivafresh'; // Replace with your app's package name
         const url = `https://play.google.com/store/apps/details?id=${appId}`;
-        Linking.openURL(url).catch(err => console.error("Failed to open store:", err));
+        Linking.openURL(url).catch(err => console.error("Failed to open brand:", err));
       };
 
 
       const openPhone = (phoneNumber) => {
         const url = `tel:${phoneNumber}`; // Replace with your app's package name
-        //const url = `https://play.google.com/store/apps/details?id=${appId}`;
+        //const url = `https://play.google.com/brand/apps/details?id=${appId}`;
         Linking.openURL(url).catch(err => console.error("Failed to open phone:", err));
       };
 
       const openWeb = (weburl) => {
         const url = weburl; // Replace with your app's package name
-        //const url = `https://play.google.com/store/apps/details?id=${appId}`;
+        //const url = `https://play.google.com/brand/apps/details?id=${appId}`;
         Linking.openURL(url).catch(err => console.error("Failed to open URL:", err));
       };
 
 
-//const [storeDataPassed, setstoreDataPassed] = useState([]);
+//const [brandDataPassed, setbrandDataPassed] = useState([]);
 
 
-//getstoreDataPassed(1, 1);
+//getbrandDataPassed(1, 1);
 
   const ratingCompleted = (rating) => {
     console.log('Rating is: ' + rating);
   };
 
+  // refer to file Brands.js for context, write a function that call the api to send the rating value to the server 
+    // together with the brandId and the userId 
+    // and update the database with the new rating value for the brandId and userId
 
 
-//console.log("storeDataPassed",storeDataPassed);
+   // the code should use async await and be something like this:
+    const sendRating = async (rating) => {
+        const response = await fetch(url + '/api/rating', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                userId: userId,
+                brandId: brandId,
+                rating: rating,
+            }),
+        })
 
-if(storeDataPassed === undefined) {
+        const data = await response.json();
+        console.log(data);
+    }
 
-    storeDataPassed = [];
+
+    // in vs code how to unccomment a block of code
+
+
+
+
+
+  
+
+
+
+
+
+//console.log("brandDataPassed",brandDataPassed);
+
+if(brandDataPassed === undefined) {
+
+    brandDataPassed = [];
 }
 
 
-const url = 'http://10.12.13.197:8800';
+//const url = 'http://10.12.13.197:8800';
 
 
 
-let storeName = '' ;
-let storeImageUrl = '' ;
-let storePrice = '' ;
-let storeFacebookUrl = '' ;
-let storeInstagramUrl = '' ;
-let storePhone = '' ;
-let storeAddress = '' ;
-let storeWebsite = '' ;
-let storeEmail = '' ;
+let brandName = '' ;
+let brandLogoUrl = '' ;
+let brandCountry = '' ;
 
 
-//storeDataPassed sample data : {"categoryId": "1", "discountPercentage": null, "discountPrice": "10", "oldPrice": "12", "storeId": 4, "storeName": "Nutella", "storePic": "nutella.png", "storeSize": null, "saleEndDate": "2024-07-29T22:00:00.000Z", "saleId": 1, "saleStartDate": "2024-07-09T22:00:00.000Z", "storeId": "3", "storeLogo": "meridian.png", "subCategoryId": "10"}s
 
-  storeDataPassed?.length > 0 ?  storeName = storeDataPassed[0]?.storeName : storeName ;
+//brandDataPassed sample data : {"categoryId": "1", "discountPercentage": null, "discountPrice": "10", "oldPrice": "12", "brandId": 4, "brandName": "Nutella", "brandPic": "nutella.png", "brandSize": null, "saleEndDate": "2024-07-29T22:00:00.000Z", "saleId": 1, "saleStartDate": "2024-07-09T22:00:00.000Z", "brandId": "3", "brandLogo": "meridian.png", "subCategoryId": "10"}s
 
-
-  if(storeDataPassed?.length > 0) {
+  brandDataPassed?.length > 0 ?  brandName = brandDataPassed[0]?.brandName : brandName ;
 
 
-        storeId = storeDataPassed[0]?.storeId;
-        storeName = storeDataPassed[0]?.storeName;
-        storeLogoUrl = storeDataPassed[0]?.storeLogoUrl;
-        storeFacebookUrl = storeDataPassed[0]?.storeFacebookUrl;
-        storeInstagramUrl = storeDataPassed[0]?.storeInstagramUrl;
-        storePhone = storeDataPassed[0]?.storePhone;
-        storeAddress = storeDataPassed[0]?.storeAddress;
-        storeWebsite = storeDataPassed[0]?.storeWebsite;
-        storeEmail = storeDataPassed[0]?.storeEmail;
-        
+  if(brandDataPassed?.length > 0) {
 
+        brandId = brandDataPassed[0]?.brandId;
+        brandName = brandDataPassed[0]?.brandName;
+        brandLogoUrl = brandDataPassed[0]?.brandLogoUrl;
   }
-
-
-
-  //console.log("storeLogoUrl",storeLogoUrl);
 
 
 
@@ -104,7 +122,7 @@ let storeEmail = '' ;
           <ScrollView style={{flex:1}} contentContainerStyle={{ paddingBottom: 30 }}>
 
         <View style={{justifyContent: 'space-between', alignItems: 'center'}}>
-            <Text>Sa jeni te kenaqur me kete kompani</Text>
+            <Text>Sa jeni te kenaqur me kete brend</Text>
 
         </View>
 
@@ -122,20 +140,18 @@ let storeEmail = '' ;
         
 
             <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                {storeDataPassed?.length > 0 ? <Image source={{uri: storeLogoUrl}} style={[styles2.icon,  { paddingHorizontal:10}]} /> : null}
+                {brandDataPassed?.length > 0 && brandLogoUrl? <Image source={{uri: brandLogoUrl}} style={[styles2.icon,  { paddingHorizontal:10}]} /> : null}
                 <Image id="favoriteImage"
                     source={
-                        storeDataPassed[0]?.isFavorite ? require('./star.png') : require('./white-star.png')
+                        brandDataPassed[0]?.isFavorite ? require('./star.png') : require('./white-star.png')
                     } style={styles2.star}
                 />
             </View>
 
-            {storeDataPassed?.length > 0 ? <Text>{storeName}</Text>  : null}
-            {storeDataPassed?.length > 0 ? <Text>{storeEmail}</Text>  : null}
-            {storeDataPassed?.length > 0 ? <Text>{storeAddress}</Text>  : null}
+            {brandDataPassed?.length > 0 ? <Text>{brandName}</Text>  : null}
         
 
-            { storeDataPassed[0]?.onSale ? <View style={{marginLeft: -28, zIndex: 2}}>
+            { brandDataPassed[0]?.onSale ? <View style={{marginLeft: -28, zIndex: 2}}>
               <Image id="saleImage" source={require('./discount-red.png')} style={styles2.icon2} /></View> 
             : null}
             

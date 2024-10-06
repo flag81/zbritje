@@ -18,7 +18,7 @@ import {QueryClient} from '@tanstack/react-query'
 
 import * as SecureStore from 'expo-secure-store';
 import Toast from 'react-native-root-toast';
-import StoreModal from './StoreModal';
+import BrandModal from './BrandModal';
 
 
 
@@ -91,6 +91,15 @@ const Brands = () => {
   }, [favoriteBrands]);
 
 
+  useEffect(() => {
+
+    console.log("brandData changed :",brandData)
+
+
+  }, [brandData]);
+
+
+
 
 
   const showToast = (message) => {
@@ -131,7 +140,7 @@ const Brands = () => {
 
 
   async function handleBrandFavorites2(item) {
-    const result = await isBrandFavorite(admin, item.BrandId);
+    const result = await isBrandFavorite(admin, item.brandId);
 
     console.log("cnt", result[0].cnt)
 
@@ -192,7 +201,7 @@ const Brands = () => {
 
 
 
-  async function addBrandToFavorites(storeId, storeName) {
+  async function addBrandToFavorites(brandId, brandName) {
 
 
     const userId = admin;
@@ -200,7 +209,7 @@ const Brands = () => {
   
     const data = new URLSearchParams();
     data.append('userId', admin);
-    data.append('storeId', storeId);
+    data.append('storeId', brandId);
 
     console.log("data:" + data);
 
@@ -210,7 +219,7 @@ const Brands = () => {
       
       body: JSON.stringify({
         userId: admin,
-        storeId: storeId,
+        brandId: brandId,
       }),
       headers: {"Content-Type": "application/json"}
     });
@@ -262,6 +271,9 @@ const Brands = () => {
 
   async function isBrandFavorite(userId,brandId) {
 
+    console.log("isBrandFavorite");
+    console.log("userId:" + userId + " brandId:" + brandId);
+
     try
     {
       const resp = await fetch(`${url}/isBrandFavorite?userId=${userId}&brandId=${brandId}`,  {
@@ -271,7 +283,7 @@ const Brands = () => {
 
         const data = await resp.json();
         console.log("is brand favorite  ----------------",data);
-        setAllStores(data);
+        setAllBrands(data);
         return data;
     }
     catch(e)
@@ -329,60 +341,56 @@ const Brands = () => {
 
   }
 
-
-
-
   const renderBrandItem = ({ item }) => 
     {
   
         const imageUrl = {uri:item?.brandLogoUrl};
-
-        const storeId = item?.brandId;
+        console.log("imageUrl:",imageUrl);
+        const brandId = item?.brandId;
   
   
-    return (
-      <ScrollView >
-        <View 
-        style={{ padding: 5, borderColor: 'gray', 
-        borderWidth:0, borderRadius:15, backgroundColor:'white', margin:5, height:150}}>
-          
-          <View style={{ padding: 5, flexDirection: 'row', position: 'relative', justifyContent: 'space-between', alignItems: 'center' }}>
-  
-          <View style={{ flexDirection: 'col',  alignItems: 'center'}}>
-          <View style={{ flexDirection: 'row' , alignItems: 'center'}}>
-  
-              <View style={{ zIndex: 1 }}><TouchableOpacity>
-                {imageUrl ? <Image id="brandImage" source={imageUrl} style={styles.image} /> : null }
-                
-                  </TouchableOpacity>
-              </View>
-              
-  
-          </View>
-          </View>
-  
-              <View style={{ flexDirection: 'col',  alignItems: 'center'}}>
-
-                <TouchableOpacity onPress={() => handleBrandFavorites2(item)}>
-                    <Image id="favoriteImage"
-                            source={
-                            item?.isFavorite ? require('./star.png') : require('./white-star.png')
-                            }
-                            style={styles.star} />
-                </TouchableOpacity>
-              </View>
-          
+      return (
+        <ScrollView >
+          <View 
+          style={{ padding: 5, borderColor: 'gray', 
+          borderWidth:0, borderRadius:15, backgroundColor:'white', margin:5, height:150}}>
+            
+            <View style={{ padding: 5, flexDirection: 'row', position: 'relative', justifyContent: 'space-between', alignItems: 'center' }}>
+    
+            <View style={{ flexDirection: 'col',  alignItems: 'center'}}>
+            <View style={{ flexDirection: 'row' , alignItems: 'center'}}>
+    
+                <View style={{ zIndex: 1 }}><TouchableOpacity onPress={()=>onModalOpen(item)}>
+                  {imageUrl.uri ? <Image id="brandImage" source={imageUrl} style={styles.image} /> : null }
+                  
+                    </TouchableOpacity>
+                </View>
+                 
             </View>
-  
-          <View style={{ flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center'}}>
-  
-          <Text style={{ fontSize: 15, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle' }}>{item.brandName}</Text>
-   
-        </View>
-  
-        </View>
-      </ScrollView>
-    )
+            </View>
+    
+                <View style={{ flexDirection: 'col',  alignItems: 'center'}}>
+
+                  <TouchableOpacity onPress={() => handleBrandFavorites2(item)}>
+                      <Image id="favoriteImage"
+                              source={
+                              item?.isFavorite ? require('./star.png') : require('./white-star.png')
+                              }
+                              style={styles.star} />
+                  </TouchableOpacity>
+                </View>
+            
+              </View>
+    
+            <View style={{ flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center'}}>
+    
+            <Text style={{ fontSize: 15, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle' }}>{item.brandName}</Text>
+    
+          </View>
+    
+          </View>
+        </ScrollView>
+      );
   
   };
   
@@ -393,15 +401,12 @@ return (
 <SafeAreaView style={styles.container}>
 
 <View style={{ padding: 10, flexDirection:'col'}}>
-   <View>
-      <Text>Username: {myUserName}</Text>
-    </View>
+
 
         <View style={{justifyContent: 'space-between', alignItems: 'center'}}>
             <Text>Zgjedheni te preferuarat e juaja</Text>
         </View>
             <View style={{ flex:1, width: Dimensions.get("window").width * 0.95}}>
-
 
                 <MasonryFlashList
                     data={allBrands}
@@ -414,19 +419,17 @@ return (
                     
                 /> 
 
-
                 <View>
-                    <StoreModal isVisible={isModalVisible} onClose={onModalClose} storeDataPassed={brandData}>
+                    <BrandModal isVisible={isModalVisible} onClose={onModalClose} brandDataPassed={brandData}>
                     {/* Details Screen */}
-                    </StoreModal>
+                    </BrandModal>
                 </View>
 
 
             </View>
-  </View>
+      </View>
 
   </SafeAreaView>
-
 
   );
 };

@@ -197,9 +197,6 @@ export default function Settings() {
 
 <View style={{ padding: 5, flexDirection: 'col', position: 'relative', justifyContent: 'space-between', backgroundColor:'white', borderRadius: 20 }}>
 <View>
-        <Text style={{ fontSize: 15, fontWeight: 'bold'}}>
-          Username: {myUserName}
-        </Text>
           
       </View>
       <View>

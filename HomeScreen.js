@@ -105,7 +105,12 @@ async function getLocalUsername(key) {
   
   };
 
-  const url = 'http://10.12.13.197:8800';
+
+
+
+
+  const url = 'http://192.168.1.6:8801';
+  //const url = 'http://10.12.13.197:8800';
   //const url = 'https://nodejs-production-18ad6.up.railway.app';
   const admin = 1 ;
 
@@ -570,9 +575,9 @@ async function getLocalUsername(key) {
   function addIsFavoriteKey(allProducts, favorites) {
     //write code here
 
-    let newProducts = allProducts.map(product => {
-        let isFavorite = favorites.some(favorite => favorite.productId === product.productId);
-        let isOnSale = new Date() >= new Date(product.saleStartDate) && new Date() <= new Date(product.saleEndDate);
+    let newProducts = allProducts?.map(product => {
+        let isFavorite = favorites?.some(favorite => favorite?.productId === product?.productId);
+        let isOnSale = new Date() >= new Date(product?.saleStartDate) && new Date() <= new Date(product?.saleEndDate);
         return {...product, isFavorite, isOnSale};
     });
     return newProducts;
@@ -943,8 +948,6 @@ useEffect
 
 
 
-
-
   const [isModalVisible, setIsModalVisible] = useState(false);
   // ...rest of the code remains same
 
@@ -1079,7 +1082,7 @@ const updateIsFavorite = (productId) => {
 
   console.log("productId:",productId);
 
-  const updatedData = originalData.map((item) => {
+  const updatedData = originalData?.map((item) => {
     if (item.productId === productId) {
       return { ...item, isFavorite: !item.isFavorite };
     }
@@ -1088,12 +1091,13 @@ const updateIsFavorite = (productId) => {
 
 
 
+
   setOriginalData(updatedData);
   setFilteredProducts(updatedData);
 
-  const item = updatedData.find((obj) => obj.productId === productId);
+  const item = updatedData?.find((obj) => obj?.productId === productId);
 
-  if(item.isFavorite)
+  if(item?.isFavorite)
   {
     addFavorite(admin, item.productId, item.productName);
   }
@@ -1134,6 +1138,8 @@ const updateIsFavorite = (productId) => {
     const date = new Date(endDate);
     const formatter = new Intl.DateTimeFormat('en-GB', { dateStyle: 'short' });
     formattedEndDate = formatter?.format(date);
+
+
 
 
 
@@ -1207,16 +1213,13 @@ const updateIsFavorite = (productId) => {
 
 
 
-
 return (
 
 <SafeAreaView style={styles.container}>
 
 
 <View style={{ padding: 10, flexDirection:'col'}}>
-   <View>
-      <Text>Telefonit: {Device.deviceName}</Text>
-    </View>
+
 
 
 
@@ -1252,15 +1255,7 @@ return (
               paddingLeft: 18,
             },
           }}
-          /*
-          renderItem={({title,id}) => (
-           
-              <Text style={{  padding: 15 }}> 
-                  {title}
-              </Text>
-           
-          )}
-          */
+
       />
      
 
@@ -1272,6 +1267,8 @@ return (
       <View >
           <StoreFilter />
       </View>
+
+
 
 
 

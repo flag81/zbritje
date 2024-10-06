@@ -3,6 +3,7 @@
 import express from "express";
 import cors from "cors";
 
+
 import db from './connection.js';
 
 import sessions from "express-session";
@@ -554,7 +555,7 @@ app.get("/getAllStores", (req, res) => {
     
     left join storefavorites on store.storeId = storefavorites.storeId
 
-    
+    and storefavorites.userId = ${userId}
     
     `;
   
@@ -572,6 +573,21 @@ app.get("/getAllStores", (req, res) => {
   });
 
 
+  // write the query so it returns the all the records from stores table and the isFavorite field is storeId is in the storefavorites table for the given userId
+
+
+
+
+
+
+  
+
+
+  
+
+  
+
+
   app.get("/getStoreData", (req, res) => {
 
     //const q = "SELECT tableid,  users.id  FROM orders join users on orders.userid = users.id WHERE orders.status = 0 ";
@@ -579,7 +595,8 @@ app.get("/getAllStores", (req, res) => {
     const userId=  parseInt(req.query.userId);
     const storeId=  parseInt(req.query.storeId);
   
-  
+  // why does the query above return duplicae records from the stores table?
+ 
     
       const q = `SELECT store.storeId, store.storeName, store.storeLogoUrl, storefavorites.userId ,
   
@@ -591,8 +608,7 @@ app.get("/getAllStores", (req, res) => {
                 FROM store
                 
                 left join storefavorites on store.storeId = storefavorites.storeId
-  
-      
+   
       
       `;
     
@@ -629,6 +645,8 @@ app.get("/getAllStores", (req, res) => {
       FROM brands
       
       left join brandfavorites on brands.brandId = brandfavorites.brandId
+
+      and brandfavorites.userId = ${userId}
     
       `;
     
@@ -1082,6 +1100,8 @@ app.put("/update/:id", (req, res) => {
     return res.json(data);
   });
 });
+
+
 
 app.listen(process.env.PORT, () => {
   console.log("Connected to backend.");
