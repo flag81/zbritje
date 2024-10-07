@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, Button, Platform } from 'react-native';
 
 import React, { useState, useEffect , useRef, useMemo, useCallback } from 'react';
 
-
+import useStore from './useStore';
 
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
@@ -45,6 +45,9 @@ Notifications.scheduleNotificationAsync({
   },
   trigger: null,
 });
+
+
+
 
 async function sendPushNotification(expoPushToken) {
   const message = {
@@ -103,10 +106,8 @@ async function registerForPushNotificationsAsync() {
     //console.log("x",Constants.expoConfig?.extra?.eas.projectId);  // --> undefined
     //console.log("x",Constants.easConfig.projectId);  // --> undefined
     //console.log("y",Constants?.expoConfig?.extra?.eas?.projectId);  // --> my project id
-
     //const projectId = Constants.expoConfig.extra.eas.projectId;
     
-
 
 
     if (!projectId) {
@@ -118,7 +119,7 @@ async function registerForPushNotificationsAsync() {
           projectId,
         })
       ).data;
-      console.log(pushTokenString);
+      console.log("expo:",pushTokenString);
       return pushTokenString;
     } catch (e) {
       handleRegistrationError(`${e}`);
@@ -135,7 +136,6 @@ export default function App() {
 
   //const { expoPushToken, notification } = usePushNotifications();
   //const data = JSON.stringify(notification, undefined, 2);
-
   //console.log("expoPushToken",expoPushToken);
   //console.log("data",data); 
 
@@ -144,10 +144,138 @@ export default function App() {
   const notificationListener = useRef();
   const responseListener = useRef();
 
+  const { url, admin } = useStore();
+
+  async function getExpoPushNotificationToken(userId) {
+
+    try
+    {
+  
+      //const responses = await Promise.all([fetch(url1), fetch(url2)])
+  
+      const resp = await fetch(`${url}/getExpoPushNotificationToken?userId=${userId}`,  {
+        method: 'GET',       
+        headers: {"Content-Type": "application/json"}
+      });
+  
+  
+    const data = await resp.json();
+  
+    console.log("getExpoPushNotificationToken----------------------------",data);
+      
+      //setFavoritesData(data);
+      //handleFilterSale();
+      //if favorites data is empty then 
+  
+   return data;
+        
+    }
+    catch(e)
+    {
+      console.log(e);
+    }
+  
+  }
+
+  // write a function to set a push notification with userID and token , take in context getExpoPushNotificationToken function
+
+
+async function setExpoPushNotificationToken(userId,expoPushToken) {
+
+  console.log("setExpoPushNotificationToken sent----------------------------",userId,expoPushToken);
+
+  try
+  {
+    const resp = await fetch(`${url}/setExpoPushNotificationToken?userId=${userId}&expoPushToken=${expoPushToken}`,  {
+      method: 'PUT',    
+      body: JSON.stringify({
+        userId: admin,
+        expoPushToken: expoPushToken
+      }),   
+      headers: {"Content-Type": "application/json"}
+    });
+
+
+
+  //const data = await resp.json();
+
+  console.log("setExpoPushNotificationToken----------------------------");
+    
+    //setFavoritesData(data);
+
+    //if favorites data is empty then
+
+  //return data;
+
+  }
+
+  catch(e)
+  {
+    console.log(e);
+  }
+
+}
+
+
+
+
+
+
+  useEffect(() => {
+
+    console.log("expoPushToken-------",expoPushToken);
+
+  }, [expoPushToken]);
+
   useEffect(() => {
     registerForPushNotificationsAsync()
       .then(token => setExpoPushToken(token ?? ''))
       .catch((error) => setExpoPushToken(`${error}`));
+
+      getExpoPushNotificationToken(1).then(data => {
+
+        console.log("expo data from server:",data);
+        console.log("expo data from server:",data?.length);
+
+        // data can be of this format [{"expoPushToken": null}] , check if expoPushToken is not null before sending push notification
+        // write this code
+
+        const isExpoPushTokenNull = data.some(item => item.expoPushToken === null);
+
+        const expoPushTokenValue = data[0].expoPushToken;
+
+        console.log(expoPushTokenValue); // This will log null
+
+
+
+
+        if(isExpoPushTokenNull) {
+          console.log("expoPushToken is null**********************");
+
+          // check if expoPushToken starts with ExponentPushToken
+
+          const isValidExpoPushToken = expoPushToken.startsWith("ExponentPushToken");
+
+          
+          console.log("isValidExpoPushToken",isValidExpoPushToken);
+
+          if(isValidExpoPushToken) {
+            console.log("expoPushToken is valid",expoPushToken );
+            setExpoPushNotificationToken( admin , expoPushToken);
+          }
+        }
+        else {
+          console.log("expoPushToken is not null");
+        }
+
+
+
+
+        if(data?.length > 0) {
+          //sendPushNotification(data[0].expoPushToken);
+        }
+      }
+      );
 
     notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
       setNotification(notification);
@@ -190,7 +318,7 @@ export default function App() {
         }}
       />
     </View>
-      */}
+  */}
 
 
       <BottomTab />

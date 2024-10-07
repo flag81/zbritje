@@ -12,6 +12,7 @@ import { View,Text,Button, TouchableOpacity,Image, ImageBackground, StyleSheet,S
 
 
 
+
 } from 'react-native';
 
 import messaging from '@react-native-firebase/messaging';
@@ -58,6 +59,7 @@ const HomeScreen = () => {
   const [productData, setProductData] = useState([]);
   const [storedUserName, setStoredUserName] = useState("");
   const [showUserNamePicker, setShowUserNamePicker] = useState(false);
+
 
   const { count, increment ,myUserName, setMyUserName, storeId, onSale, categoryId, 
     subCategoryId, isFavorite, searchText ,setSearchText } = useStore();
@@ -108,9 +110,8 @@ async function getLocalUsername(key) {
 
 
 
-
-  const url = 'http://192.168.1.6:8801';
-  //const url = 'http://10.12.13.197:8800';
+  //const url = 'http://192.168.1.6:8801';
+  const url = 'http://10.12.13.197:8800';
   //const url = 'https://nodejs-production-18ad6.up.railway.app';
   const admin = 1 ;
 
@@ -512,6 +513,10 @@ async function getLocalUsername(key) {
     const data = new URLSearchParams();
     data.append('userId', userId);
     data.append('productId', productId);
+
+
+
+
 
     console.log("data:" + data);
 
@@ -996,7 +1001,7 @@ useEffect(() => {
 }, [prefetchedProductsData]);
 
 useEffect(() => {
-  console.log("filteredProducts changed-------:", filteredProducts)
+  //console.log("filteredProducts changed-------:", filteredProducts)
 }, [filteredProducts]);
 
 

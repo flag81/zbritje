@@ -5,8 +5,8 @@ import {create} from 'zustand';
 const useStore = create((set) => ({
   count: 0,
   myUserName: '',
-  //url : 'http://10.12.13.197:8800',
-  url : 'http://192.168.1.6:8801',
+  url : 'http://10.12.13.197:8800',
+  //url : 'http://192.168.1.6:8801',
   //url : 'https://nodejs-production-18ad6.up.railway.app',
   admin: 1,
   subCategoryId: 0,

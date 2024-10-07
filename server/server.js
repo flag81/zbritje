@@ -155,6 +155,65 @@ app.get("/getUserEmail", (req, res) => {
 });
 
 
+//write a get endpoint getExpoPushNotificationToken that takes userId as a parameter and returns the expo push notification token for the user from users table
+
+app.get("/getExpoPushNotificationToken", (req, res) => {
+  
+    //const q = "SELECT tableid,  users.id  FROM orders join users on orders.userid = users.id WHERE orders.status = 0 ";
+    const q = `SELECT expoPushToken FROM users WHERE userId = ${req.query.userId}`;
+    
+    const userId= req.query.userId;
+  
+    db.query(q, [userId], (err, data) => {
+  
+      if (err) {
+        console.log(err);
+        return res.json(err);
+      }
+
+      console.log("expoPushToken", data);
+  
+      return res.json(data);
+    });
+  });
+
+  //write a get endpoint setExpoPushNotificationToken that takes userId and expoPushToken as parameters and updates the expo push notification token for the user in the users table
+
+  app.put("/setExpoPushNotificationToken", (req, res) => {
+
+    //convert string to number
+    const userId = parseInt(req.body.userId);
+
+    console.log("userId",userId);
+
+
+    //convert to string with escape characters
+    const expoPushToken = req.body.expoPushToken;
+
+    console.log("setExpoPushNotificationToken expoPushToken:::::",expoPushToken);
+
+
+    const q = `UPDATE users SET expoPushToken="${expoPushToken}" WHERE userId = ${userId}`;
+
+
+    console.log("q",q);
+
+    const values = [
+      req.body.userId,
+      req.body.expoPushToken
+    ];
+
+    //console.log(">>" + q);
+    //console.log(">>" + req.body.expoPushToken);
+
+    db.query(q, [values], (err, data) => {
+      if (err) return res.send(err);
+
+      //console.log("id",bookId)
+      return res.json(data);
+    });
+  });
+
 
 app.get("/getUserNotificationLevel", (req, res) => {
 
@@ -1104,5 +1163,5 @@ app.put("/update/:id", (req, res) => {
 
 
 app.listen(process.env.PORT, () => {
-  console.log("Connected to backend.");
+  console.log("Connected to backend.", process.env.PORT);
 });
