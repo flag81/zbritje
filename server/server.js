@@ -347,37 +347,56 @@ console.log("searchText", searchText);
 
 
   //offset1 = parseInt(offset1);
-
   //console.log("valuessssss")
   //const q = "SELECT tableid,  users.id  FROM orders join users on orders.userid = users.id WHERE orders.status = 0 ";
-
 // change the query so if storeId is greater than 0 then it will filter by storeId
 // if storeId is 0 then it will return all products
 
 
   const q = 
   
-  `SELECT products.productId, products.productName, products.productPic, products.categoryId, 
-  products.productSize , products.subCategoryId, products.storeId, products.imageUrl,products.productUrl,products.productRating,
-    sales.saleId, sales.saleStartDate,sales.saleEndDate,sales.storeLogo, sales.oldPrice, sales.discountPrice,
-    sales.discountPercentage, store.storeLogo as storeLogo,
+  `
+  SELECT 
+  products.productId, 
+  products.productName, 
+  products.productPic, 
+  products.categoryId, 
+  products.productSize, 
+  products.subCategoryId, 
+  products.storeId, 
+  products.imageUrl,
+  products.productUrl,
+  products.productRating,
+  sales.saleId, 
+  sales.saleStartDate,
+  sales.saleEndDate,
+  sales.storeLogo, 
+  sales.oldPrice, 
+  sales.discountPrice,
+  sales.discountPercentage, 
+  store.storeLogo as storeLogo,
 
-    CASE 
-        WHEN f.id IS NOT NULL THEN true 
-        ELSE false 
-    END AS isFavorite ,
+  CASE 
+    WHEN f.id IS NOT NULL THEN true 
+    ELSE false 
+  END AS isFavorite,
   
   CASE 
-        WHEN
-    CURRENT_DATE() between sales.saleStartDate and sales.saleEndDate THEN true 
-            ELSE false 
-    END AS onSale
+    WHEN sf.id IS NOT NULL THEN true 
+    ELSE false 
+  END AS isStoreFavorite, -- Added this line to check if the store is a favorite
   
-  FROM products
+  CASE 
+    WHEN CURRENT_DATE() BETWEEN sales.saleStartDate AND sales.saleEndDate THEN true 
+    ELSE false 
+  END AS onSale
   
-  left join sales on products.productId = sales.productId
-  left join store on products.storeId = store.storeId
-  left join favorites f on products.productId = f.productId
+FROM products
+  
+LEFT JOIN sales ON products.productId = sales.productId
+LEFT JOIN store ON products.storeId = store.storeId
+LEFT JOIN favorites f ON products.productId = f.productId
+LEFT JOIN storefavorites sf ON store.storeId = sf.storeId -- Assuming the join condition is correct
 
 
   WHERE 
@@ -418,7 +437,10 @@ console.log("searchText", searchText);
 
 
 
-  order by isFavorite DESC,sales.saleEndDate DESC limit 10 OFFSET ${offset1} `;
+  order by isFavorite DESC,sales.saleEndDate DESC,
+  isStoreFavorite DESC
+  
+  limit 10 OFFSET ${offset1} `;
 
 
   //LIMIT ${req.query.limit} OFFSET ${req.query.offset}
@@ -790,7 +812,7 @@ app.get("/checkIfUserNameExists", (req, res) => {
 
   //console.log("x",req.query.id);
 
-  const q = "SELECT count(*) as found FROM users WHERE userName = ? ";
+  const q = "SELECT userId as found FROM users WHERE userName = ? ";
   db.query(q, [username], (err, data) => {
 
 

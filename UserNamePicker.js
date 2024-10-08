@@ -1,11 +1,10 @@
 import { Modal, View, Text, TextInput, Pressable, StyleSheet, Button, Alert, Input } from 'react-native';
 import React, { useState, useEffect , useCallback } from 'react';
-
+import { Storage } from 'expo-storage';
 
 
 import * as SecureStore from 'expo-secure-store';
 import useStore from './useStore';
-
 
 
 export default function UserNamePicker({ isVisible, onClose }) {
@@ -15,9 +14,9 @@ export default function UserNamePicker({ isVisible, onClose }) {
     const [visible, setVisible] = useState(false);
     const [showForm, setShowForm] = useState(true);
 
-    const { myUserName, setMyUserName } = useStore();
+    const { myUserName, setMyUserName, url, setUserId } = useStore();
     
-  const url = 'http://10.12.13.197:8800';
+  //const url = 'http://10.12.13.197:8800';
 
 
 
@@ -25,6 +24,16 @@ export default function UserNamePicker({ isVisible, onClose }) {
     await SecureStore.setItemAsync(key, value);
   }
   
+
+  async function getLocalUsername(key) {
+    let result = await SecureStore.getItemAsync(key);
+
+    if (result)
+      return result;
+    else
+      return null;
+
+  }
 
 
   useEffect(() => {
@@ -60,10 +69,8 @@ export default function UserNamePicker({ isVisible, onClose }) {
           });
     
 
-
-
             //const data = await resp;    
-            console.log("addUser:",resp.json())  ;
+            console.log("addUser function response:",resp.json())  ;
 
             //on success, show message and close modal
             setUserMessage(" Username i juaj u ruajt me sukses.");
@@ -74,6 +81,7 @@ export default function UserNamePicker({ isVisible, onClose }) {
 
             //diable save button and textinput
             setUserName("");
+
             //setSaveButtonDisabled(true);
             setShowForm(false);
 
@@ -92,27 +100,32 @@ export default function UserNamePicker({ isVisible, onClose }) {
     async function checkIfUserNameExists(userName) {
         try
         {
+
+          console.log("checkIfUserNameExists with username",userName);
+
           const resp = await fetch(`${url}/checkIfUserNameExists?userName=${userName}`,  {
             method: 'GET',       
             headers: {"Content-Type": "application/json"}
           });
     
-            const data = await resp.json();    
-            console.log("checkIfUserNameExists",data);
+            const data = await resp.json();  
+            console.log("checkIfUserNameExists data",data);  
+            console.log("checkIfUserNameExists length",data.length);
 
-            if (data.length > 0) {
-                const found = data[0].found;
-                console.log("Found:", found);
+            if (data.length == 0) {
+                //const found = data[0].found;
+                console.log("Not found userId:");
                 // You can now use the 'found' variable as needed
 
-                if(found == 0) {
-                    //onSubmit();
-                    (async() => await addUser(userName))();
-                } else {
-                    //Alert.alert("Username jo-valid", "Username eshte i zene, zgjidhni nje tjeter."); 
-                    setUserMessage("Username eshte i zene, zgjidhni nje tjeter.");       
-                }       
-            }
+                (async() => await addUser(userName))();
+      
+            } else {
+              //Alert.alert("Username jo-valid", "Username eshte i zene, zgjidhni nje tjeter.");
+              const found = data[0].found;
+              console.log("found userId:",found);
+              setUserId(found);
+              setUserMessage("Username eshte i zene, zgjidhni nje tjeter.");       
+          }       
   
         }
         catch(e)

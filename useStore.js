@@ -24,6 +24,7 @@ const useStore = create((set) => ({
   setStoreId: (storeId) => set(() => ({ storeId: storeId })),
   setIsFavorite: (isFavorite) => set(() => ({ isFavorite: isFavorite })),
   setOnSale: (onSale) => set(() => ({ onSale: onSale })),
+  setUserId: (userId) => set(() => ({ userId: userId })),
   
   //write a function to set the onSearchFilterIdList with an array of productIds
   setSearchText: (searchText) => set(() => ({ searchText: searchText })),

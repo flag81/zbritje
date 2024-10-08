@@ -62,21 +62,13 @@ const HomeScreen = () => {
 
 
   const { count, increment ,myUserName, setMyUserName, storeId, onSale, categoryId, 
-    subCategoryId, isFavorite, searchText ,setSearchText } = useStore();
+    subCategoryId, isFavorite, searchText ,setSearchText, admin, url } = useStore();
 
     
 
 
 
-    const [isConditionMet, setIsConditionMet] = useState(false);
-
-  //const first = useFetchData();
-
-  //const token = handleAuth();
-
-
-
-
+const [isConditionMet, setIsConditionMet] = useState(false);
 
 async function setLocalUsername(key, value) {
   await SecureStore.setItemAsync(key, value);
@@ -108,12 +100,10 @@ async function getLocalUsername(key) {
   };
 
 
-
-
   //const url = 'http://192.168.1.6:8801';
-  const url = 'http://10.12.13.197:8800';
+  //const url = 'http://10.12.13.197:8800';
   //const url = 'https://nodejs-production-18ad6.up.railway.app';
-  const admin = 1 ;
+  //const admin = 1 ;
 
   
   const onRefresh = React.useCallback(() => {
@@ -136,12 +126,8 @@ async function getLocalUsername(key) {
   }, []);
 
 
-
   // write code to use useInfiniteQuery from @tanstack/react-query to fetch the data from the server with paggination and infinite scroll 
   // the data should be fetched in pages of 10 items per page, the data should be fetched from the server using the getData function
-
-
-
 
   const prefetchGetData = async (admin) => {
     // The results of this query will be cached like a normal query
@@ -205,10 +191,9 @@ async function getLocalUsername(key) {
 
 
 
-
   useEffect(() => {
 
-    //console.log("filteredProducts changed>>>>>:",filteredProducts?.length)
+    //console.log("filteredProducts changed>>>>>:",filteredProducts)
     setListLength(filteredProducts?.length);
 
   }, [filteredProducts]);
@@ -216,10 +201,16 @@ async function getLocalUsername(key) {
 
   const loadInitaialData = () => {
    
+
+
+
+
+
     const userName =  getLocalUsername('username').then((result) => {
       console.log("username:------------------------------------------------:",result);
       //setShowUserNamePicker(true);
 
+      //result = false;
 
       if(!result)
       {
@@ -248,12 +239,9 @@ async function getLocalUsername(key) {
     setIsVisible(false);
     //getProductOnSale(admin);
     //prefetchProducts(admin);
-    
-   
+       
     console.log("*************************************************************************************************")
     //filterSaleData();
-
-
 
   ;}
 
@@ -276,8 +264,6 @@ async function getLocalUsername(key) {
   useEffect(() => {
 
 
-
-    
     //setAuthToken(token);
     // handle promise rejection
     
@@ -288,8 +274,6 @@ async function getLocalUsername(key) {
  
 
   }, []);
-
-
 
 
    async function auth()  {
@@ -424,11 +408,13 @@ async function getLocalUsername(key) {
     }
 
   }
+
+
   
 //write function to filter the to match the sale data with the favorites data
   const filterSaleData = () => {
 
-    const filteredSaleData = saleData.filter(item => favoritesData.some(obj => obj.productId === item.productId));
+    const filteredSaleData = saleData?.filter(item => favoritesData?.some(obj => obj?.productId === item?.productId));
     console.log("filteredFavoritesDataOnSale",filteredSaleData);
     //setFilteredProducts(filteredSaleData);
 
@@ -992,6 +978,7 @@ useEffect(() => {
 
 
 
+
 useEffect(() => {
   console.log("searchText changed-------:", searchText)
 }, [searchText]);
@@ -1128,6 +1115,7 @@ const updateIsFavorite = (productId) => {
 
       // 
  
+
       let oldPrice = '';
       let discountPrice = '';
       let discountPercentage = '';

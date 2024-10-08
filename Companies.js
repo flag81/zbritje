@@ -229,6 +229,8 @@ const Companies = () => {
   }
 
 
+  
+
   async function removeStoreFromFavorites(storeId, storeName) {
 
     //const queryParams = new URLSearchParams({ userId: userId, productId:productId });
