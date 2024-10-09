@@ -79,6 +79,13 @@ const storeToken = async (token) => {
 };
 
 
+const getToken = async () => {
+  const result = await SecureStore.getItemAsync('userToken');
+
+  return result;
+  //console.log("result token------:",result);
+};
+
 async function getLocalUsername(key) {
   let result = await SecureStore.getItemAsync(key);
   if (result) {
@@ -204,13 +211,22 @@ async function getLocalUsername(key) {
 
 
 
+    getToken().then((result) => {
+      console.log("result token:",result);
+      //setAuthToken(result);
+
+    });
+
+
+
+
 
 
     const userName =  getLocalUsername('username').then((result) => {
       console.log("username:------------------------------------------------:",result);
       //setShowUserNamePicker(true);
 
-      //result = false;
+      result = false;
 
       if(!result)
       {
@@ -225,6 +241,11 @@ async function getLocalUsername(key) {
         console.log("result found setMyUserName:");  
       }
     });
+
+
+
+    
+    
 
 
     setSelectedData([]);

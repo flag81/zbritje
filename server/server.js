@@ -135,7 +135,29 @@ app.get("/", (req, res) => {
 
 });
 
-app.get("/getUserEmail", (req, res) => {
+
+app.get("/getUserId", (req, res) => {
+
+  //const q = "SELECT tableid,  users.id  FROM orders join users on orders.userid = users.id WHERE orders.status = 0 ";
+  const q = `SELECT userId FROM users WHERE userName = "${req.query.userName}"`;
+  
+
+  console.log("getUserId:",q);
+
+  const userName= req.query.userName;
+
+  db.query(q, [userName], (err, data) => {
+
+    if (err) {
+      console.log(err);
+      return res.json(err);
+    }
+
+    return res.json(data);
+  });
+});
+
+app.get("/", (req, res) => {
 
   //const q = "SELECT tableid,  users.id  FROM orders join users on orders.userid = users.id WHERE orders.status = 0 ";
   const q = `SELECT email FROM users WHERE userId = ${req.query.userId}`;
@@ -179,7 +201,7 @@ app.get("/getExpoPushNotificationToken", (req, res) => {
 
   //write a get endpoint setExpoPushNotificationToken that takes userId and expoPushToken as parameters and updates the expo push notification token for the user in the users table
 
-  app.put("/setExpoPushNotificationToken", (req, res) => {
+  app.put("/addExpoPushNotificationToken", (req, res) => {
 
     //convert string to number
     const userId = parseInt(req.body.userId);

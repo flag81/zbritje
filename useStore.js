@@ -16,6 +16,7 @@ const useStore = create((set) => ({
   onSale: false,
   searchText: '',
   userId:0,
+  expoPushToken: '',
   setMyUserName: (userData) => set((state) => ({ myUserName: userData })),
   increment: () => set((state) => ({ count: state.count + 1 })),
   decrement: () => set((state) => ({ count: state.count - 1 })),
@@ -28,6 +29,7 @@ const useStore = create((set) => ({
   
   //write a function to set the onSearchFilterIdList with an array of productIds
   setSearchText: (searchText) => set(() => ({ searchText: searchText })),
+  setExpoPushToken: (expoPushToken) => set(() => ({ expoPushToken: expoPushToken })),
 
 }));
 

@@ -120,7 +120,9 @@ async function registerForPushNotificationsAsync() {
         })
       ).data;
       console.log("expo:",pushTokenString);
+      //setExpoPushNotificationToken(pushTokenString);
       return pushTokenString;
+
     } catch (e) {
       handleRegistrationError(`${e}`);
     }
@@ -144,7 +146,7 @@ export default function App() {
   const notificationListener = useRef();
   const responseListener = useRef();
 
-  const { url, admin } = useStore();
+  const { url, admin , setExpoPushNotificationToken, userId} = useStore();
 
   async function getExpoPushNotificationToken(userId) {
 
@@ -180,13 +182,13 @@ export default function App() {
   // write a function to set a push notification with userID and token , take in context getExpoPushNotificationToken function
 
 
-async function setExpoPushNotificationToken(userId,expoPushToken) {
+async function addExpoPushNotificationToken(userId,expoPushToken) {
 
-  console.log("setExpoPushNotificationToken sent----------------------------",userId,expoPushToken);
+  console.log("addExpoPushNotificationToken sent----------------------------",userId,expoPushToken);
 
   try
   {
-    const resp = await fetch(`${url}/setExpoPushNotificationToken?userId=${userId}&expoPushToken=${expoPushToken}`,  {
+    const resp = await fetch(`${url}/addExpoPushNotificationToken?userId=${userId}&expoPushToken=${expoPushToken}`,  {
       method: 'PUT',    
       body: JSON.stringify({
         userId: admin,
@@ -199,7 +201,7 @@ async function setExpoPushNotificationToken(userId,expoPushToken) {
 
   //const data = await resp.json();
 
-  console.log("setExpoPushNotificationToken----------------------------");
+  console.log("addExpoPushNotificationToken added token----------------------------");
     
     //setFavoritesData(data);
 
@@ -250,7 +252,7 @@ async function setExpoPushNotificationToken(userId,expoPushToken) {
 
 
         if(isExpoPushTokenNull) {
-          console.log("expoPushToken is null**********************");
+          console.log("expoPushToken is null ********************** ");
 
           // check if expoPushToken starts with ExponentPushToken
 
@@ -261,7 +263,7 @@ async function setExpoPushNotificationToken(userId,expoPushToken) {
 
           if(isValidExpoPushToken) {
             console.log("expoPushToken is valid",expoPushToken );
-            setExpoPushNotificationToken( admin , expoPushToken);
+            addExpoPushNotificationToken(userId, expoPushToken);
           }
         }
         else {

@@ -24,6 +24,9 @@ export default function UserNamePicker({ isVisible, onClose }) {
     await SecureStore.setItemAsync(key, value);
   }
   
+  async function setLocalUserId(key, value) {
+    await SecureStore.setItemAsync(key, value);
+  }
 
   async function getLocalUsername(key) {
     let result = await SecureStore.getItemAsync(key);
@@ -94,6 +97,41 @@ export default function UserNamePicker({ isVisible, onClose }) {
     
       }
 
+// write a function getUserId to call api to return the userId  with given username,
+// if username exists, then return the userId
+
+
+
+async function getUserId(username) {
+  try {
+
+    console.log("getUserId with username",username);
+
+    // Replace 'API_ENDPOINT' with the actual endpoint URL for checking usernames
+    const response = await fetch(`${url}/getUserId?userName=${username}`);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const data = await response.json();
+
+    console.log("found userid ---", data[0]?.userId) 
+    
+    // Assuming the API returns an array and the first object contains the userId if found
+    if (data.length > 0 && data[0].userId) {
+      console.log("found userId::::", data[0]?.userId)  ;
+
+      setUserId(data[0].userId);
+      return data[0].userId; // Return the found userId
+    } else {
+      console.log("userId not found");
+      return null; // Username does not exist
+    }
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    return null;
+  }
+}
+
 
 
 
@@ -117,12 +155,14 @@ export default function UserNamePicker({ isVisible, onClose }) {
                 console.log("Not found userId:");
                 // You can now use the 'found' variable as needed
 
-                (async() => await addUser(userName))();
+                await addUser(userName);
+
+                await getUserId(userName);
       
             } else {
               //Alert.alert("Username jo-valid", "Username eshte i zene, zgjidhni nje tjeter.");
               const found = data[0].found;
-              console.log("found userId:",found);
+              console.log("found taken userId:",found);
               setUserId(found);
               setUserMessage("Username eshte i zene, zgjidhni nje tjeter.");       
           }       
