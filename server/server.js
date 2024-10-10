@@ -335,6 +335,11 @@ app.get("/products",verifyToken, (req, res) => {
   }
 
 
+  let userId = parseInt(req.query.userId, 10);
+  if (isNaN(userId) || userId < 0) {
+    userId = 0;
+  } 
+
   let storeId = parseInt(req.query.storeId, 10);
   if (isNaN(storeId) || storeId < 0) {
     storeId = 0;
@@ -349,6 +354,8 @@ app.get("/products",verifyToken, (req, res) => {
   console.log("offset1:", offset1);
 
   console.log("storeId", storeId);
+
+  console.log("userId", userId);
 
   console.log("categoryId", categoryId);
 
@@ -399,7 +406,7 @@ console.log("searchText", searchText);
   store.storeLogo as storeLogo,
 
   CASE 
-    WHEN f.id IS NOT NULL THEN true 
+    WHEN f.userId = ${userId} THEN true 
     ELSE false 
   END AS isFavorite,
   
@@ -466,7 +473,7 @@ LEFT JOIN storefavorites sf ON store.storeId = sf.storeId -- Assuming the join c
 
 
   //LIMIT ${req.query.limit} OFFSET ${req.query.offset}
-  const userId= req.query.userId;
+  //const userId= req.query.userId;
 
   //console.log("q",q);
 
@@ -945,13 +952,14 @@ app.post("/addUser", (req, res) => {
  
     const my = {errors:''}
     console.clear();
-    console.log("valuessssss111111");
-    const q = "INSERT INTO users(`userName`) VALUES (?)";
+    console.log("add user");
+    const q = "INSERT INTO users(`userName`,`expoPushToken`) VALUES (?)";
   
     const values = [
-      req.body.userName
+      req.body.userName,
+      req.body.expoPushToken
     ];
-    console.log(">>" + req.body.userName);
+    console.log(">> addUser:" + values);
    
     db.query(q, [values], (err, data) => {
   
@@ -961,6 +969,9 @@ app.post("/addUser", (req, res) => {
   });
 
 
+
+  
+  
   app.put("/updateUserEmail", (req, res) => {
 
     //convert string to number

@@ -26,6 +26,8 @@ import { AutocompleteDropdown } from 'react-native-autocomplete-dropdown';
 import Toast from 'react-native-root-toast';
 import StoreFilter from './StoreFilter';
 
+
+
 //import useFetchData from './useFetchData';
 
 const queryClient = new QueryClient();
@@ -62,7 +64,7 @@ const HomeScreen = () => {
 
 
   const { count, increment ,myUserName, setMyUserName, storeId, onSale, categoryId, 
-    subCategoryId, isFavorite, searchText ,setSearchText, admin, url } = useStore();
+    subCategoryId, isFavorite, searchText ,setSearchText, admin,  setAdmin , url, myUserId, setMyUserId} = useStore();
 
     
 
@@ -79,12 +81,15 @@ const storeToken = async (token) => {
 };
 
 
-const getToken = async () => {
-  const result = await SecureStore.getItemAsync('userToken');
+const getLocalToken = async () => {
+  const result = await SecureStore.getItemAsync('expoToken');
 
   return result;
   //console.log("result token------:",result);
 };
+
+
+
 
 async function getLocalUsername(key) {
   let result = await SecureStore.getItemAsync(key);
@@ -95,7 +100,17 @@ async function getLocalUsername(key) {
     //alert('No values stored under that key.');
     return false;
   }
-}
+};
+
+
+
+
+
+
+
+
+
+ //console.log("myUserId:::::::::",myUserId);
 
 
   const handleBottomSheet = (data, item) => {
@@ -122,6 +137,7 @@ async function getLocalUsername(key) {
       setFilteredProducts([]); 
       setSaleData([]);     
       getFavorites(admin);
+
       //getData(admin,1);
       getCategories(admin);
       getSubCategories(admin);
@@ -205,13 +221,71 @@ async function getLocalUsername(key) {
 
   }, [filteredProducts]);
 
+useEffect(() => {
+
+
+  console.log("myUserName changed:",myUserName);
+
+  getUserIdByUsername(myUserName)
+
+ .then(userId => {
+  console.log('User ID:', userId);
+  setAdmin(userId);
+  setMyUserId(userId);
+
+})
+.catch(error => {
+  console.error('Failed to fetch user ID:', error);
+});
+
+
+}, [myUserName]);
+
+  async function getUserIdByUsername(username) {
+    try {
+  
+      console.log("getUserId with username",username);
+  
+      // Replace 'API_ENDPOINT' with the actual endpoint URL for checking usernames
+      const response = await fetch(`${url}/getUserId?userName=${username}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+  
+      console.log("found userid ---", data[0]?.userId) 
+      
+      // Assuming the API returns an array and the first object contains the userId if found
+      if (data.length > 0 && data[0].userId) {
+        console.log("found userId::::", data[0]?.userId)  ;
+  
+  
+        // HOW TO parse to string data[0].userId VALUE
+  
+        //setUserId(data[0].userId);
+        //await setLocalUserId("userId", data[0].userId.toString());
+  
+        //console.log("setLocalUserId init:",data[0].userId);
+  
+        return data[0].userId; // Return the found userId
+      } else {
+        console.log("userId not found");
+        return null; // Username does not exist
+      }
+    } catch (error) {
+      console.error('Error fetching userid :', error);
+      return null;
+    }
+  }
+
+
 
   const loadInitaialData = () => {
    
 
 
 
-    getToken().then((result) => {
+    getLocalToken().then((result) => {
       console.log("result token:",result);
       //setAuthToken(result);
 
@@ -223,14 +297,14 @@ async function getLocalUsername(key) {
 
 
     const userName =  getLocalUsername('username').then((result) => {
-      console.log("username:------------------------------------------------:",result);
+      console.log("local username by key:--------:",result);
       //setShowUserNamePicker(true);
 
-      result = false;
+      //result = false;
 
       if(!result)
       {
-        console.log("result found:", result);
+        console.log("storage username not found:", result);
         //poup login modal 
         setShowUserNamePicker(true);
         //setLocalUsername('username', 'admin');
@@ -244,7 +318,12 @@ async function getLocalUsername(key) {
 
 
 
-    
+
+
+
+
+
+
     
 
 
@@ -513,12 +592,12 @@ async function getLocalUsername(key) {
 
 
 
-  async function addFavorite(userId, productId, productName) {
+  async function addFavorite(admin, productId, productName) {
 
-    console.log("addFav:" + userId + "-" + productId);
+    console.log("addFav:" + admin + "-" + productId);
   
     const data = new URLSearchParams();
-    data.append('userId', userId);
+    data.append('userId', admin);
     data.append('productId', productId);
 
 
@@ -623,7 +702,7 @@ useInfiniteQuery({
 //const userId = user?.id
 
 
-const params = { admin:admin, storeId:storeId };
+const params = { admin:myUserId, storeId:storeId };
 
 
 
@@ -678,6 +757,7 @@ const { data, isLoading, refetch, hasNextPage, fetchNextPage, allPages, error } 
 
 
 
+
 useEffect
 (() => {
 
@@ -701,13 +781,14 @@ useEffect
 }, [data]);
 
 
+
 //console.log("dataArray:",dataArray);
 
   async function getData(userId,page, storeId, categoryId, subCategoryId, isFavorite, onSale, searchText) {
     try
     {
 
-      console.log("getData:::::::::::::::::");
+      console.log("getData:::::::::::::::::, userId:",userId);
 
       const resp = await fetch(`${url}/products?limit=10&userId=${userId}&offset=${page}&storeId=${storeId}&categoryId=${categoryId}&isFavorite=${isFavorite}&onSale=${onSale}&searchText=${searchText}`,  {
         method: 'GET',       

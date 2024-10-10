@@ -14,13 +14,25 @@ export default function UserNamePicker({ isVisible, onClose }) {
     const [visible, setVisible] = useState(false);
     const [showForm, setShowForm] = useState(true);
 
-    const { myUserName, setMyUserName, url, setUserId } = useStore();
+    const { myUserName, setMyUserName, url, setUserId , expoToken} = useStore();
     
   //const url = 'http://10.12.13.197:8800';
+
+  useEffect(() => {
+
+
+
+    console.log("expoToken changed:",expoToken);
+
+  }, [expoToken]);
 
 
 
   async function setLocalUsername(key, value) {
+    await SecureStore.setItemAsync(key, value);
+  }
+
+  async function setLocalExpoToken(key, value) {
     await SecureStore.setItemAsync(key, value);
   }
   
@@ -59,14 +71,17 @@ export default function UserNamePicker({ isVisible, onClose }) {
 
 
 
-    async function addUser(userName) {
+    async function addUser(userName, token) {
         try
         {
-          const resp = await fetch(`${url}/addUser?userName=${userName}`,  {
+
+          console.log("addUser with token",token);
+          const resp = await fetch(`${url}/addUser?userName=${userName}&expoPushToken=${token}`,  {
             method: 'POST',      
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({
                 userName: userName,
+                expoPushToken: token
               }),
 
           });
@@ -81,6 +96,8 @@ export default function UserNamePicker({ isVisible, onClose }) {
             setLocalUsername("username", userName);
 
             setMyUserName(userName);
+
+            setLocalExpoToken("expoToken",expoToken);
 
             //diable save button and textinput
             setUserName("");
@@ -120,7 +137,19 @@ async function getUserId(username) {
     if (data.length > 0 && data[0].userId) {
       console.log("found userId::::", data[0]?.userId)  ;
 
+
+      // HOW TO parse to string data[0].userId VALUE
+
+
+
+
+
+
       setUserId(data[0].userId);
+      await setLocalUserId("userId", data[0].userId.toString());
+
+      console.log("setLocalUserId init:",data[0].userId);
+
       return data[0].userId; // Return the found userId
     } else {
       console.log("userId not found");
@@ -131,6 +160,8 @@ async function getUserId(username) {
     return null;
   }
 }
+
+
 
 
 
@@ -152,10 +183,12 @@ async function getUserId(username) {
 
             if (data.length == 0) {
                 //const found = data[0].found;
-                console.log("Not found userId:");
+                console.log("Not found username:");
                 // You can now use the 'found' variable as needed
 
-                await addUser(userName);
+                await addUser(userName, expoToken);
+
+                console.log("addUser with tokennnnnnn",userName,expoToken);
 
                 await getUserId(userName);
       

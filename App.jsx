@@ -27,9 +27,6 @@ import { RootSiblingParent } from 'react-native-root-siblings';
 //import { usePushNotifications } from './usePushNotifications';
 
 
-//console.log("x",Constants.easConfig.projectId);  // --> undefined
-//console.log("y",Constants?.expoConfig?.extra?.eas?.projectId);  // --> my project id
-
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -120,7 +117,8 @@ async function registerForPushNotificationsAsync() {
         })
       ).data;
       console.log("expo:",pushTokenString);
-      //setExpoPushNotificationToken(pushTokenString);
+
+     
       return pushTokenString;
 
     } catch (e) {
@@ -130,6 +128,7 @@ async function registerForPushNotificationsAsync() {
     handleRegistrationError('Must use physical device for push notifications');
   }
 }
+
 
 
 const queryClient = new QueryClient();
@@ -146,7 +145,7 @@ export default function App() {
   const notificationListener = useRef();
   const responseListener = useRef();
 
-  const { url, admin , setExpoPushNotificationToken, userId} = useStore();
+  const { url, admin , setExpoToken, userId} = useStore();
 
   async function getExpoPushNotificationToken(userId) {
 
@@ -246,7 +245,9 @@ async function addExpoPushNotificationToken(userId,expoPushToken) {
 
         const expoPushTokenValue = data[0].expoPushToken;
 
-        console.log(expoPushTokenValue); // This will log null
+
+        setExpoToken(expoPushTokenValue);
+        console.log("setExpoToken:::",expoPushTokenValue); // This will log null
 
 
 

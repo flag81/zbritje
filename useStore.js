@@ -1,3 +1,4 @@
+import { setAutoServerRegistrationEnabledAsync } from 'expo-notifications';
 import {create} from 'zustand';
 
 
@@ -16,7 +17,8 @@ const useStore = create((set) => ({
   onSale: false,
   searchText: '',
   userId:0,
-  expoPushToken: '',
+  myUserId:0,
+  expoToken: '',
   setMyUserName: (userData) => set((state) => ({ myUserName: userData })),
   increment: () => set((state) => ({ count: state.count + 1 })),
   decrement: () => set((state) => ({ count: state.count - 1 })),
@@ -26,10 +28,12 @@ const useStore = create((set) => ({
   setIsFavorite: (isFavorite) => set(() => ({ isFavorite: isFavorite })),
   setOnSale: (onSale) => set(() => ({ onSale: onSale })),
   setUserId: (userId) => set(() => ({ userId: userId })),
+  setAdmin: (admin) => set(() => ({ admin: admin })),
   
   //write a function to set the onSearchFilterIdList with an array of productIds
   setSearchText: (searchText) => set(() => ({ searchText: searchText })),
-  setExpoPushToken: (expoPushToken) => set(() => ({ expoPushToken: expoPushToken })),
+  setExpoToken: (expoToken) => set(() => ({ expoToken: expoToken })),
+  setMyUserId: (myUserId) => set(() => ({ myUserId: myUserId })),
 
 }));
 
