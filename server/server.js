@@ -424,7 +424,7 @@ FROM products
   
 LEFT JOIN sales ON products.productId = sales.productId
 LEFT JOIN store ON products.storeId = store.storeId
-LEFT JOIN favorites f ON products.productId = f.productId
+LEFT JOIN favorites f ON products.productId = f.productId and f.userId = ${userId}
 LEFT JOIN storefavorites sf ON store.storeId = sf.storeId -- Assuming the join condition is correct
 
 

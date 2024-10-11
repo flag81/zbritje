@@ -33,7 +33,10 @@ import StoreFilter from './StoreFilter';
 const queryClient = new QueryClient();
 
 
+
 const HomeScreen = () => {
+
+  //console.log("EEEEEEEEEEENNNNNNNNNNNNNTTTTTTTTTTTTTTTEEEEEEEEEEEEERRRRRRRRRRRRRR11111111111111111");
 
 
   const [allProducts, setAllProducts] = useState([]);
@@ -136,11 +139,11 @@ async function getLocalUsername(key) {
       setSubCategories([]);
       setFilteredProducts([]); 
       setSaleData([]);     
-      getFavorites(admin);
+      //getFavorites(admin);
 
       //getData(admin,1);
       getCategories(admin);
-      getSubCategories(admin);
+      //getSubCategories(admin);
       //filterSaleData();
       setTimeout(() => {
       setRefreshing(false);
@@ -216,10 +219,19 @@ async function getLocalUsername(key) {
 
   useEffect(() => {
 
-    //console.log("filteredProducts changed>>>>>:",filteredProducts)
+    console.log("filteredProducts changed>>>>>:",filteredProducts?.length)
     setListLength(filteredProducts?.length);
 
   }, [filteredProducts]);
+
+
+
+  useEffect(() => {
+
+    console.log("originalData changed>>>>>:",originalData?.length)
+    setListLength(filteredProducts?.length);
+
+  }, [originalData]);
 
 useEffect(() => {
 
@@ -324,18 +336,16 @@ useEffect(() => {
 
 
 
-    
-
 
     setSelectedData([]);
-    setOriginalData([]);
+    //setOriginalData([]);
     setCategories([]);
-    setSubCategories([]);
+    //setSubCategories([]);
     setFilteredProducts([]);
     setSaleData([]); 
 
     prefetchGetCategories(admin);
-    getSubCategories(admin);
+    //getSubCategories(admin);
     setIsVisible(false);
     //getProductOnSale(admin);
     //prefetchProducts(admin);
@@ -456,32 +466,14 @@ useEffect(() => {
 
   const handleRemoveFavorites= (item) => {
     setFavoritesData((prevFavorites) =>
-      prevFavorites.filter((product) => product.productId !== item.productId)
+      prevFavorites.filter((product) => product?.productId !== item?.productId)
     );
     
   };
 
 
 
-  const handlePressFavorites = (item) => {
-    //setSelectedProduct(productId);
 
-      const result = favoritesData.some((element) => element.productId === item.productId);
-      //console.log(result)
-
-      // updateIsFavorite(item.productId);
-
-      if(result)
-      {
-        handleRemoveFavorites(item)
-        removeFavorite(admin, item.productId, item.productName);
-      }
-      else{
-        handleAddProduct(item)
-        addFavorite(admin, item.productId, item.productName);
-      }
-
-  };
 
 
   const handleMainFilters = (favoritesFilter, onSaleFilter) => {
@@ -592,12 +584,12 @@ useEffect(() => {
 
 
 
-  async function addFavorite(admin, productId, productName) {
+  async function addFavorite(userId, productId, productName) {
 
-    console.log("addFav:" + admin + "-" + productId);
+    console.log("addFavorite function:",userId, productId, productName);
   
     const data = new URLSearchParams();
-    data.append('userId', admin);
+    data.append('userId', userId);
     data.append('productId', productId);
 
 
@@ -611,7 +603,7 @@ useEffect(() => {
       method: 'POST',
       
       body: JSON.stringify({
-        userId: admin,
+        userId: userId,
         productId: productId
       }),
       headers: {"Content-Type": "application/json"}
@@ -631,7 +623,7 @@ useEffect(() => {
   async function removeFavorite(userId, productId, productName) {
 
     //const queryParams = new URLSearchParams({ userId: userId, productId:productId });
-    console.log("removeFavorite");
+    console.log("removeFavorite function:", userId, productId, productName);
     try
     {
         const resp = await fetch(`${url}/removeFavorite/${userId}/${productId}`,
@@ -808,11 +800,22 @@ useEffect
     console.log(" data length------------------------------------------------:",data.length);
 
 
+
     //console.log(data);
-    setOriginalData(...data);
+
+      setOriginalData([...data]);
+
+
+
+
+      
+ 
+    
     setOriginalDataBackup(data);
 
     setRefreshing(false);
+
+    console.log("originalData in getData:",originalData.length);
 
     return data;
   
@@ -830,6 +833,7 @@ useEffect
 
 
   
+
   async function getCategories(userId) {
 
     try
@@ -1176,33 +1180,80 @@ const updateIsFavorite = (productId) => {
 
   console.log("productId:",productId);
 
-  const updatedData = originalData?.map((item) => {
-    if (item.productId === productId) {
-      return { ...item, isFavorite: !item.isFavorite };
-    }
-    return item;
+  console.log("filteredProducts LENGTH BEFORE in updateFavorite:",filteredProducts.length);
+
+
+
+
+
+
+
+  //setOriginalData(updatedData);
+  //setFilteredProducts(updatedData);
+
+  const item = filteredProducts?.find((obj) => obj?.productId === productId);
+
+ // console.log("item in updateIsFavorite:",item);
+
+  if(!item?.isFavorite)
+  {
+    addFavorite(myUserId, item?.productId, item?.productName);
+  }
+  else{
+    removeFavorite(myUserId, item?.productId, item?.productName);
+  }
+
+
+  //write function to update the isfavorite key in the filteredProducts array basen on productId, by setting the opposite value of the isFavorite key
+  // if the isfavorite key is set to true then call the fucntion addFavorite, if the isfavorite key is set to false then call the function removeFavorite
+
+
+  
+
+
+  toggleFavorite(filteredProducts, item?.productId);
+  //console.log("setOriginalData:",originalData);  
+
+  //write code to loop through the filteredProducts array and print out productId of each
+
+
+
+  setExtraData(extraData + 1);
+
+  console.log("filteredProducts LENGTH AFTER in updateFavorite:",filteredProducts.length);
+
+  //console.log("updatedData1:",updatedData1);
+
+  filteredProducts.forEach(product => {
+    //console.log(product.productId);
   });
 
 
-
-
-  setOriginalData(updatedData);
-  setFilteredProducts(updatedData);
-
-  const item = updatedData?.find((obj) => obj?.productId === productId);
-
-  if(item?.isFavorite)
-  {
-    addFavorite(admin, item.productId, item.productName);
-  }
-  else{
-    removeFavorite(admin, item.productId, item.productName);
-  }
-
-  //console.log("setOriginalData:",originalData);  
-
 }
 
+
+
+
+
+
+function toggleFavorite(filteredProducts, productId) {
+  // Iterate through the filteredProducts array
+
+  //console.log("toggleFavorite:",filteredProducts, productId );
+  for (let i = 0; i < filteredProducts.length; i++) {
+    // Check if the current product's id matches the productId
+    if (filteredProducts[i].productId === productId) {
+      // Toggle the isFavorite property
+      filteredProducts[i].isFavorite = !filteredProducts[i].isFavorite;
+      break; // Exit the loop once the product is found and updated
+    }
+  }
+
+  setFilteredProducts(filteredProducts);
+
+  
+
+}
 
 
   const renderItem = ({ item }) => 

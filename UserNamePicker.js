@@ -163,9 +163,6 @@ async function getUserId(username) {
 
 
 
-
-
-
     async function checkIfUserNameExists(userName) {
         try
         {
