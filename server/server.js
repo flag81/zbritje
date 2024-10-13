@@ -425,7 +425,7 @@ FROM products
 LEFT JOIN sales ON products.productId = sales.productId
 LEFT JOIN store ON products.storeId = store.storeId
 LEFT JOIN favorites f ON products.productId = f.productId and f.userId = ${userId}
-LEFT JOIN storefavorites sf ON store.storeId = sf.storeId -- Assuming the join condition is correct
+LEFT JOIN storefavorites sf ON store.storeId = sf.storeId and sf.userId = ${userId} -- Assuming the join condition is correct
 
 
   WHERE 
@@ -475,7 +475,7 @@ LEFT JOIN storefavorites sf ON store.storeId = sf.storeId -- Assuming the join c
   //LIMIT ${req.query.limit} OFFSET ${req.query.offset}
   //const userId= req.query.userId;
 
-  //console.log("q",q);
+  console.log("q",q);
 
 
 
@@ -647,6 +647,7 @@ app.get("/getAllStores", (req, res) => {
   const userId=  parseInt(req.query.userId);
 
 
+
   
     const q = `SELECT store.storeId, store.storeName, store.storeLogoUrl, storefavorites.userId ,
 
@@ -739,6 +740,8 @@ app.get("/getAllStores", (req, res) => {
   app.get("/getAllBrands", (req, res) => {
 
     //const q = "SELECT tableid,  users.id  FROM orders join users on orders.userid = users.id WHERE orders.status = 0 ";
+
+    console.log("getAllBrands userid:", req.query.userId);
   
     const userId=  parseInt(req.query.userId);
   

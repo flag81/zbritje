@@ -241,7 +241,7 @@ async function addExpoPushNotificationToken(userId,expoPushToken) {
         // data can be of this format [{"expoPushToken": null}] , check if expoPushToken is not null before sending push notification
         // write this code
 
-        const isExpoPushTokenNull = data.some(item => item.expoPushToken === null);
+        const isExpoPushTokenNull = data?.some(item => item?.expoPushToken === null);
 
         const expoPushTokenValue = data[0].expoPushToken;
 
@@ -253,7 +253,7 @@ async function addExpoPushNotificationToken(userId,expoPushToken) {
 
 
         if(isExpoPushTokenNull) {
-          console.log("expoPushToken is null ********************** ");
+          console.log("Error: expoPushToken is null ********************** ");
 
           // check if expoPushToken starts with ExponentPushToken
 
@@ -263,7 +263,7 @@ async function addExpoPushNotificationToken(userId,expoPushToken) {
           console.log("isValidExpoPushToken",isValidExpoPushToken);
 
           if(isValidExpoPushToken) {
-            console.log("expoPushToken is valid",expoPushToken );
+            console.log("expoPushToken is valid.",expoPushToken );
             addExpoPushNotificationToken(userId, expoPushToken);
           }
         }

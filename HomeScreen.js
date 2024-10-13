@@ -13,6 +13,12 @@ import { View,Text,Button, TouchableOpacity,Image, ImageBackground, StyleSheet,S
 
 
 
+
+
+
+
+
+
 } from 'react-native';
 
 import messaging from '@react-native-firebase/messaging';
@@ -67,7 +73,7 @@ const HomeScreen = () => {
 
 
   const { count, increment ,myUserName, setMyUserName, storeId, onSale, categoryId, 
-    subCategoryId, isFavorite, searchText ,setSearchText, admin,  setAdmin , url, myUserId, setMyUserId} = useStore();
+    subCategoryId, isFavorite, searchText ,setSearchText, admin,  setAdmin , url, myUserId, setMyUserId, expoToken} = useStore();
 
     
 
@@ -297,12 +303,21 @@ useEffect(() => {
 
 
 
-    getLocalToken().then((result) => {
+    const localToken = getLocalToken().then((result) => {
       console.log("result token:",result);
       //setAuthToken(result);
 
     });
 
+
+
+    // if localToken from securestorage is null the setLocalToken with the token from the server
+
+    if(!localToken)
+    {
+      storeToken(expoToken);
+      console.log("localToken not found , it is set:", localToken);
+    }
 
 
 
@@ -502,6 +517,12 @@ useEffect(() => {
   }
 
 
+
+
+
+
+
+
   
 //write function to filter the to match the sale data with the favorites data
   const filterSaleData = () => {
@@ -569,8 +590,8 @@ useEffect(() => {
   const sortProducts = (firstArray, secondArray) => {
 
     const sortedProductsArray = firstArray?.sort((a, b) => {
-      const aIsMatch = secondArray.some(obj => obj.productId === a.productId);
-      const bIsMatch = secondArray.some(obj => obj.productId === b.productId);
+      const aIsMatch = secondArray?.some(obj => obj.productId === a.productId);
+      const bIsMatch = secondArray?.some(obj => obj.productId === b.productId);
     
       if (aIsMatch && !bIsMatch) return -1;
       if (!aIsMatch && bIsMatch) return 1;
@@ -760,7 +781,7 @@ useEffect
   //setOriginalData(data?.pages?.map(page=>page).flat());
 
   filteredProducts?.forEach(obj2 => {
-    if (!allProducts.some(obj1 => obj1?.productId === obj2?.productId)) {
+    if (!allProducts?.some(obj1 => obj1?.productId === obj2?.productId)) {
       allProducts.push(obj2);
     }
   });
@@ -1389,6 +1410,8 @@ return (
           // change the border color to red if the search text is more that 1 character
           //onFocus={() => setBorderColor('red')}
 
+          //maxLength={2}
+
 
           onSubmit={(e) => onSubmitSearch(e.nativeEvent.text)}
           onClear={onClearPress}
@@ -1396,6 +1419,7 @@ return (
             placeholder: 'Kerko produktet',
             autoCorrect: false,
             autoCapitalize: 'none',
+            maxLength: 20,
             style: {
               borderRadius: 25,
               paddingLeft: 18,
