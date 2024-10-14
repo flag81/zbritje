@@ -329,12 +329,19 @@ useEffect(() => {
 
       //result = false;
 
+
+
+
+
+
       if(!result)
       {
         console.log("storage username not found:", result);
         //poup login modal 
         setShowUserNamePicker(true);
-        //setLocalUsername('username', 'admin');
+        //setLocalUsername('setShowUserNamePicker ');
+
+        console
 
       }
       else{
@@ -342,13 +349,6 @@ useEffect(() => {
         console.log("result found setMyUserName:");  
       }
     });
-
-
-
-
-
-
-
 
 
 
@@ -470,6 +470,7 @@ useEffect(() => {
   });
     
   };
+  
 
 
 
@@ -1153,6 +1154,8 @@ const getSuggestions = (q) => {
     // write the code to extract the id from suggestionsList array into an new array of ids
 
   
+
+
       if(productId)
       {
         const productSearchById = getProductsByIds(admin, productId);
@@ -1161,6 +1164,12 @@ const getSuggestions = (q) => {
     //console.log("productListSearch:",productListSearch);
   
   }
+
+
+
+
+
+
 
 const onSubmitSearch = (searchText) => {
   console.log("searchText:",searchText);
@@ -1202,6 +1211,11 @@ const updateIsFavorite = (productId) => {
   console.log("productId:",productId);
 
   console.log("filteredProducts LENGTH BEFORE in updateFavorite:",filteredProducts.length);
+
+
+
+
+
 
 
 

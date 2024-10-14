@@ -88,20 +88,16 @@ export default function UserNamePicker({ isVisible, onClose }) {
     
 
             //const data = await resp;    
-            console.log("addUser function response:",resp.json())  ;
+            console.log("addUser function response:",resp.json());
 
             //on success, show message and close modal
             setUserMessage(" Username i juaj u ruajt me sukses.");
-
             setLocalUsername("username", userName);
-
             setMyUserName(userName);
 
-            setLocalExpoToken("expoToken",expoToken);
-
+            //setLocalExpoToken("expoToken",expoToken);
             //diable save button and textinput
-            setUserName("");
-
+            //setUserName("");
             //setSaveButtonDisabled(true);
             setShowForm(false);
 
@@ -185,7 +181,7 @@ async function getUserId(username) {
 
                 await addUser(userName, expoToken);
 
-                console.log("addUser with tokennnnnnn",userName,expoToken);
+                console.log("calling addUser with tokennnnnnn",userName,expoToken);
 
                 await getUserId(userName);
       

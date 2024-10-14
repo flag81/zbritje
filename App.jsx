@@ -1,3 +1,8 @@
+//This is the entering file of the mobile app. It is the first file that is executed when the app is started. It get the push notification token from expo
+//
+//
+
+
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Button, Platform } from 'react-native';
 
@@ -23,6 +28,12 @@ import { AutocompleteDropdownContextProvider } from 'react-native-autocomplete-d
 import HomeScreen from './HomeScreen';
 
 import { RootSiblingParent } from 'react-native-root-siblings';
+
+import * as SecureStore from 'expo-secure-store';
+
+async function setLocalExpoToken(key, value) {
+  await SecureStore.setItemAsync(key, value);
+}
 
 //import { usePushNotifications } from './usePushNotifications';
 
@@ -118,6 +129,10 @@ async function registerForPushNotificationsAsync() {
       ).data;
       console.log("expo:",pushTokenString);
 
+      setLocalExpoToken('expoPushToken', pushTokenString);
+
+      console.log("expoPushToken set locally:",pushTokenString);
+
      
       return pushTokenString;
 
@@ -162,7 +177,7 @@ export default function App() {
   
     const data = await resp.json();
   
-    console.log("getExpoPushNotificationToken----------------------------",data);
+    console.log("getExpoPushNotificationToken----------------------------",userId, data);
       
       //setFavoritesData(data);
       //handleFilterSale();
@@ -224,7 +239,16 @@ async function addExpoPushNotificationToken(userId,expoPushToken) {
 
   useEffect(() => {
 
-    console.log("expoPushToken-------",expoPushToken);
+    console.log("expoPushToken from expo changed -------",expoPushToken);
+
+    if(expoPushToken != '')
+    {
+         setExpoToken(expoPushToken);
+         console.log("useStore expoToken set:-------",expoPushToken);
+
+    }
+
+   
 
   }, [expoPushToken]);
 
@@ -233,52 +257,9 @@ async function addExpoPushNotificationToken(userId,expoPushToken) {
       .then(token => setExpoPushToken(token ?? ''))
       .catch((error) => setExpoPushToken(`${error}`));
 
-      getExpoPushNotificationToken(1).then(data => {
-
-        console.log("expo data from server:",data);
-        console.log("expo data from server:",data?.length);
-
-        // data can be of this format [{"expoPushToken": null}] , check if expoPushToken is not null before sending push notification
-        // write this code
-
-        const isExpoPushTokenNull = data?.some(item => item?.expoPushToken === null);
-
-        const expoPushTokenValue = data[0].expoPushToken;
+      //getExpoPushNotificationToken(1).then(data => {
 
 
-        setExpoToken(expoPushTokenValue);
-        console.log("setExpoToken:::",expoPushTokenValue); // This will log null
-
-
-
-
-        if(isExpoPushTokenNull) {
-          console.log("Error: expoPushToken is null ********************** ");
-
-          // check if expoPushToken starts with ExponentPushToken
-
-          const isValidExpoPushToken = expoPushToken.startsWith("ExponentPushToken");
-
-          
-          console.log("isValidExpoPushToken",isValidExpoPushToken);
-
-          if(isValidExpoPushToken) {
-            console.log("expoPushToken is valid.",expoPushToken );
-            addExpoPushNotificationToken(userId, expoPushToken);
-          }
-        }
-        else {
-          console.log("expoPushToken is not null");
-        }
-
-
-
-
-        if(data?.length > 0) {
-          //sendPushNotification(data[0].expoPushToken);
-        }
-      }
-      );
 
     notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
       setNotification(notification);
