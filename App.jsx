@@ -80,6 +80,7 @@ async function sendPushNotification(expoPushToken) {
 
 function handleRegistrationError(errorMessage) {
   alert(errorMessage);
+ //IN ALBANIAN 
   throw new Error(errorMessage);
 }
 
@@ -127,7 +128,7 @@ async function registerForPushNotificationsAsync() {
           projectId,
         })
       ).data;
-      console.log("expo:",pushTokenString);
+      console.log("token from Notifications.getExpoPushTokenAsync from Expo:",pushTokenString);
 
       setLocalExpoToken('expoPushToken', pushTokenString);
 
@@ -250,7 +251,7 @@ async function addExpoPushNotificationToken(userId,expoPushToken) {
 
    
 
-    
+
 
   }, [expoPushToken]);
 

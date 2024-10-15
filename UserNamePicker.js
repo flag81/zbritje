@@ -16,7 +16,6 @@ export default function UserNamePicker({ isVisible, onClose }) {
 
     const { myUserName, setMyUserName, url, setUserId , expoToken} = useStore();
     
-  //const url = 'http://10.12.13.197:8800';
 
   useEffect(() => {
 
@@ -70,12 +69,31 @@ export default function UserNamePicker({ isVisible, onClose }) {
     }
 
 
+    //write function to check if variable is valid , by checking if it starts with ExponentPushToken[...]
+
+
+    function isValidExpoPushToken(token) {
+      return token.startsWith('ExponentPushToken[') && token.endsWith(']');
+    }
+
+
+
+
+
+
 
     async function addUser(userName, token) {
         try
         {
 
-          console.log("addUser with token",token);
+          console.log("addUser with username and token", userName, token);
+
+          if(!isValidExpoPushToken(token))
+          {
+              token = ""
+          }
+
+          
           const resp = await fetch(`${url}/addUser?userName=${userName}&expoPushToken=${token}`,  {
             method: 'POST',      
             headers: {"Content-Type": "application/json"},
@@ -158,8 +176,7 @@ async function getUserId(username) {
 }
 
 
-
-    async function checkIfUserNameExists(userName) {
+async function checkIfUserNameExists(userName) {
         try
         {
 
