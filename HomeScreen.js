@@ -11,14 +11,6 @@ import React, { useState, useEffect , useRef, useCallback } from 'react';
 import { View,Text,Button, TouchableOpacity,Image, ImageBackground, StyleSheet,SafeAreaView,ScrollView,RefreshControl,Dimensions
 
 
-
-
-
-
-
-
-
-
 } from 'react-native';
 
 import messaging from '@react-native-firebase/messaging';
@@ -73,7 +65,7 @@ const HomeScreen = () => {
 
 
   const { count, increment ,myUserName, setMyUserName, storeId, onSale, categoryId, 
-    subCategoryId, isFavorite, searchText ,setSearchText, admin,  setAdmin , url, myUserId, setMyUserId, expoToken} = useStore();
+    subCategoryId, isFavorite, searchText ,setSearchText, admin,  setAdmin , url, myUserId, setMyUserId, expoToken, setExpoToken} = useStore();
 
     
 
@@ -239,27 +231,57 @@ async function getLocalUsername(key) {
 
   }, [originalData]);
 
+  function isValidExpoPushToken(token) {
+    return token.startsWith('ExponentPushToken[') && token.endsWith(']');
+  }
+
 useEffect(() => {
 
 
   console.log("myUserName changed:",myUserName);
 
-  getUserIdByUsername(myUserName)
+  getUserDataByUsername(myUserName)
 
- .then(userId => {
-  console.log('User ID:', userId);
+ .then(({userId, expoPushToken}) => {
+  console.log('User ID db:', userId);
+  console.log('expoPushToken db', expoPushToken);
   setAdmin(userId);
   setMyUserId(userId);
 
+  if(!isValidExpoPushToken(expoPushToken))
+  {
+
+    //get local expoPushToken and compare it with the one from the server
+
+      getLocalToken().then((result) => {
+        console.log("getLocalToken token:",result);
+        //setAuthToken(result);
+
+        
+
+        if(isValidExpoPushToken(result))
+        {
+          setExpoToken(result);
+          console.log("setExpoToken to store called with:", result);
+          //console.log("useStore expoToken set:",expoPushToken);
+        } 
+
+      //setExpoToken(expoPushToken);
+      //console.log("useStore expoToken set:",expoPushToken);
+
+    })
+
+  }
+
 })
 .catch(error => {
-  console.error('Failed to fetch user ID:', error);
+  console.error('Failed to fetch user data:', error);
 });
 
 
 }, [myUserName]);
 
-  async function getUserIdByUsername(username) {
+  async function getUserDataByUsername(username) {
     try {
   
       console.log("getUserId with username",username);
@@ -275,17 +297,20 @@ useEffect(() => {
       
       // Assuming the API returns an array and the first object contains the userId if found
       if (data.length > 0 && data[0].userId) {
-        console.log("found userId::::", data[0]?.userId)  ;
+        console.log("getUserDataByUsername: userId from Db", data[0]?.userId)  ;
+        console.log("getUserDataByUsername: expoPushToken from DB:",data[0].expoPushToken);
   
-  
+  //expoPushToken
         // HOW TO parse to string data[0].userId VALUE
   
         //setUserId(data[0].userId);
         //await setLocalUserId("userId", data[0].userId.toString());
   
         //console.log("setLocalUserId init:",data[0].userId);
+
+        const userData = {userId: data[0].userId, expoPushToken: data[0].expoPushToken};
   
-        return data[0].userId; // Return the found userId
+        return userData; // Return the found userId
       } else {
         console.log("userId not found");
         return null; // Username does not exist

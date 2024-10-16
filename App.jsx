@@ -107,6 +107,8 @@ async function registerForPushNotificationsAsync() {
       handleRegistrationError('Permission not granted to get push token for push notification!');
       return;
     }
+
+    // update the token in the server with the new token
     
     
     const projectId = Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
@@ -189,7 +191,7 @@ export default function App() {
     }
     catch(e)
     {
-      console.log(e);
+      console.log("Error: getExpoPushNotificationToken",e);
     }
   
   }
@@ -261,8 +263,6 @@ async function addExpoPushNotificationToken(userId,expoPushToken) {
       .catch((error) => setExpoPushToken(`${error}`));
 
       //getExpoPushNotificationToken(1).then(data => {
-
-
 
     notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
       setNotification(notification);

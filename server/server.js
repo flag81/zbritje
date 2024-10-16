@@ -139,7 +139,7 @@ app.get("/", (req, res) => {
 app.get("/getUserId", (req, res) => {
 
   //const q = "SELECT tableid,  users.id  FROM orders join users on orders.userid = users.id WHERE orders.status = 0 ";
-  const q = `SELECT userId FROM users WHERE userName = "${req.query.userName}"`;
+  const q = `SELECT userId, expoPushToken FROM users WHERE userName = "${req.query.userName}"`;
   
 
   console.log("getUserId:",q);
