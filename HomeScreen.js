@@ -7,8 +7,12 @@ import ProductCategories from './ProductCategories';
 import EmojiPicker from "./EmojiPicker";
 import * as Device from 'expo-device';
 import useStore from './useStore';
+//import {*} from './apiUtils';
+import {updateExpoPushNotificationToken}  from './apiUtils';
 import React, { useState, useEffect , useRef, useCallback } from 'react';
 import { View,Text,Button, TouchableOpacity,Image, ImageBackground, StyleSheet,SafeAreaView,ScrollView,RefreshControl,Dimensions
+
+
 
 
 } from 'react-native';
@@ -64,8 +68,9 @@ const HomeScreen = () => {
   const [showUserNamePicker, setShowUserNamePicker] = useState(false);
 
 
-  const { count, increment ,myUserName, setMyUserName, storeId, onSale, categoryId, 
-    subCategoryId, isFavorite, searchText ,setSearchText, admin,  setAdmin , url, myUserId, setMyUserId, expoToken, setExpoToken} = useStore();
+  const { myUserName, setMyUserName, storeId, onSale, categoryId, 
+    subCategoryId, isFavorite, searchText ,setSearchText, admin,  setAdmin , url, 
+    myUserId, setMyUserId, expoToken, setExpoToken, localStoreExpoToken} = useStore();
 
     
 
@@ -83,7 +88,7 @@ const storeToken = async (token) => {
 
 
 const getLocalToken = async () => {
-  const result = await SecureStore.getItemAsync('expoToken');
+  const result = await SecureStore.getItemAsync('expoPushToken');
 
   return result;
   //console.log("result token------:",result);
@@ -224,6 +229,7 @@ async function getLocalUsername(key) {
 
 
 
+
   useEffect(() => {
 
     console.log("originalData changed>>>>>:",originalData?.length)
@@ -232,8 +238,14 @@ async function getLocalUsername(key) {
   }, [originalData]);
 
   function isValidExpoPushToken(token) {
-    return token.startsWith('ExponentPushToken[') && token.endsWith(']');
+    return token?.startsWith('ExponentPushToken[') && token?.endsWith(']');
   }
+
+  // WRITE A FUNCTION TO UPDATE THE EXPO TOKEN IN THE DB BY USERID
+
+
+
+
 
 useEffect(() => {
 
@@ -243,7 +255,7 @@ useEffect(() => {
   getUserDataByUsername(myUserName)
 
  .then(({userId, expoPushToken}) => {
-  console.log('User ID db:', userId);
+  console.log('User ID from db:', userId);
   console.log('expoPushToken db', expoPushToken);
   setAdmin(userId);
   setMyUserId(userId);
@@ -258,18 +270,43 @@ useEffect(() => {
         //setAuthToken(result);
 
         
-
         if(isValidExpoPushToken(result))
         {
           setExpoToken(result);
           console.log("setExpoToken to store called with:", result);
           //console.log("useStore expoToken set:",expoPushToken);
+
+              //UPDATE THE EXPO TOKEN IN THE DB WITH USERID
+
+              console.log("updating expoToken in DB:",url, userId, result);
+
+             
+
+
+              updateExpoPushNotificationToken(url, userId, result)
+              .then((data) => {
+                console.log("updateExpoPushNotificationToken added token succesfully----------------------------");
+              })
+              .error((e) => {
+                console.log("updateExpoPushNotificationToken ERROR:", e);
+              });
+
+    
+            //setExpoToken(expoPushToken);
+            //console.log("updating expoToken in DB:",userId, expoPushToken);
+            //updateExpoPushNotificationToken(userId, expoPushToken);
+
         } 
+
 
       //setExpoToken(expoPushToken);
       //console.log("useStore expoToken set:",expoPushToken);
 
     })
+
+  }
+  else
+  {
 
   }
 
@@ -284,7 +321,7 @@ useEffect(() => {
   async function getUserDataByUsername(username) {
     try {
   
-      console.log("getUserId with username",username);
+      console.log("getUserDataByUsername",username);
   
       // Replace 'API_ENDPOINT' with the actual endpoint URL for checking usernames
       const response = await fetch(`${url}/getUserId?userName=${username}`);
@@ -296,9 +333,9 @@ useEffect(() => {
       console.log("found userid ---", data[0]?.userId) 
       
       // Assuming the API returns an array and the first object contains the userId if found
-      if (data.length > 0 && data[0].userId) {
-        console.log("getUserDataByUsername: userId from Db", data[0]?.userId)  ;
-        console.log("getUserDataByUsername: expoPushToken from DB:",data[0].expoPushToken);
+      if (data?.length > 0 && data[0]?.userId) {
+        console.log("getUserDataByUsername userId from Db:", data[0]?.userId)  ;
+        console.log("getUserDataByUsername expoPushToken from DB:",data[0]?.expoPushToken);
   
   //expoPushToken
         // HOW TO parse to string data[0].userId VALUE
@@ -308,7 +345,7 @@ useEffect(() => {
   
         //console.log("setLocalUserId init:",data[0].userId);
 
-        const userData = {userId: data[0].userId, expoPushToken: data[0].expoPushToken};
+        const userData = {userId: data[0]?.userId, expoPushToken: data[0]?.expoPushToken};
   
         return userData; // Return the found userId
       } else {
@@ -329,7 +366,7 @@ useEffect(() => {
 
 
     const localToken = getLocalToken().then((result) => {
-      console.log("result token:",result);
+      console.log("result from local token:",result);
       //setAuthToken(result);
 
     });
@@ -349,7 +386,7 @@ useEffect(() => {
 
 
     const userName =  getLocalUsername('username').then((result) => {
-      console.log("local username by key:--------:",result);
+      console.log("local username by key username:--------:",result);
       //setShowUserNamePicker(true);
 
       //result = false;
@@ -453,7 +490,7 @@ useEffect(() => {
   
     const data = await resp.json();
 
-    console.log("auth data:",data.token);
+    //console.log("auth data:",data.token);
 
     setAuthToken(data.token);
     setIsConditionMet(true);
@@ -543,7 +580,7 @@ useEffect(() => {
 
   }
 
-  
+
 
 
 

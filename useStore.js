@@ -19,6 +19,7 @@ const useStore = create((set) => ({
   userId:0,
   myUserId:0,
   expoToken: '',
+  localStoreExpoToken: '',
   setMyUserName: (userData) => set((state) => ({ myUserName: userData })),
   increment: () => set((state) => ({ count: state.count + 1 })),
   decrement: () => set((state) => ({ count: state.count - 1 })),
@@ -34,6 +35,7 @@ const useStore = create((set) => ({
   setSearchText: (searchText) => set(() => ({ searchText: searchText })),
   setExpoToken: (expoToken) => set(() => ({ expoToken: expoToken })),
   setMyUserId: (myUserId) => set(() => ({ myUserId: myUserId })),
+  setLocalStoreExpoToken: (localStoreExpoToken) => set(() => ({ localStoreExpoToken: localStoreExpoToken })),
 
 }));
 

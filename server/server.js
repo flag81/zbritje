@@ -201,13 +201,15 @@ app.get("/getExpoPushNotificationToken", (req, res) => {
 
   //write a get endpoint setExpoPushNotificationToken that takes userId and expoPushToken as parameters and updates the expo push notification token for the user in the users table
 
-  app.put("/addExpoPushNotificationToken", (req, res) => {
+  app.put("/updateExpoPushNotificationToken", (req, res) => {
 
     //convert string to number
     const userId = parseInt(req.body.userId);
 
+
     console.log("userId",userId);
 
+    
 
     //convert to string with escape characters
     const expoPushToken = req.body.expoPushToken;
@@ -218,7 +220,7 @@ app.get("/getExpoPushNotificationToken", (req, res) => {
     const q = `UPDATE users SET expoPushToken="${expoPushToken}" WHERE userId = ${userId}`;
 
 
-    console.log("q",q);
+    console.log("q setExpoPushNotificationToken:",q);
 
     const values = [
       req.body.userId,
@@ -477,7 +479,7 @@ LEFT JOIN storefavorites sf ON store.storeId = sf.storeId and sf.userId = ${user
   //LIMIT ${req.query.limit} OFFSET ${req.query.offset}
   //const userId= req.query.userId;
 
-  console.log("q",q);
+  //console.log("q",q);
 
 
 

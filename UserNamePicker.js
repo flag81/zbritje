@@ -13,6 +13,7 @@ export default function UserNamePicker({ isVisible, onClose }) {
     const [userMessage, setUserMessage] = useState('');
     const [visible, setVisible] = useState(false);
     const [showForm, setShowForm] = useState(true);
+    const [showCloseButton, setShowCloseButton] = useState(false);
 
     const { myUserName, setMyUserName, url, setUserId , expoToken} = useStore();
     
@@ -198,9 +199,11 @@ async function checkIfUserNameExists(userName) {
 
                 await addUser(userName, expoToken);
 
-                console.log("calling addUser with tokennnnnnn",userName,expoToken);
+                console.log("calling addUser with data:",userName,expoToken);
 
                 await getUserId(userName);
+
+                setShowCloseButton(true);
       
             } else {
               //Alert.alert("Username jo-valid", "Username eshte i zene, zgjidhni nje tjeter.");
@@ -240,9 +243,7 @@ async function checkIfUserNameExists(userName) {
       <View style={styles2.modalContent}>
         <View style={styles2.titleContainer}>
           <Text style={styles2.title}>Zgjidh emrin e perdoruesit</Text>
-          <Pressable onPress={onCloseModal}>
-          <Text style={styles2.title}>Mbyll X</Text>
-          </Pressable>
+          {showCloseButton && <Pressable onPress={onCloseModal}><Text style={styles2.title}>Mbyll X</Text></Pressable>}
         </View>
 
 

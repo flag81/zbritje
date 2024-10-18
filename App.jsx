@@ -14,6 +14,10 @@ import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 
+
+import{isValidExpoPushToken, 
+  getLocalExpoToken, setLocalExpoToken} from './apiUtils';
+
 import {
   QueryClient,
   QueryClientProvider
@@ -30,10 +34,9 @@ import HomeScreen from './HomeScreen';
 import { RootSiblingParent } from 'react-native-root-siblings';
 
 import * as SecureStore from 'expo-secure-store';
+import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 
-async function setLocalExpoToken(key, value) {
-  await SecureStore.setItemAsync(key, value);
-}
+
 
 //import { usePushNotifications } from './usePushNotifications';
 
@@ -86,6 +89,7 @@ function handleRegistrationError(errorMessage) {
 
 
 
+
 async function registerForPushNotificationsAsync() {
   if (Platform.OS === 'android') {
     Notifications.setNotificationChannelAsync('default', {
@@ -104,7 +108,7 @@ async function registerForPushNotificationsAsync() {
       finalStatus = status;
     }
     if (finalStatus !== 'granted') {
-      handleRegistrationError('Permission not granted to get push token for push notification!');
+      handleRegistrationError('Ju lutem i aktivizoni notifikimet per kete aplikacion!');
       return;
     }
 
@@ -114,16 +118,10 @@ async function registerForPushNotificationsAsync() {
     const projectId = Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
 
 
-    //console.log("x",Constants.expoConfig?.extra?.eas.projectId);  // --> undefined
-    //console.log("x",Constants.easConfig.projectId);  // --> undefined
-    //console.log("y",Constants?.expoConfig?.extra?.eas?.projectId);  // --> my project id
-    //const projectId = Constants.expoConfig.extra.eas.projectId;
-    
-
-
     if (!projectId) {
       handleRegistrationError('Project ID not found');
     }
+
     try {
       const pushTokenString = (
         await Notifications.getExpoPushTokenAsync({
@@ -134,7 +132,30 @@ async function registerForPushNotificationsAsync() {
 
       setLocalExpoToken('expoPushToken', pushTokenString);
 
-      console.log("expoPushToken set locally:",pushTokenString);
+      //setLocalStoreExpoToken('pushTokenString');
+
+
+
+      getLocalExpoToken('expoPushToken').then(data => {
+          
+          console.log("getLocalExpoToken from local SecureStore:",data);
+
+          if(isValidExpoPushToken(data))
+          {
+            //console.log("getLocalExpoToken from local SecureStore is valid:",data);
+            //updateExpoPushNotificationToken(1,data);
+          }
+
+
+
+        }
+        );
+
+
+
+      //console.log("expoPushToken set locally:", );
+
+      //updateExpoPushNotificationToken(1,pushTokenString);
 
      
       return pushTokenString;
@@ -153,10 +174,6 @@ const queryClient = new QueryClient();
 
 export default function App() {
 
-  //const { expoPushToken, notification } = usePushNotifications();
-  //const data = JSON.stringify(notification, undefined, 2);
-  //console.log("expoPushToken",expoPushToken);
-  //console.log("data",data); 
 
   const [expoPushToken, setExpoPushToken] = useState('');
   const [notification, setNotification] = useState();
@@ -165,7 +182,7 @@ export default function App() {
 
   const { url, admin , setExpoToken, userId} = useStore();
 
-  async function getExpoPushNotificationToken(userId) {
+async function getExpoPushNotificationToken(userId) {
 
     try
     {
@@ -237,22 +254,21 @@ async function addExpoPushNotificationToken(userId,expoPushToken) {
 
 
 
+useEffect(() => {
 
+    console.log("expoPushToken from expo changed:",expoPushToken);
 
-
-  useEffect(() => {
-
-    console.log("expoPushToken from expo changed -------",expoPushToken);
-
-    if(expoPushToken != '')
+    if(isValidExpoPushToken(expoPushToken))
     {
          setExpoToken(expoPushToken);
-         console.log("useStore expoToken set:-------",expoPushToken);
+         console.log("useStore expoToken set:",expoPushToken);
 
     }
-
-   
-
+    else
+    {
+      //setExpoToken("");
+      console.log("expoPushToken is not valid:-------",expoPushToken);
+    } 
 
 
   }, [expoPushToken]);

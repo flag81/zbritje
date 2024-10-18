@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, Platform, TouchableOpacity } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from './HomeScreen';
 import Chats from './Chats';
@@ -18,6 +18,8 @@ const BottomTabNavigator = createBottomTabNavigator();
 
 export default function BottomTab() {
   //   const tabBarHeight = useBottomTabBarHeight();
+
+  const [permission] = useState(false);
 
   const { admin , myUserName, url} = useStore();
 
