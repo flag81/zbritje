@@ -135,6 +135,29 @@ app.get("/", (req, res) => {
 
 });
 
+app.get("/getUserEmail", (req, res) => {
+
+  //const q = "SELECT tableid,  users.id  FROM orders join users on orders.userid = users.id WHERE orders.status = 0 ";
+  const q = `SELECT email FROM users WHERE userId = "${req.query.userId}"`;
+  
+
+  console.log("getUserEmail:", q);
+
+  const userId= req.query.userId;
+
+  db.query(q, [userId], (err, data) => {
+
+    if (err) {
+
+
+      console.log("getUserEmail error:", err);
+      return res.json(err);
+    }
+
+    return res.json(data);
+  });
+});
+
 
 app.get("/getUserId", (req, res) => {
 

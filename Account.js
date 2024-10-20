@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Button, Alert, TextInput } from 'react-native';
+import { StyleSheet, Text, View, Button, Alert, TextInput, TouchableOpacity } from 'react-native';
 
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -7,6 +7,7 @@ import Toast from 'react-native-root-toast';
 import * as Device from 'expo-device';
 
 const Account = () => {
+  const [oldEmail, setOldEmail] = useState('');
   const [email, setEmail] = useState('');
   const [isValid, setIsValid] = useState(true);
 
@@ -38,9 +39,10 @@ const Account = () => {
 
       
 
+
   async function getUserEmail(userId) {
 
-    //console.log('userid :', userId);
+    console.log('getUserEmail with userid :', userId);
 
     try
     {
@@ -51,7 +53,7 @@ const Account = () => {
       });
 
     const data = await resp.json();
-    console.log('getUserNotificationLevel:', data);
+    //console.log('getUserEmail:', data);
 
     if(data.length == 0)
     {
@@ -64,7 +66,7 @@ const Account = () => {
       console.log('email ID:', data[0].email);
       //setSelectedId(data[0].notificationLevel.toString());
       //setExtraData(extraData + 1);
-      setEmail(data[0].email);
+      setOldEmail(data[0].email);
       return;         
     }  
   
@@ -72,7 +74,7 @@ const Account = () => {
     }
     catch(e)
     {
-      console.log(e);
+      console.log("Error:", e);
 
     }
 
@@ -104,7 +106,9 @@ const Account = () => {
       headers: {"Content-Type": "application/json"}
     });
 
-    showToast(`Emaili juaj u shtua me sukses.`);
+    
+    showToast(`Emaili juaj u ndryshua me sukses.`);
+    setOldEmail(userEmail);
 
     }
     catch(e)
@@ -125,7 +129,7 @@ const Account = () => {
   const handleSave = async () => {
     if (!validateEmail(email)) {
       setIsValid(false);
-      Alert.alert('Email jo valid', 'Ju lutem shenoni nje email sakt.');
+      Alert.alert('Email jo valid', 'Ju lutem shenoni nje email ne format sakt.');
       return;
     }
     setIsValid(true);
@@ -144,7 +148,7 @@ const Account = () => {
 
       <View style={{ fontSize: 15, fontWeight: 'bold',  marginBottom: 20, }} >
         <Text style={{ fontSize: 15}}>
-          Email: {email}
+          Email: {oldEmail ? oldEmail : 'Ju lutem shenoni emailin tuaj'}
         </Text>
       </View>  
           
@@ -157,7 +161,15 @@ const Account = () => {
         keyboardType="email-address"
         autoCapitalize="none"
       />
-      <Button title="Ruaj" onPress={handleSave} style={{with:'50%'}}/>
+
+<TouchableOpacity onPress={handleSave}>
+  <View style={{ borderWidth: 1, borderColor: 'blue', borderRadius: 10, padding: 20, alignItems: 'center', marginBottom: 20 }}>
+    <Text style={{ textAlign: 'center' }}>Ruaj shenimet</Text>
+  </View>
+</TouchableOpacity>
+
+
+
     </View>
   );
 };

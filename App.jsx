@@ -1,10 +1,11 @@
-//This is the entering file of the mobile app. It is the first file that is executed when the app is started. It get the push notification token from expo
+//This is the entering file of the mobile app. It is the first file that is executed when the app is started. 
+// It get the push notification token from expo
 //
 //
 
 
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Button, Platform } from 'react-native';
+import { StyleSheet, Text, View, Button, Platform, Alert } from 'react-native';
 
 import React, { useState, useEffect , useRef, useMemo, useCallback } from 'react';
 
@@ -35,7 +36,8 @@ import { RootSiblingParent } from 'react-native-root-siblings';
 
 import * as SecureStore from 'expo-secure-store';
 import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
-
+import NetInfo from '@react-native-community/netinfo';
+import Toast from 'react-native-root-toast';
 
 
 //import { usePushNotifications } from './usePushNotifications';
@@ -181,6 +183,49 @@ export default function App() {
   const responseListener = useRef();
 
   const { url, admin , setExpoToken, userId} = useStore();
+
+  const [isConnected, setConnected] = useState(true);
+
+
+
+  const showAlert = () => {
+		Alert.alert(
+			'Internet Connection',
+			'Ju lutem kontrolloni lidhjen tuaj me internetin dhe provoni perseri.',
+		);
+	};
+
+
+  const showToast = (message) => {
+    //setFavoritesData((prevProducts) => [...prevProducts, item]);
+
+    let toast = Toast.show(message, {
+      duration: Toast.durations.SHORT,
+      position: Toast.positions.TOP,
+      shadow: false,
+      animation: true,
+      hideOnPress: true,
+      delay: 0
+  
+  });
+    
+  };
+
+
+  useEffect(() => {
+		const unsubscribe = NetInfo.addEventListener((state) => {
+			setConnected(state.isConnected);
+			if (!state.isConnected) {
+				showAlert();
+        showToast("Nuk keni lidhje me internetin per momentin. Ju lutem kontrolloni lidhjen tuaj dhe provoni perseri.");
+			}
+		});
+
+		return () => {
+			unsubscribe();
+		};
+	}, []);
+
 
 async function getExpoPushNotificationToken(userId) {
 

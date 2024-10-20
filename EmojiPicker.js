@@ -48,7 +48,7 @@ let productUrl = '' ;
 
   if(productData.length > 0) {
     //console.log("productData",productData[0].productName);
-    productImageUrl = {uri:`${url}/images/${productData[0].productPic}`};
+    productImageUrl = {uri:productData[0].imageUrl};
     storeLogo = {uri:`${url}/images/${productData[0].storeLogo}`};
     productName = productData[0].productName;
 
@@ -69,6 +69,7 @@ let productUrl = '' ;
 console.log(productUrl);
 
   const imageUrl = {uri:`${url}/images/${productImageUrl}`};
+  //const imageUrl = {uri:item?.imageUrl};
 
   //let productData = productData;
   //console.log("productData",productData[0]);

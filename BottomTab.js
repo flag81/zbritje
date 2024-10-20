@@ -81,7 +81,7 @@ export default function BottomTab() {
         options={{
           tabBarIcon: ({ focused }) => (
             <AntDesign
-              name="tags"
+              name="appstore-o"
               size={21}
               color={focused ? '#0071ff' : 'gray'}
             />

@@ -1,3 +1,18 @@
+/*
+
+this file is the main file for the home screen, it contains the main logic for the home screen
+it contains a search component that searches for products by name and displays the results in a list. 
+it contains a filters for items on sale ans favorites selected by the user
+it contains filters for  categories and subcategories
+it contaisn a flashlist component that displays the products in a masonry layout
+it contains a bottomsheet component that displays the product details when a product is clicked
+the users can add products to their favorites by clicking the star icon on the product
+the users can remove products from their favorites by clicking the star icon on the product
+the users can click on product to view the product details in a bottomsheet
+
+*/
+
+
 import 'react-native-url-polyfill/auto';
 import 'react-native-get-random-values';
 import BottomSheet ,{BottomSheetBackdrop } from '@gorhom/bottom-sheet';
@@ -27,6 +42,8 @@ import UserNamePicker from './UserNamePicker'; //
 import { AutocompleteDropdown } from 'react-native-autocomplete-dropdown';
 import Toast from 'react-native-root-toast';
 import StoreFilter from './StoreFilter';
+import SearchComponent from './SearchComponent';
+
 
 
 
@@ -107,13 +124,6 @@ async function getLocalUsername(key) {
     return false;
   }
 };
-
-
-
-
-
-
-
 
 
  //console.log("myUserId:::::::::",myUserId);
@@ -252,68 +262,83 @@ useEffect(() => {
 
   console.log("myUserName changed:",myUserName);
 
+ //check if myUserName is not empty , null or undefined then fetch the user data by username
+
+ if (myUserName && myUserName.trim() !== '') {
+
   getUserDataByUsername(myUserName)
 
- .then(({userId, expoPushToken}) => {
-  console.log('User ID from db:', userId);
-  console.log('expoPushToken db', expoPushToken);
-  setAdmin(userId);
-  setMyUserId(userId);
+  .then(({userId, expoPushToken}) => {
+   console.log('User ID from db:', userId);
+   console.log('expoPushToken db', expoPushToken);
+   setAdmin(userId);
+   setMyUserId(userId);
+ 
+ 
+ 
+   
+   if(!isValidExpoPushToken(expoPushToken))
+   {
+ 
+     //get local expoPushToken and compare it with the one from the server
+ 
+       getLocalToken().then((result) => {
+         console.log("getLocalToken token:",result);
+         //setAuthToken(result);
+ 
+         
+         if(isValidExpoPushToken(result))
+         {
+           setExpoToken(result);
+           console.log("setExpoToken to store called with:", result);
+           //console.log("useStore expoToken set:",expoPushToken);
+ 
+               //UPDATE THE EXPO TOKEN IN THE DB WITH USERID
+ 
+               console.log("updating expoToken in DB:",url, userId, result);
+ 
+              
+ 
+ 
+               updateExpoPushNotificationToken(url, userId, result)
+               .then((data) => {
+                 console.log("updateExpoPushNotificationToken added token succesfully----------------------------");
+               })
+               .error((e) => {
+                 console.log("updateExpoPushNotificationToken ERROR:", e);
+               });
+ 
+     
+             //setExpoToken(expoPushToken);
+             //console.log("updating expoToken in DB:",userId, expoPushToken);
+             //updateExpoPushNotificationToken(userId, expoPushToken);
+ 
+         } 
+ 
+ 
+       //setExpoToken(expoPushToken);
+       //console.log("useStore expoToken set:",expoPushToken);
+ 
+     })
+ 
+   }
+   else
+   {
+ 
+   }
+ 
+ })
+ .catch(error => {
+   console.error('Failed to fetch user data:', error);
+ });
 
-  if(!isValidExpoPushToken(expoPushToken))
-  {
 
-    //get local expoPushToken and compare it with the one from the server
-
-      getLocalToken().then((result) => {
-        console.log("getLocalToken token:",result);
-        //setAuthToken(result);
-
-        
-        if(isValidExpoPushToken(result))
-        {
-          setExpoToken(result);
-          console.log("setExpoToken to store called with:", result);
-          //console.log("useStore expoToken set:",expoPushToken);
-
-              //UPDATE THE EXPO TOKEN IN THE DB WITH USERID
-
-              console.log("updating expoToken in DB:",url, userId, result);
-
-             
+ }
 
 
-              updateExpoPushNotificationToken(url, userId, result)
-              .then((data) => {
-                console.log("updateExpoPushNotificationToken added token succesfully----------------------------");
-              })
-              .error((e) => {
-                console.log("updateExpoPushNotificationToken ERROR:", e);
-              });
-
-    
-            //setExpoToken(expoPushToken);
-            //console.log("updating expoToken in DB:",userId, expoPushToken);
-            //updateExpoPushNotificationToken(userId, expoPushToken);
-
-        } 
 
 
-      //setExpoToken(expoPushToken);
-      //console.log("useStore expoToken set:",expoPushToken);
 
-    })
-
-  }
-  else
-  {
-
-  }
-
-})
-.catch(error => {
-  console.error('Failed to fetch user data:', error);
-});
 
 
 }, [myUserName]);
@@ -334,10 +359,10 @@ useEffect(() => {
       
       // Assuming the API returns an array and the first object contains the userId if found
       if (data?.length > 0 && data[0]?.userId) {
-        console.log("getUserDataByUsername userId from Db:", data[0]?.userId)  ;
-        console.log("getUserDataByUsername expoPushToken from DB:",data[0]?.expoPushToken);
+        console.log("getUserDataByUsername userId and expoPushToken from Db:", data[0]?.userId, data[0]?.expoPushToken)  ;
+       // console.log("getUserDataByUsername expoPushToken from DB:",data[0]?.expoPushToken);
   
-  //expoPushToken
+        //expoPushToken
         // HOW TO parse to string data[0].userId VALUE
   
         //setUserId(data[0].userId);
@@ -784,9 +809,9 @@ const params = { admin:myUserId, storeId:storeId };
 
 
 
-console.log("params:",params);
+//console.log("params:",params);
 
-console.log("isConditionMet:",isConditionMet);
+//console.log("isConditionMet:",isConditionMet);
 
 
 const { data: user } = useQuery({
