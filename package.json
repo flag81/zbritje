@@ -49,6 +49,7 @@
     "react-native-autocomplete-dropdown": "^4.0.0-rc.5",
     "react-native-device-info": "^11.1.0",
     "react-native-element-dropdown": "^2.10.1",
+    "react-native-fast-image": "^8.6.3",
     "react-native-gesture-handler": "~2.16.1",
     "react-native-get-random-values": "~1.11.0",
     "react-native-masonry-list": "^2.16.1",

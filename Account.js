@@ -153,6 +153,9 @@ const Account = () => {
       </View>  
           
 
+
+          
+
       <TextInput
         style={[styles.input, !isValid && styles.error]}
         placeholder="Sheno email"
@@ -160,6 +163,7 @@ const Account = () => {
         onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
+        maxLength={30} // Set the character limit here
       />
 
 <TouchableOpacity onPress={handleSave}>

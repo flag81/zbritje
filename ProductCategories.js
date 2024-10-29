@@ -2,11 +2,12 @@ import React, { useState, useEffect} from "react";
 import { SafeAreaView, View, Text, ScrollView, TextInput, TouchableOpacity , StyleSheet, Image} from "react-native";
 import { COLORS , SIZES} from "./theme";
 import useStore from './useStore';
+import {showToast}  from './apiUtils';
 
 
 
 
-const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData}) => {
+const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData, refreshFilters}) => {
 
     const [location, setLocation] = useState();
     const [cuisines, setCuisines] = useState(1);
@@ -28,7 +29,7 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData}) 
     const subCategories = subData;
 
     const { admin, url, onSale, setOnSale, isFavorite, setIsFavorite, 
-        categoryId, setCategoryId, subCategoryId, selectedSubCategoriyId} = useStore();
+        categoryId, setCategoryId, subCategoryId, selectedSubCategoriyId, setCategoryName} = useStore();
 
 
     useEffect(() => {
@@ -36,7 +37,7 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData}) 
         setSelectedCategories([]);       
         sendFilteredCategories();
 
-        //console.log("Category data:-------------",data);
+        console.log("Category data:-------------",data);
         
       }, []);
 
@@ -93,20 +94,34 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData}) 
         setIsFavorite(!isFavorite);
         //console.log("New selected:",selected)
         //onFilterChange(selectedCategories, selectedSubCategories);
+        if(!favoritesFilter)
+        {
+            showToast("Favoritet e tua.");
+        }
+            
       };  
   
+
       const handleOnSaleFilter = () => {
 
         setOnSale(!onSale);
 
+        if(!onSale)
+        {
+            showToast("Produktet ne zbritje.");
+        }
+
+        //showToast("Produktet ne zbritje.");
+
       }; 
 
 
-      const handleCategoriesFilter = (id) =>
+      const handleCategoriesFilter = (id, name) =>
       {
 
-        console.log("selected catwegory id:-------------",id)
+        console.log("selected category id and name:-------------",id, name)
             setCategoryId(id);
+            setCategoryName(name);
       }
 
 
@@ -222,7 +237,7 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData}) 
                     <TouchableOpacity onPress={() => handleOnSaleFilter()}>
                         <Image id="favoriteImage"
                         source={
-                            onSale ? require('./discount-red.png') : require('./discount.png')                           
+                            onSale ? require('./discount-fill.png') : require('./discount.png')                           
                         }
                         style={styles1.star}  />
                     </TouchableOpacity>
@@ -235,7 +250,17 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData}) 
                             isFavorite ? require('./star.png') : require('./white-star.png')
                         }
                         style={styles1.star}  />
-                </TouchableOpacity>
+                    </TouchableOpacity>
+
+                    
+                    <TouchableOpacity onPress={() =>  refreshFilters()}>
+                    <Image id="favoriteImage"
+                        source={
+
+                            require('./refresh.png')
+                        }
+                        style={styles1.star}  />
+                    </TouchableOpacity>
 
                     </View>
 
@@ -246,7 +271,7 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData}) 
                             <TouchableOpacity
                             onPress={() => {
                                // setSelectedCategories([])
-                               handleCategoriesFilter(0);
+                               handleCategoriesFilter(0, '');
                                  
                             }}
                             
@@ -258,7 +283,7 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData}) 
                             {categories.map((category) => (
                                 <TouchableOpacity
                                 key={category.id}
-                                onPress={() => handleCategoriesFilter(category.categoryId)}
+                                onPress={() => handleCategoriesFilter(category.categoryId, category.categoryName)}
                                 style={[styles1.category, { borderColor: categoryId == category.categoryId ? COLORS1.primary : COLORS1.grey}]} 
                                 >
                                 <Text style={[styles1.subtitle]}> 

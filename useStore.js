@@ -6,13 +6,16 @@ import {create} from 'zustand';
 const useStore = create((set) => ({
   count: 0,
   myUserName: '',
-  //url : 'http://10.12.13.197:8800',
-  url : 'http://192.168.1.6:8801',
+  //url : 'http://10.12.13.197:8801',
+  //url : 'http://192.168.1.6:8801',
   //url : 'https://nodejs-production-18ad6.up.railway.app',
+  url : 'https://flag-81-374131877123.europe-west3.run.app/',
   admin: 1,
   subCategoryId: 0,
   categoryId: 0,
+  categoryName:'',
   storeId: 0,
+  storeName: '',
   isFavorite: false,
   onSale: false,
   searchText: '',
@@ -20,6 +23,7 @@ const useStore = create((set) => ({
   myUserId:0,
   expoToken: '',
   localStoreExpoToken: '',
+  serverError: '',
   setMyUserName: (userData) => set((state) => ({ myUserName: userData })),
   increment: () => set((state) => ({ count: state.count + 1 })),
   decrement: () => set((state) => ({ count: state.count - 1 })),
@@ -36,6 +40,9 @@ const useStore = create((set) => ({
   setExpoToken: (expoToken) => set(() => ({ expoToken: expoToken })),
   setMyUserId: (myUserId) => set(() => ({ myUserId: myUserId })),
   setLocalStoreExpoToken: (localStoreExpoToken) => set(() => ({ localStoreExpoToken: localStoreExpoToken })),
+  setServerError: (serverError) => set(() => ({ serverError: serverError })),
+  setCategoryName: (categoryName) => set(() => ({ categoryName: categoryName })),
+  setStoreName: (storeName) => set(() => ({ storeName: storeName })),
 
 }));
 

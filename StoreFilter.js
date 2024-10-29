@@ -3,6 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-nati
 
 
 import useStore from './useStore';
+import {showToast}  from './apiUtils';
 
 
 const StoreFilter = ({ data}) => {
@@ -12,7 +13,7 @@ const StoreFilter = ({ data}) => {
 
   //const { admin, url } = useStore();
 
-  const { admin, url, setStoreId } = useStore();
+  const { admin, url, setStoreId, setStoreName } = useStore();
 
   async function getAllStores(userId) {
 
@@ -27,8 +28,6 @@ const StoreFilter = ({ data}) => {
         //console.log("all stores ----------------",data);
         setStoresData(data);
         return data;
-
-
 
 
     }
@@ -52,16 +51,15 @@ const StoreFilter = ({ data}) => {
 //setStoresData(getAllStores(1));
 
 
-
-
-
-
   //console.log("storesData", storesData);
 
-  const handleStoreSelection = (storeId) => {
+  const handleStoreSelection = (storeId, storeName) => {
+
+    console.log("handleStoreSelection", storeId, storeName);  
 
     setStoreId(storeId);
     setSelectedStore(storeId);
+    setStoreName(storeName);
     //onStoreFilterChange();
   };
 
@@ -82,7 +80,7 @@ const StoreFilter = ({ data}) => {
         {storesData.length > 0 ? storesData.map((store) => (
           <TouchableOpacity
             key={store.storeId}
-            onPress={() => handleStoreSelection(store.storeId)}
+            onPress={() => handleStoreSelection(store.storeId, store.storeName)}
             style={[
               styles.storeButton,
               { borderColor: selectedStore === store.storeId ? '#007bff' : '#d3d3d3' },

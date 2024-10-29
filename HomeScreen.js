@@ -9,6 +9,7 @@ it contains a bottomsheet component that displays the product details when a pro
 the users can add products to their favorites by clicking the star icon on the product
 the users can remove products from their favorites by clicking the star icon on the product
 the users can click on product to view the product details in a bottomsheet
+the api endpoints are located in the ./server/server.js file on the node server with express
 
 */
 
@@ -25,12 +26,13 @@ import useStore from './useStore';
 //import {*} from './apiUtils';
 import {updateExpoPushNotificationToken}  from './apiUtils';
 import React, { useState, useEffect , useRef, useCallback } from 'react';
-import { View,Text,Button, TouchableOpacity,Image, ImageBackground, StyleSheet,SafeAreaView,ScrollView,RefreshControl,Dimensions
-
-
+import { View,Text, TouchableOpacity,Image, ImageBackground, StyleSheet,SafeAreaView,RefreshControl,Dimensions, ActivityIndicator
 
 
 } from 'react-native';
+
+
+
 
 import messaging from '@react-native-firebase/messaging';
 import {PermissionsAndroid} from 'react-native';
@@ -87,9 +89,16 @@ const HomeScreen = () => {
 
   const { myUserName, setMyUserName, storeId, onSale, categoryId, 
     subCategoryId, isFavorite, searchText ,setSearchText, admin,  setAdmin , url, 
-    myUserId, setMyUserId, expoToken, setExpoToken, localStoreExpoToken} = useStore();
+    myUserId, setMyUserId, expoToken, setExpoToken, localStoreExpoToken, serverError, setServerError,
+    setStoreId, setOnSale, setCategoryId, setSubCategoryId, setIsFavorite, categoryName, storeName
+  
+  
+  } = useStore();
 
     
+
+
+
 
 
 
@@ -268,16 +277,46 @@ useEffect(() => {
 
   getUserDataByUsername(myUserName)
 
-  .then(({userId, expoPushToken}) => {
-   console.log('User ID from db:', userId);
-   console.log('expoPushToken db', expoPushToken);
-   setAdmin(userId);
-   setMyUserId(userId);
+  // check if the returned data is not null then set the userId and expoPushToken to the store
+
+  .then((data) => {
+
+      if(data)
+      {
+
+        console.log("User ID from db:", data?.datauserId);
+        console.log("expoPushToken db", data?.expoPushToken);
+        setAdmin(data?.userId);
+        setMyUserId(data?.userId);
+      }
+      else
+      {
+
+        console.log("User not found in the db:", data);
+        // clear al the local storage and the store data
+        
+
+        if(serverError === 'Network request failed')
+          {    
+            console.log("Network request failed:", serverError);
+          }
+          else{
+
+            setShowUserNamePicker(true);
+          }    
+        
+       
+
+
+      }
+
+
+
  
  
  
    
-   if(!isValidExpoPushToken(expoPushToken))
+   if(!isValidExpoPushToken(data?.expoPushToken))
    {
  
      //get local expoPushToken and compare it with the one from the server
@@ -295,18 +334,28 @@ useEffect(() => {
  
                //UPDATE THE EXPO TOKEN IN THE DB WITH USERID
  
-               console.log("updating expoToken in DB:",url, userId, result);
- 
-              
+               console.log("updating expoToken in DB:",url, data?.userId, result);
  
  
-               updateExpoPushNotificationToken(url, userId, result)
-               .then((data) => {
-                 console.log("updateExpoPushNotificationToken added token succesfully----------------------------");
-               })
-               .error((e) => {
-                 console.log("updateExpoPushNotificationToken ERROR:", e);
-               });
+               if(data?.userId && result)
+                {
+
+
+                    updateExpoPushNotificationToken(url, data?.userId, result)
+                    .then((data) => {
+                      console.log("updateExpoPushNotificationToken added token succesfully");
+                    })
+                    .catch((e) => {
+                      console.log("updateExpoPushNotificationToken ERROR:", e);
+                    });
+                }
+                else
+                {
+                  console.log("updateExpoPushNotificationToken ERROR: userId or token not valid");
+
+                }
+
+
  
      
              //setExpoToken(expoPushToken);
@@ -329,17 +378,11 @@ useEffect(() => {
  
  })
  .catch(error => {
-   console.error('Failed to fetch user data:', error);
+   console.error('Failed to fetch user data for myUserName change:', error);
  });
 
 
  }
-
-
-
-
-
-
 
 }, [myUserName]);
 
@@ -355,7 +398,7 @@ useEffect(() => {
       }
       const data = await response.json();
   
-      console.log("found userid ---", data[0]?.userId) 
+      console.log("found userid ---", data) 
       
       // Assuming the API returns an array and the first object contains the userId if found
       if (data?.length > 0 && data[0]?.userId) {
@@ -376,9 +419,17 @@ useEffect(() => {
       } else {
         console.log("userId not found");
         return null; // Username does not exist
+
       }
     } catch (error) {
-      console.error('Error fetching userid :', error);
+      console.error('Error getUserDataByUsername:', error.message);
+
+      if(error.message === 'Network request failed')
+      {
+        showToast('Kishte nje problem me lidhjen me serverin.');
+        setServerError('Network request failed');
+      }
+
       return null;
     }
   }
@@ -411,7 +462,7 @@ useEffect(() => {
 
 
     const userName =  getLocalUsername('username').then((result) => {
-      console.log("local username by key username:--------:",result);
+      console.log("get local username by key username key:--------:",result);
       //setShowUserNamePicker(true);
 
       //result = false;
@@ -821,6 +872,25 @@ const { data: user } = useQuery({
 
 
 
+function refreshFilters() {
+
+  console.log("refreshFilters called");
+
+  showToast('Duke rifreskuar...');
+
+  setStoreId(0);
+  setCategoryId(0);
+  setIsFavorite(false);
+  setOnSale(false);
+  setSearchText('');
+
+  
+
+  
+
+
+}
+
 
 function useCustomInfiniteQuery(params) {
   const {
@@ -882,6 +952,7 @@ useEffect
 
 
 }, [data]);
+
 
 
 
@@ -1261,7 +1332,7 @@ const getSuggestions = (q) => {
 
 
 const onSubmitSearch = (searchText) => {
-  console.log("searchText:",searchText);
+  console.log("onSubmitSearch searchText:",searchText);
   // write the code to extract the id from suggestionsList array into an new array of ids
 
   //
@@ -1272,12 +1343,6 @@ const onSubmitSearch = (searchText) => {
 
     if(suggestionsList)
     {
-      //const suggestionsListIds = suggestionsList.length > 0 ? suggestionsList.map(obj => obj.id) : [];
-      //console.log("suggestionsListIds:",suggestionsListIds);
-      //const paramsString = suggestionsListIds.join(',');
-      //console.log("paramsString:",paramsString  );
-      //const productListSearch = getProductsByIds(admin, paramsString);
-      // copy suggestionsListIds to the onSearchFilterIdList in the store IF THE LENGTH IS GREATER THAN 0      
 
     }
 
@@ -1379,6 +1444,8 @@ function toggleFavorite(filteredProducts, productId) {
 
 }
 
+const [isImageLoading, setIsImageLoading ] = useState(true);
+
 
   const renderItem = ({ item }) => 
   {
@@ -1386,6 +1453,8 @@ function toggleFavorite(filteredProducts, productId) {
       const imageUrl = {uri:item?.imageUrl};
 
       //console.log("imageUrl:",imageUrl);
+
+      
 
       //const storeLogo = saleProductsDetails[0]; 
       const storeLogo = {uri:`${url}/images/${item?.storeLogo}`};
@@ -1417,7 +1486,7 @@ function toggleFavorite(filteredProducts, productId) {
     <TouchableOpacity onPress={()=> handleBottomSheet(true, item) }>
       <View 
       style={{ padding: 5, borderColor: 'gray', 
-      borderWidth:0, borderRadius:15, backgroundColor:'white', margin:5, height:150}}>
+      borderWidth:0, borderRadius:15, backgroundColor:'white', margin:5, alignSelf: 'stretch' }}>
         
         <View style={{ padding: 5, flexDirection: 'row', position: 'relative', justifyContent: 'space-between', alignItems: 'center' }}>
 
@@ -1425,13 +1494,24 @@ function toggleFavorite(filteredProducts, productId) {
         <View style={{ flexDirection: 'row' , alignItems: 'center'}}>
           
 
-          
-        <View style={{ zIndex: 1 }}><TouchableOpacity onPress={() => onModalOpen(item)}>
-            <Image id="productImage" source={imageUrl} style={styles.image} />
+
+
+
+        <View style={{ zIndex: 1 , width: 70, height:70, borderColor:'red',  alignSelf: 'stretch' }}><TouchableOpacity onPress={() => onModalOpen(item)}>
+
+
+         <Image id="productImage" source={imageUrl} style={styles.image} 
+
+                
+           />
+
 
 
            
+
             </TouchableOpacity></View>
+
+           
 
   
               {item?.onSale ? <View style={{
@@ -1440,7 +1520,7 @@ function toggleFavorite(filteredProducts, productId) {
     <ImageBackground id="saleImage" source={require('./discount-red.png')} style={{justifyContent: 'center', 
     alignItems: 'center', width:35, height:35}} >
 
-<Text style= {{textAlign: 'center', textAlignVertical: 'center' }}>-23%</Text></ImageBackground></View> : null}
+        <Text style= {{textAlign: 'center', textAlignVertical: 'center' }}>-23%</Text></ImageBackground></View> : null}
             
             </View>
             </View>
@@ -1463,23 +1543,25 @@ function toggleFavorite(filteredProducts, productId) {
         
           </View>
 
-        <View style={{ flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center'}}>
+        <View style={{ flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center', height:40}}>
 
-        <Text style={{ fontSize: 15, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle' }}>{item?.productName}</Text>
+        <Text style={{ fontSize: 14, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle' }}>{item?.productName}</Text>
 
 
       </View>
-      <View style={{  flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center'}}>
+      <View style={{  flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap',}}>
           {item?.onSale  ? <Text style={{ borderRadius: 7, paddingHorizontal: 5,fontSize: 15, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle',textDecorationLine: 'line-through', backgroundColor:'#F44336' }}>{`€${oldPrice}`}</Text> : null}
           {item?.onSale  ? <Text style={{ borderRadius: 7, paddingHorizontal: 5,fontSize: 15, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle', backgroundColor:'#9CCC65' }}>{`€${discountPrice}`}</Text> : null}
-          {item?.onSale  ? <Text style={{ borderRadius: 7, paddingHorizontal: 5,fontSize: 15, fontWeight: 'bold', textAlign: 'center', verticalAlign:'top', backgroundColor:'#BBDEFB'  }}>{formattedEndDate}</Text> : null}        
+          {item?.onSale  ? <Text style={{ borderRadius: 7, paddingHorizontal: 5,fontSize: 12, fontWeight: 'bold', textAlign: 'center', verticalAlign:'top', backgroundColor:'#BBDEFB'  }}>{formattedEndDate}</Text> : null}        
       </View>
       </View>
     </TouchableOpacity>
   )
 
 
+
 };
+
 
 
 
@@ -1514,12 +1596,13 @@ return (
           //onFocus={() => setBorderColor('red')}
 
           //maxLength={2}
+          
 
 
           onSubmit={(e) => onSubmitSearch(e.nativeEvent.text)}
           onClear={onClearPress}
           textInputProps={{
-            placeholder: 'Kerko produktet',
+            placeholder: 'Kerko produkte',
             autoCorrect: false,
             autoCapitalize: 'none',
             maxLength: 20,
@@ -1546,13 +1629,28 @@ return (
 
 
       <View >
-          <ProductCategories data={categories}  subData={subCategories} onFilterChange={handleFilters} onMainFilterChange={handleMainFilters}/>
+          <ProductCategories data={categories}  subData={subCategories} onFilterChange={handleFilters} 
+          refreshFilters={refreshFilters}
+          onMainFilterChange={handleMainFilters}/>
       </View>
+
+
+
+
 
 
       <View style={{ flex:1, width: Dimensions.get("window").width * 0.95}}>
 
             <View ><Text>Numri i produkteve: {listLength}</Text></View>
+            <View style={{flexDirection: 'row'}}>
+              <Text>{storeId > 0 ?  <Text> - {storeName}</Text> : null}</Text>
+              <Text>{categoryId > 0 ?  <Text> - {categoryName}</Text> : null}</Text>
+              <Text>{onSale ?  <Text> - Ne zbritje </Text> : null}</Text>
+              <Text>{isFavorite ?  <Text> - Te preferuarat</Text> : null}</Text>
+              <Text>{searchText ?  <Text> - {searchText}</Text> : null}</Text>
+            
+            </View>
+
 
 
           <MasonryFlashList
@@ -1564,10 +1662,8 @@ return (
             extraData={extraData}
             showsVerticalScrollIndicator={false}
             marginBottom={60}
-            
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={refetch} />
-            }
+
+
 
             onEndReached={() => {
               console.log("onEndReached");
@@ -1625,6 +1721,7 @@ const styles = StyleSheet.create({
     padding: 5,
     marginVertical: 8,
     marginHorizontal: 16,
+    flexWrap: 'wrap',
   },
   selectedItem: {
     backgroundColor: '#e1f1fd',
@@ -1636,6 +1733,7 @@ const styles = StyleSheet.create({
 
 
   image: {
+    resizeMode: 'cover',
     width: 70,
     height: 70,
     marginRight: 5,

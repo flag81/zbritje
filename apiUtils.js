@@ -1,4 +1,23 @@
 import * as SecureStore from 'expo-secure-store';
+import Toast from 'react-native-root-toast';
+
+export const showToast = (message) => {
+  //setFavoritesData((prevProducts) => [...prevProducts, item]);
+
+  let toast = Toast.show(message, {
+    duration: Toast.durations.SHORT,
+    position: Toast.positions.TOP,
+    shadow: false,
+    animation: true,
+    hideOnPress: true,
+    delay: 0
+
+});
+  
+};
+
+
+
 
 export async function getLocalExpoToken(key) {
     const result = await SecureStore.getItemAsync('expoPushToken');
@@ -53,7 +72,7 @@ export async function updateExpoPushNotificationToken(url , userId, token) {
     }
     catch(e)
     {
-      console.log("updateExpoPushNotificationToken added token succesfully ERROR:", e);
+      console.log("updateExpoPushNotificationToken  ERROR:", e);
     }
 
   };
