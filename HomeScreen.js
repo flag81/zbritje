@@ -977,9 +977,10 @@ useEffect
 
 
 
+
     const data = await resp.json();
 
-    console.log(" data length------------------------------------------------:",data.length);
+    console.log(" data length------------------------------------------------:",data);
 
 
 
@@ -1457,7 +1458,7 @@ const [isImageLoading, setIsImageLoading ] = useState(true);
       
 
       //const storeLogo = saleProductsDetails[0]; 
-      const storeLogo = {uri:`${url}/images/${item?.storeLogo}`};
+      const storeLogo = {uri:item?.storeLogoUrl};
 
       // 
  
@@ -1493,17 +1494,10 @@ const [isImageLoading, setIsImageLoading ] = useState(true);
         <View style={{ flexDirection: 'col',  alignItems: 'center'}}>
         <View style={{ flexDirection: 'row' , alignItems: 'center'}}>
           
-
-
-
-
         <View style={{ zIndex: 1 , width: 70, height:70, borderColor:'red',  alignSelf: 'stretch' }}><TouchableOpacity onPress={() => onModalOpen(item)}>
 
 
-         <Image id="productImage" source={imageUrl} style={styles.image} 
-
-                
-           />
+         <Image id="productImage" source={imageUrl} style={styles.image} />
 
 
 
@@ -1535,7 +1529,7 @@ const [isImageLoading, setIsImageLoading ] = useState(true);
                   }
                   style={styles.star} />
 
-            <Image id="favoriteImage"
+            <Image id="storeLogo"
                   source={storeLogo}
                   style={styles.star} />
             </TouchableOpacity>
@@ -1639,11 +1633,13 @@ return (
 
 
 
+
       <View style={{ flex:1, width: Dimensions.get("window").width * 0.95}}>
 
             <View ><Text>Numri i produkteve: {listLength}</Text></View>
+
             <View style={{flexDirection: 'row'}}>
-              <Text>{storeId > 0 ?  <Text> - {storeName}</Text> : null}</Text>
+              <Text>{storeId > 0 ?  <Text>  - {storeName}</Text> : null}</Text>
               <Text>{categoryId > 0 ?  <Text> - {categoryName}</Text> : null}</Text>
               <Text>{onSale ?  <Text> - Ne zbritje </Text> : null}</Text>
               <Text>{isFavorite ?  <Text> - Te preferuarat</Text> : null}</Text>

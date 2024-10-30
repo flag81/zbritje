@@ -94,10 +94,7 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData, r
         setIsFavorite(!isFavorite);
         //console.log("New selected:",selected)
         //onFilterChange(selectedCategories, selectedSubCategories);
-        if(!favoritesFilter)
-        {
-            showToast("Favoritet e tua.");
-        }
+
             
       };  
   

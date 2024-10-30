@@ -7,13 +7,13 @@ import {showToast}  from './apiUtils';
 
 
 const StoreFilter = ({ data}) => {
-  const [selectedStore, setSelectedStore] = useState(null);
+  const [selectedStore, setSelectedStore] = useState(0);
   const [storesData, setStoresData] = useState([]);
 
 
   //const { admin, url } = useStore();
 
-  const { admin, url, setStoreId, setStoreName } = useStore();
+  const { admin, url, storeId, setStoreId, setStoreName } = useStore();
 
   async function getAllStores(userId) {
 
@@ -71,9 +71,10 @@ const StoreFilter = ({ data}) => {
             onPress={() => handleStoreSelection(0)}
             style={[
               styles.storeButton,
-              { borderColor: '#007bff' },
+              { borderColor: storeId === 0 ? '#007bff' : '#d3d3d3' },
             ]}
           >
+
             
             <Text>Te gjitha</Text>
           </TouchableOpacity>
@@ -83,7 +84,7 @@ const StoreFilter = ({ data}) => {
             onPress={() => handleStoreSelection(store.storeId, store.storeName)}
             style={[
               styles.storeButton,
-              { borderColor: selectedStore === store.storeId ? '#007bff' : '#d3d3d3' },
+              { borderColor: storeId === store.storeId ? '#007bff' : '#d3d3d3' },
             ]}
           >
             <Text style={styles.storeName}>{store.storeName}</Text>
