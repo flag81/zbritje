@@ -49,9 +49,8 @@ let productUrl = '' ;
   if(productData.length > 0) {
     //console.log("productData",productData[0].productName);
     productImageUrl = {uri:productData[0].imageUrl};
-    storeLogo = {uri:`${url}/images/${productData[0].storeLogo}`};
+    storeLogo = {uri:productData[0].storeLogoUrl};
     productName = productData[0].productName;
-
     productPrice = productData[0].productPrice;
     productDiscount = productData[0].productDiscount;
     productDiscountPrice = productData[0].productDiscountPrice;
@@ -60,7 +59,6 @@ let productUrl = '' ;
     productSaleEndDate = productData[0].saleEndDate;
     productSalePercentage = productData[0].productSalePercentage;
     productUrl = productData[0].productUrl;
-
 
 
   }
@@ -86,7 +84,7 @@ console.log(productUrl);
           </Pressable>
         </View>
         
-        <View style={{padding: 5,  flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center'}}> 
+        <View style={{padding: 5,  flexDirection: 'row',  alignItems: 'center'}}> 
 
           <ScrollView >
 
@@ -101,19 +99,24 @@ console.log(productUrl);
           imageSize={20}
           onFinishRating={ratingCompleted}
 
+
           style={{ paddingVertical: 0 }} />
 
           <View style={{flexDirection: 'col', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 5}}>
 
-          <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 5}}>
+            <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',  width: '95%'}}>
 
-          <View style={{flexDirection: 'col', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 5}}>
-        
-            {productData?.length > 0 ? <Image source={productImageUrl} style={[styles2.icon,  { }]} /> : null}
-            {productData?.length > 0 ? <Text>{productName}</Text>  : null}
-          </View>
+              <View style={{flexDirection: 'col', alignItems: 'center', paddingVertical: 5, width:'30%'}}>
+            
+                {productData?.length > 0 ? <Image source={productImageUrl} style={[styles2.icon,  { }]} /> : null}
+                {productData?.length > 0 ? <Text>{productName}</Text>  : null}
+              </View>
 
-            {productData?.length > 0 ? <Image  source={storeLogo} style={[styles2.storeIcon,  { }]} /> : null}
+            {productData?.length > 0 ? 
+            
+            <Image  source={storeLogo} style={[styles2.storeIcon,  { }]} /> 
+            
+            : null}
 
             <Image id="favoriteImage"
                   source={
@@ -123,24 +126,21 @@ console.log(productUrl);
 
       
 
-            { productData[0]?.onSale ? <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+            { productData[0]?.onSale ? 
+            
+              <View style={{flexDirection: 'row',  alignItems: 'center'}}>
 
-
-              <Image id="saleImage" source={require('./discount-red.png')} style={styles2.icon2} />
-
-
-              { productData[0]?.productUrl != null ?
-
-              <TouchableOpacity onPress={() => openUrl(productUrl)} style={styles2.category} >
-
-              <Text style={{fontSize: 20, textAlign: 'center', verticalAlign:'middle' }}>Buy Online</Text>
-
-
-              </TouchableOpacity> : null}
-              
-              
+                <Image id="saleImage" source={require('./discount-red.png')} style={styles2.icon2} />
+ 
               </View> 
-            : null}
+            : null }
+
+              <TouchableOpacity  style={styles2.category} >
+
+              <Text style={{fontSize: 15, textAlign: 'center', verticalAlign:'middle' }}>Blej Online</Text>
+
+
+              </TouchableOpacity> 
             
               </View>
                    

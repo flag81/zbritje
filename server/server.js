@@ -502,13 +502,9 @@ LEFT JOIN storefavorites sf ON store.storeId = sf.storeId and sf.userId = ${user
   
   limit 10 OFFSET ${offset1} `;
 
-
   //LIMIT ${req.query.limit} OFFSET ${req.query.offset}
   //const userId= req.query.userId;
-
   //console.log("q",q);
-
-
 
   db.query(q, [storeId, offset1], (err, data) => {
 

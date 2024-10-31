@@ -161,7 +161,7 @@ let storeEmail = '' ;
 
                 <TouchableOpacity onPress={openPlayStore} style={styles2.category}>
                             
-                        <Text> Download Viva App </Text>
+                        <Text> Shkarko {storeName} App </Text>
                         
                 </TouchableOpacity>
 

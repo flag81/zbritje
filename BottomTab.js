@@ -32,7 +32,7 @@ export default function BottomTab() {
 
         headerRight: ({ focused }) => (
           <TouchableOpacity onPress={() => navigation.navigate('Profili')}>
-            <View style={{ padding: 10 }}>
+            <View style={{ padding: 10, alignItems: 'center' }}>
               <AntDesign
                 name="user"
                 size={22}

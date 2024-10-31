@@ -238,6 +238,7 @@ async function getLocalUsername(key) {
   }, [storeId, onSale, categoryId, subCategoryId, isFavorite]);
 
 
+  
 
   useEffect(() => {
 
@@ -964,6 +965,8 @@ useEffect
 
       console.log("getData:::::::::::::::::, userId:",userId);
 
+      //setFilteredProducts([]);
+
       const resp = await fetch(`${url}/products?limit=10&userId=${userId}&offset=${page}&storeId=${storeId}&categoryId=${categoryId}&isFavorite=${isFavorite}&onSale=${onSale}&searchText=${searchText}`,  {
         method: 'GET',       
         headers: {
@@ -980,7 +983,9 @@ useEffect
 
     const data = await resp.json();
 
-    console.log(" data length------------------------------------------------:",data);
+    console.log(" data length------------------------------------------------:",data.length);
+
+    console.log(" data ------------------------------------------------:",data);
 
 
 
@@ -1483,6 +1488,7 @@ const [isImageLoading, setIsImageLoading ] = useState(true);
 
 
 
+
   return (
     <TouchableOpacity onPress={()=> handleBottomSheet(true, item) }>
       <View 
@@ -1490,6 +1496,8 @@ const [isImageLoading, setIsImageLoading ] = useState(true);
       borderWidth:0, borderRadius:15, backgroundColor:'white', margin:5, alignSelf: 'stretch' }}>
         
         <View style={{ padding: 5, flexDirection: 'row', position: 'relative', justifyContent: 'space-between', alignItems: 'center' }}>
+
+
 
         <View style={{ flexDirection: 'col',  alignItems: 'center'}}>
         <View style={{ flexDirection: 'row' , alignItems: 'center'}}>
