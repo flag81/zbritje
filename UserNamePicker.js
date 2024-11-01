@@ -9,13 +9,15 @@ import useStore from './useStore';
 
 export default function UserNamePicker({ isVisible, onClose }) {
 
+  console.log("UserNamePicker componet loaded");
+
     const [userName, setUserName] = useState('');
     const [userMessage, setUserMessage] = useState('');
     const [visible, setVisible] = useState(false);
     const [showForm, setShowForm] = useState(true);
     const [showCloseButton, setShowCloseButton] = useState(false);
 
-    const { myUserName, setMyUserName, url, setUserId , expoToken} = useStore();
+    const { myUserName, setMyUserName, url, setUserId , expoToken, setMyUserID} = useStore();
     
 
   useEffect(() => {
@@ -161,6 +163,7 @@ async function getUserId(username) {
 
 
       setUserId(data[0].userId);
+      setMyUserID(data[0].userId);  
       await setLocalUserId("userId", data[0].userId.toString());
 
       console.log("setLocalUserId init:",data[0].userId);

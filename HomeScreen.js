@@ -18,7 +18,7 @@ import 'react-native-url-polyfill/auto';
 import 'react-native-get-random-values';
 import BottomSheet ,{BottomSheetBackdrop } from '@gorhom/bottom-sheet';
 import Banner from './Banner';
-import { MasonryFlashList } from "@shopify/flash-list";
+import { MasonryFlashList, useFlatListBenchmark } from "@shopify/flash-list";
 import ProductCategories from './ProductCategories';
 import EmojiPicker from "./EmojiPicker";
 import * as Device from 'expo-device';
@@ -58,6 +58,14 @@ const queryClient = new QueryClient();
 const HomeScreen = () => {
 
   //console.log("EEEEEEEEEEENNNNNNNNNNNNNTTTTTTTTTTTTTTTEEEEEEEEEEEEERRRRRRRRRRRRRR11111111111111111");
+
+  const renderCount = useRef(0);
+
+  // Log render count
+  useEffect(() => {
+    renderCount.current += 1;
+    console.log(`HomeScreen component has rendered ${renderCount.current} times`);
+  });
 
 
   const [allProducts, setAllProducts] = useState([]);
@@ -238,7 +246,7 @@ async function getLocalUsername(key) {
   }, [storeId, onSale, categoryId, subCategoryId, isFavorite]);
 
 
-  
+
 
   useEffect(() => {
 
@@ -866,6 +874,44 @@ const params = { admin:myUserId, storeId:storeId };
 //console.log("isConditionMet:",isConditionMet);
 
 
+useEffect(() => {
+
+  console.log("isConditionMet changed:",isConditionMet);
+
+}, [isConditionMet]);
+
+
+useEffect(() => {
+
+  console.log("searchText changed:",searchText);
+
+}, [searchText]);
+
+
+useEffect(() => {
+
+  console.log("storeId changed:",storeId);
+
+}, [storeId]);
+
+
+
+useEffect(() => {
+
+  console.log("categoryId changed:",categoryId);
+
+
+}, [categoryId]);
+
+useEffect(() => {
+
+  console.log("onSale changed:",onSale);
+
+}, [onSale]);
+
+
+
+
 const { data: user } = useQuery({
   queryKey: ['auth'],
   queryFn: auth,
@@ -894,6 +940,9 @@ function refreshFilters() {
 
 
 function useCustomInfiniteQuery(params) {
+
+console.log("useCustomInfiniteQuery called with:",params);
+
   const {
     data,
     isLoading,
@@ -906,9 +955,11 @@ function useCustomInfiniteQuery(params) {
 
     {
     queryKey: ['getData', params.admin ,storeId, categoryId, searchText, isConditionMet, onSale, isFavorite],
-    queryFn: ({ pageParam = 1 }) => getData(params.admin, pageParam, storeId, categoryId, subCategoryId, isFavorite, onSale, searchText),
-    
-    enabled: isConditionMet,
+    queryFn: ({ pageParam = 1 }) => {
+      console.log('useCustomInfiniteQuery called getData with:', { admin: params.admin, pageParam, storeId, categoryId, subCategoryId, isFavorite, onSale, searchText });
+      return getData(params.admin, pageParam, storeId, categoryId, subCategoryId, isFavorite, onSale, searchText);
+    },
+    enabled: isConditionMet && params.admin != 0 && !isLoading,
 
 
     getNextPageParam: (lastPage, allPages) => {
@@ -963,7 +1014,9 @@ useEffect
     try
     {
 
-      console.log("getData:::::::::::::::::, userId:",userId);
+      const off = (page-1) *10 ;
+
+      console.log("getData called with  userId and offeset:",userId, off);
 
       //setFilteredProducts([]);
 
@@ -983,9 +1036,9 @@ useEffect
 
     const data = await resp.json();
 
-    console.log(" data length------------------------------------------------:",data.length);
+    console.log(" data length and offset:",data.length, page);
 
-    console.log(" data ------------------------------------------------:",data);
+    console.log(" data retured from /products api :",data);
 
 
 
@@ -1238,6 +1291,8 @@ useEffect
 
   const onModalOpen = (item) => {
     // setProductData([]);
+
+    console.log("onModalOpen called with item array:",item);
     setProductData([item]);
     setIsModalVisible(true);
   };
@@ -1681,10 +1736,11 @@ return (
 
       </View>
 
-      <View>
+      <View>{ productData.length > 0 ?
+
         <EmojiPicker isVisible={isModalVisible} onClose={onModalClose} productData={productData}>
           {/* Details Screen */}
-        </EmojiPicker>
+        </EmojiPicker> : null }
       </View>
 
 

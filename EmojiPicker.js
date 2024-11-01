@@ -22,7 +22,7 @@ export default function EmojiPicker({ isVisible, children, onClose, productData 
   // productdata is passed from the parent component and is an array of objects and i need to reference the first object in the array and then the key value pair of productPic
 // write code for the above
 
-console.log("productData",productData);
+console.log("EmojiPicker component loaded with productData:",productData);
 
 
 const url = 'http://10.12.13.197:8800';
