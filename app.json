@@ -6,6 +6,10 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "packagerOpts": {
+      "dev": false,
+      "minify": true
+    },
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",

@@ -19,13 +19,16 @@ const StoreFilter = ({ data}) => {
 
     try
     {
+
+      console.log("called getAllStores with userId:", userId);
+
       const resp = await fetch(`${url}/getAllStores?userId=${userId}`,  {
         method: 'GET',       
         headers: {"Content-Type": "application/json"}
       });
 
         const data = await resp.json();
-        //console.log("all stores ----------------",data);
+        console.log("returned getAllStores with userId all stores:",data);
         setStoresData(data);
         return data;
 
@@ -102,7 +105,7 @@ const styles = StyleSheet.create({
   },
   storeButton: {
     borderWidth: 1,
-    borderRadius: 5,
+    borderRadius: 15,
     padding: 10,
     marginRight: 10,
   },

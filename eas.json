@@ -13,7 +13,14 @@
       "channel": "preview"
     },
     "production": {
-      "channel": "production"
+      "channel": "production",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_NO_DEV": "true",
+        "EXPO_MINIFY": "true"
+      }
     }
   },
   "submit": {

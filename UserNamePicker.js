@@ -162,8 +162,8 @@ async function getUserId(username) {
 
 
 
-      setUserId(data[0].userId);
-      setMyUserID(data[0].userId);  
+      setUserId(data[0]?.userId);
+      setMyUserID(data[0]?.userId);  
       await setLocalUserId("userId", data[0].userId.toString());
 
       console.log("setLocalUserId init:",data[0].userId);
