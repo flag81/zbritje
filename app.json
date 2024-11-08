@@ -22,7 +22,9 @@
       "supportsTablet": true,
       "runtimeVersion": {
         "policy": "appVersion"
-      }
+      },
+      "bundleIdentifier": "com.anonymous.zbritje",
+      "googleServicesFile": "./ios/GoogleService-Info.plist"
     },
     "android": {
       "adaptiveIcon": {
