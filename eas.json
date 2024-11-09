@@ -17,9 +17,17 @@
       "android": {
         "buildType": "apk"
       },
+      "ios": {
+        "buildType": "release",
+        "distribution": "app-store",
+        "autoIncrement": "version",
+        "image": "latest",
+        "credentialsSource": "remote"
+      },
       "env": {
         "EXPO_NO_DEV": "true",
-        "EXPO_MINIFY": "true"
+        "EXPO_MINIFY": "true",
+        "GOOGLE_SERVICE_INFO": "@flag81/GOOGLE_SERVICE_INFO"
       }
     }
   },
