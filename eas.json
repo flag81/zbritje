@@ -18,8 +18,7 @@
         "buildType": "apk"
       },
       "ios": {
-        "buildType": "release",
-        "distribution": "app-store",
+        "distribution": "store",
         "autoIncrement": "version",
         "image": "latest",
         "credentialsSource": "remote"
