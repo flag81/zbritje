@@ -48,7 +48,16 @@ export default
             "expo-router",
             "@react-native-firebase/app",
             "@react-native-firebase/auth",
-            "expo-build-properties"
+            "@react-native-firebase/messaging",
+            [
+            "expo-build-properties",
+            {
+                "ios" :{
+                  "useFrameworks" : "static"
+                }
+              }
+
+            ]
           ],
           "extra": {
             "router": {
