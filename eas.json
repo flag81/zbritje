@@ -19,7 +19,6 @@
       },
       "ios": {
         "distribution": "store",
-        "autoIncrement": "version",
         "image": "latest",
         "credentialsSource": "remote"
       },
