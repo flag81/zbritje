@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Platform, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Platform, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
 import React, { useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from './HomeScreen';
@@ -24,6 +24,11 @@ export default function BottomTab() {
   const { admin , myUserName, url} = useStore();
 
   return (
+
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.container}>
+
     <BottomTabNavigator.Navigator
 
     
@@ -44,6 +49,7 @@ export default function BottomTab() {
         ),
         
 
+        
 
         tabBarStyle: [
           styles.tabContainer,
@@ -51,6 +57,7 @@ export default function BottomTab() {
             shadowOffset: { height: -2, width: 2 },
             shadowOpacity: 0.1,
             shadowRadius: 10,
+            padding: 60,
           },
         ],
         tabBarItemStyle: {
@@ -133,10 +140,14 @@ export default function BottomTab() {
         }}
       />
     </BottomTabNavigator.Navigator>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   tabContainer: {
     position: 'absolute',
     width: '96%',

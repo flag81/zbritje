@@ -1702,11 +1702,12 @@ return (
             <View ><Text>Numri i produkteve: {listLength}</Text></View>
 
             <View style={{flexDirection: 'row'}}>
-              <Text>{storeId > 0 ?  <Text>  - {storeName}</Text> : null}</Text>
-              <Text>{categoryId > 0 ?  <Text> - {categoryName}</Text> : null}</Text>
-              <Text>{onSale ?  <Text> - Ne zbritje </Text> : null}</Text>
-              <Text>{isFavorite ?  <Text> - Te preferuarat</Text> : null}</Text>
-              <Text>{searchText ?  <Text> - {searchText}</Text> : null}</Text>
+              <Text>Filtrat:</Text>
+              <Text>{storeId > 0 ?  <Text>  {storeName}</Text> : null}</Text>
+              <Text>{categoryId > 0 ?  <Text> : {categoryName}</Text> : null}</Text>
+              <Text>{onSale ?  <Text> : Ne zbritje </Text> : null}</Text>
+              <Text>{isFavorite ?  <Text> : Te preferuarat</Text> : null}</Text>
+              <Text>{searchText ?  <Text> : {searchText}</Text> : null}</Text>
             
             </View>
 

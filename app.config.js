@@ -25,7 +25,7 @@ export default
             "runtimeVersion": {
               "policy": "appVersion"
             },
-            "bundleIdentifier": "com.anonymous.zbritje",
+            "bundleIdentifier": "com.anonymous.zbritje1",
             "googleServicesFile":
             process.env.GOOGLE_SERVICE_INFO || "./ios/GoogleService-Info.plist",
           },

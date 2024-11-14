@@ -17,7 +17,7 @@ export default function UserNamePicker({ isVisible, onClose }) {
     const [showForm, setShowForm] = useState(true);
     const [showCloseButton, setShowCloseButton] = useState(false);
 
-    const { myUserName, setMyUserName, url, setUserId , expoToken, setMyUserID} = useStore();
+    const { myUserName, setMyUserName, url, setUserId , expoToken, setMyUserId} = useStore();
     
 
   useEffect(() => {
@@ -78,9 +78,6 @@ export default function UserNamePicker({ isVisible, onClose }) {
     function isValidExpoPushToken(token) {
       return token.startsWith('ExponentPushToken[') && token.endsWith(']');
     }
-
-
-
 
 
 
@@ -163,7 +160,7 @@ async function getUserId(username) {
 
 
       setUserId(data[0]?.userId);
-      setMyUserID(data[0]?.userId);  
+      setMyUserId(data[0]?.userId);  
       await setLocalUserId("userId", data[0].userId.toString());
 
       console.log("setLocalUserId init:",data[0].userId);

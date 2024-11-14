@@ -51,6 +51,7 @@ Notifications.setNotificationHandler({
   }),
 });
 
+/*
 Notifications.scheduleNotificationAsync({
   content: {
     title: 'Look at that notification',
@@ -58,7 +59,7 @@ Notifications.scheduleNotificationAsync({
   },
   trigger: null,
 });
-
+*/
 
 
 
