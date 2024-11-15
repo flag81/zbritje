@@ -60,6 +60,16 @@ let productUrl = '' ;
     productSalePercentage = productData[0].productSalePercentage;
     productUrl = productData[0].productUrl;
 
+    oldPrice = productData[0].oldPrice;
+    discountPrice = productData[0].discountPrice;
+    saleEndDate = productData[0].saleEndDate;
+
+    const date = new Date(saleEndDate);
+    const formatter = new Intl.DateTimeFormat('en-GB', { dateStyle: 'short' });
+    formattedEndDate = formatter?.format(date);
+
+    onSale = productData[0].onSale;
+
 
   }
 
@@ -90,21 +100,9 @@ console.log(productUrl);
 
 
 
-          <Rating
-          showRating
-          type="star"
-          fractions={1}
-          startingValue={2.5}
+          <View style={{flexDirection: 'col', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 5, paddingBottom: 10}}>
 
-          imageSize={20}
-          onFinishRating={ratingCompleted}
-
-
-          style={{ paddingVertical: 0 }} />
-
-          <View style={{flexDirection: 'col', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 5}}>
-
-            <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',  width: '95%'}}>
+            <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',  width: '95%' }}>
 
               <View style={{flexDirection: 'col', alignItems: 'center', paddingVertical: 5, width:'30%'}}>
             
@@ -137,17 +135,42 @@ console.log(productUrl);
 
               <TouchableOpacity  style={styles2.category} >
 
-              <Text style={{fontSize: 15, textAlign: 'center', verticalAlign:'middle' }}>Blej Online</Text>
-
+                <Text style={{fontSize: 15, textAlign: 'center', verticalAlign:'middle' }}>Blej Online</Text>
 
               </TouchableOpacity> 
             
               </View>
-                   
-            <View style={{flexDirection: 'col', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 20}} />
+
+
+            { productData[0]?.onSale ?     
+
+              <View style={{borderColor: 'red' , borderWidth: 0 , flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '60%'}} >
+                  <View><Text style={{borderRadius: 7, fontSize: 20, textAlign: 'center', verticalAlign:'middle',textDecorationLine: 'line-through', backgroundColor:'#F44336' }}>{oldPrice} </Text></View>
+                  <View><Text style={{borderRadius:7, fontSize: 20, textAlign: 'center', verticalAlign:'middle',  backgroundColor:'green' }}> {discountPrice} </Text></View>
+                  <View><Text style={{borderRadius:7, fontSize: 20, textAlign: 'center', verticalAlign:'middle',  backgroundColor:'#BBDEFB' }}> {formattedEndDate} </Text></View>
+
+              </View>
+             : null 
+
+            }
+
        
          
-          
+          <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 30}} >
+              <Rating
+                showRating
+                type="star"
+                fractions={1}
+                startingValue={2.5}
+
+                imageSize={20}
+                onFinishRating={ratingCompleted}
+
+
+                style={{ paddingVertical: 0 }} 
+            />
+
+            </View>
 
          
 
@@ -177,6 +200,7 @@ const styles2 = StyleSheet.create({
       borderTopLeftRadius: 18,
       position: 'absolute',
       bottom: 0,
+      paddingBottom: 0,
 
     },
     titleContainer: {

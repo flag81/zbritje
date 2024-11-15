@@ -57,7 +57,6 @@ export default function BottomTab() {
             shadowOffset: { height: -2, width: 2 },
             shadowOpacity: 0.1,
             shadowRadius: 10,
-            padding: 60,
           },
         ],
         tabBarItemStyle: {
@@ -144,6 +143,7 @@ export default function BottomTab() {
   );
 }
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -155,7 +155,10 @@ const styles = StyleSheet.create({
     left: '2%',
     bottom: 10,
     backgroundColor: 'white',
-    height: 60,
+    height: Platform.select({
+      ios: 90, // Height for iOS
+      android: 60, // Height for Android
+    }),
   },
   label: {
     textTransform: 'capitalize',

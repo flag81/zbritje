@@ -26,7 +26,8 @@ import useStore from './useStore';
 //import {*} from './apiUtils';
 import {updateExpoPushNotificationToken}  from './apiUtils';
 import React, { useState, useEffect , useRef, useCallback } from 'react';
-import { View,Text, TouchableOpacity,Image, ImageBackground, StyleSheet,SafeAreaView,RefreshControl,Dimensions, ActivityIndicator
+import { View,Text, TouchableOpacity,Image, ImageBackground, StyleSheet,SafeAreaView,RefreshControl,Dimensions,
+   ActivityIndicator, KeyboardAvoidingView, Platform
 
 
 } from 'react-native';
@@ -83,8 +84,8 @@ const HomeScreen = () => {
   const [filteredDataFinal, setFilteredFinal] = useState([]);
   const [favoritesData, setFavoritesData] = useState([]);
   const [saleProductsData, setSaleProductsData] = useState([]);
-  const [isVisible, setIsVisible] = useState(false)
-  const [currentItem, setCurrentItem] = useState({})
+  const [isVisible, setIsVisible] = useState(false);
+  const [currentItem, setCurrentItem] = useState({});
   const sheetRef = useRef(null);
   const [refreshing, setRefreshing] = useState(true);
   const [productSheet, setProductSheet] = useState();
@@ -93,6 +94,7 @@ const HomeScreen = () => {
   const [productData, setProductData] = useState([]);
   const [storedUserName, setStoredUserName] = useState("");
   const [showUserNamePicker, setShowUserNamePicker] = useState(false);
+
 
 
   const { myUserName, setMyUserName, storeId, onSale, categoryId, 
@@ -104,11 +106,6 @@ const HomeScreen = () => {
   } = useStore();
 
     
-
-
-
-
-
 
 const [isConditionMet, setIsConditionMet] = useState(false);
 
@@ -1501,8 +1498,6 @@ function toggleFavorite(filteredProducts, productId) {
 
   setFilteredProducts(filteredProducts);
 
-  
-
 }
 
 const [isImageLoading, setIsImageLoading ] = useState(true);
@@ -1607,9 +1602,9 @@ const [isImageLoading, setIsImageLoading ] = useState(true);
 
       </View>
       <View style={{  flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap',}}>
-          {item?.onSale  ? <Text style={{ borderRadius: 7, paddingHorizontal: 5,fontSize: 15, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle',textDecorationLine: 'line-through', backgroundColor:'#F44336' }}>{`€${oldPrice}`}</Text> : null}
-          {item?.onSale  ? <Text style={{ borderRadius: 7, paddingHorizontal: 5,fontSize: 15, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle', backgroundColor:'#9CCC65' }}>{`€${discountPrice}`}</Text> : null}
-          {item?.onSale  ? <Text style={{ borderRadius: 7, paddingHorizontal: 5,fontSize: 12, fontWeight: 'bold', textAlign: 'center', verticalAlign:'top', backgroundColor:'#BBDEFB'  }}>{formattedEndDate}</Text> : null}        
+          {item?.onSale  ? <Text style={{ borderRadius: 7, paddingHorizontal: 5,fontSize: 14, fontWeight: 'bold', textAlign: 'center', textDecorationLine: 'line-through', backgroundColor:'#F44336' }}>{`€${oldPrice}`}</Text> : null}
+          {item?.onSale  ? <Text style={{ borderRadius: 7, paddingHorizontal: 5,fontSize: 14, fontWeight: 'bold', textAlign: 'center',  backgroundColor:'#9CCC65' }}>{`€${discountPrice}`}</Text> : null}
+          {item?.onSale  ? <Text style={{ borderRadius: 7, paddingHorizontal: 5,fontSize: 12, fontWeight: 'bold', textAlign: 'center', backgroundColor:'#BBDEFB'  }}>{formattedEndDate}</Text> : null}        
       </View>
       </View>
     </TouchableOpacity>
@@ -1640,6 +1635,7 @@ return (
           closeOnBlur={true}
           closeOnSubmit={true}
           
+
 
           //initialValue={{ id: '2' }} // or just '2'
           onSelectItem={item => {
@@ -1746,7 +1742,21 @@ return (
 
 
       {
-        showUserNamePicker && <View><UserNamePicker isVisible={showUserNamePicker} onClose={() => setShowUserNamePicker(false)}  /></View>
+        showUserNamePicker && 
+
+        <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.container}
+      >
+        
+        
+        <View>
+          
+          <UserNamePicker isVisible={showUserNamePicker} onClose={() => setShowUserNamePicker(false)}  />
+        
+        
+        </View>
+        </KeyboardAvoidingView>
       }
           
   
