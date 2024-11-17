@@ -1,10 +1,13 @@
-import { Modal, View, Text, TextInput, Pressable, StyleSheet, Button, Alert, Input } from 'react-native';
+import { Modal, View, Text, TextInput, Pressable, StyleSheet, Button, Alert,
+   Input, KeyboardAvoidingView, Platform } from 'react-native';
 import React, { useState, useEffect , useCallback } from 'react';
 import { Storage } from 'expo-storage';
 
 
 import * as SecureStore from 'expo-secure-store';
 import useStore from './useStore';
+
+
 
 
 export default function UserNamePicker({ isVisible, onClose }) {
@@ -239,6 +242,15 @@ async function checkIfUserNameExists(userName) {
     
 
   return (
+
+    <KeyboardAvoidingView
+    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    style={styles2.container}
+
+    keyboardVerticalOffset={Platform.OS === 'ios' ? 264 : 0}
+  >
+<View>
+
     <Modal animationType="slide" transparent={true} visible={isVisible} >
       <View style={styles2.modalContent}>
         <View style={styles2.titleContainer}>
@@ -262,13 +274,16 @@ async function checkIfUserNameExists(userName) {
                     value={userName}
                     placeholder=""
                     /> 
-                    <Button title="Save" onPress={validateUserName}  />      
+                    <Button title="Ruaj" onPress={validateUserName}  />      
         
             </View>
         }
 
       </View>
     </Modal>
+
+    </View>
+  </KeyboardAvoidingView>
   );
 
   
@@ -276,6 +291,9 @@ async function checkIfUserNameExists(userName) {
 }
 
 const styles2 = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
     modalContent: {
       height: '25%',
       width: '100%',
@@ -283,7 +301,11 @@ const styles2 = StyleSheet.create({
       borderTopRightRadius: 18,
       borderTopLeftRadius: 18,
       position: 'absolute',
-      bottom: 0,
+      bottom: Platform.select({
+        ios: '25%' , // Height for iOS
+        android: 0, // Height for Android
+      }),
+      
     },
     titleContainer: {
       height: '16%',

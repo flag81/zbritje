@@ -25,9 +25,6 @@ export default function BottomTab() {
 
   return (
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.container}>
 
     <BottomTabNavigator.Navigator
 
@@ -139,7 +136,7 @@ export default function BottomTab() {
         }}
       />
     </BottomTabNavigator.Navigator>
-    </KeyboardAvoidingView>
+  
   );
 }
 

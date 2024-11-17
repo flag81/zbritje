@@ -22,14 +22,14 @@ import{isValidExpoPushToken,
 import {
   QueryClient,
   QueryClientProvider
-} from '@tanstack/react-query'
+} from '@tanstack/react-query';
 
 
 
 import { NavigationContainer } from '@react-navigation/native';
 import BottomTab from './BottomTab';
 
-import { AutocompleteDropdownContextProvider } from 'react-native-autocomplete-dropdown'
+import { AutocompleteDropdownContextProvider } from 'react-native-autocomplete-dropdown';
 import HomeScreen from './HomeScreen';
 
 import { RootSiblingParent } from 'react-native-root-siblings';
@@ -61,7 +61,12 @@ Notifications.scheduleNotificationAsync({
 });
 */
 
+//ExponentPushToken[5gnnxxI8sra2r0IPT4v3d_]
+//sendPushNotification("ExponentPushToken[5gnnxxI8sra2r0IPT4v3d_]");
 
+async () => {
+  await sendPushNotification("ExponentPushToken[5gnnxxI8sra2r0IPT4v3d_]");
+};
 
 async function sendPushNotification(expoPushToken) {
   const message = {

@@ -1619,6 +1619,8 @@ const [isImageLoading, setIsImageLoading ] = useState(true);
 
 return (
 
+
+
 <SafeAreaView style={styles.container}>
 
 
@@ -1744,10 +1746,7 @@ return (
       {
         showUserNamePicker && 
 
-        <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.container}
-      >
+
         
         
         <View>
@@ -1756,14 +1755,14 @@ return (
         
         
         </View>
-        </KeyboardAvoidingView>
+      
       }
           
   
   </View>
 
   </SafeAreaView>
-
+  
 
   );
 };
