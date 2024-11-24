@@ -259,6 +259,7 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData, r
                         style={styles1.star}  />
                     </TouchableOpacity>
 
+              
                     </View>
 
 
@@ -277,7 +278,7 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData, r
                             <Text style={[styles1.subtitle, { color: cuisines === 2 ? COLORS.primary : COLORS.grey }]}>Te gjitha</Text>
                         </TouchableOpacity>
 
-                            {categories.map((category) => (
+                            {categories?.map((category) => (
                                 <TouchableOpacity
                                 key={category.id}
                                 onPress={() => handleCategoriesFilter(category.categoryId, category.categoryName)}

@@ -71,7 +71,8 @@
   "devDependencies": {
     "@babel/core": "^7.24.0",
     "@rnx-kit/align-deps": "^2.5.1",
-    "@tanstack/eslint-plugin-query": "^5.51.12"
+    "@tanstack/eslint-plugin-query": "^5.51.12",
+    "fetch-mock": "^12.2.0"
   },
   "private": true
 }

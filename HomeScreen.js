@@ -33,7 +33,7 @@ import { View,Text, TouchableOpacity,Image, ImageBackground, StyleSheet,SafeArea
 } from 'react-native';
 
 
-
+import fetchMock from 'fetch-mock';
 
 import messaging from '@react-native-firebase/messaging';
 import {PermissionsAndroid} from 'react-native';
@@ -46,6 +46,7 @@ import { AutocompleteDropdown } from 'react-native-autocomplete-dropdown';
 import Toast from 'react-native-root-toast';
 import StoreFilter from './StoreFilter';
 import SearchComponent from './SearchComponent';
+import { textSpanContainsPosition } from 'typescript';
 
 
 
@@ -255,6 +256,9 @@ async function getLocalUsername(key) {
 
 
 
+
+
+
   useEffect(() => {
 
     console.log("originalData changed>>>>>:",originalData?.length)
@@ -395,12 +399,39 @@ useEffect(() => {
   async function getUserDataByUsername(username) {
     try {
   
-      console.log("getUserDataByUsername",username);
+      console.log("getUserDataByUsername with username:",username);
+
+
+
+
+      console.log("getUserDataByUsername url:", `${url}/getUserId?userName=${username}`);
+
   
       // Replace 'API_ENDPOINT' with the actual endpoint URL for checking usernames
-      const response = await fetch(`${url}/getUserId?userName=${username}`);
+      const response = await fetch(`${url}/getUserId?userName=${username}`,
+
+        {
+
+          method: 'GET',
+          mode: 'cors',
+          headers: {
+            "Content-Type": "application/json",
+            Accept: 'application/json',
+            Connection: 'keep-alive',
+            "Cache-Control": "no-cache"
+            
+        }
+      }
+
+
+      );
+
+     
+
+      console.log("getUserDataByUsername response:",response);
+
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
   
@@ -428,7 +459,7 @@ useEffect(() => {
 
       }
     } catch (error) {
-      console.error('Error getUserDataByUsername:', error.message);
+      console.error('Error getUserDataByUsername:', error);
 
       if(error.message === 'Network request failed')
       {
@@ -490,7 +521,7 @@ useEffect(() => {
       }
       else{
         setMyUserName(result);    
-        console.log("result found setMyUserName:");  
+        console.log("result found getLocalUsername , setting setMyUserName:", result);  
       }
     });
 
@@ -547,8 +578,8 @@ useEffect(() => {
 
    async function auth()  {
 
-    console.log("myUserName:",myUserName);
-    console.log("url:",`${url}/auth`);
+    console.log("auth() with myUserName:",myUserName);
+    console.log("Auth url:",`${url}/auth`);
 
     const resp = await fetch(`${url}/auth`,  {
       method: 'POST',       
@@ -1099,6 +1130,8 @@ useEffect
 
 
   
+
+  
   async function getSubCategories(userId) {
 
     try
@@ -1572,7 +1605,9 @@ const [isImageLoading, setIsImageLoading ] = useState(true);
     <ImageBackground id="saleImage" source={require('./discount-red.png')} style={{justifyContent: 'center', 
     alignItems: 'center', width:35, height:35}} >
 
-        <Text style= {{textAlign: 'center', textAlignVertical: 'center' }}>-23%</Text></ImageBackground></View> : null}
+
+
+        <Text style= {styles.discountText}>-{discountPercentage}%</Text></ImageBackground></View> : null}
             
             </View>
             </View>
@@ -1769,6 +1804,7 @@ return (
 
 
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -1819,6 +1855,12 @@ const styles = StyleSheet.create({
     height: 30,
     marginRight: 5,
     marginTop: 5,
+   
+  },
+  discountText: {
+    textAlign: 'center', 
+    textAlignVertical: 'center', 
+    fontWeight: 'bold' 
    
   }
 

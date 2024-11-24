@@ -293,6 +293,7 @@ async function checkIfUserNameExists(userName) {
 const styles2 = StyleSheet.create({
   container: {
     flex: 1,
+    height: '100%',
   },
     modalContent: {
       height: '25%',
@@ -302,7 +303,7 @@ const styles2 = StyleSheet.create({
       borderTopLeftRadius: 18,
       position: 'absolute',
       bottom: Platform.select({
-        ios: '25%' , // Height for iOS
+        ios: '30%' , // Height for iOS
         android: 0, // Height for Android
       }),
       
