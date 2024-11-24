@@ -31,6 +31,12 @@ export async function getLocalExpoToken(key) {
   }
 
 
+ export function getPercentageChange(oldNumber, newNumber) {
+    var decreaseValue = oldNumber - newNumber;
+    var percentageChange = (decreaseValue / oldNumber) * 100;
+    return Math.ceil(percentageChange); // Rounded up to the nearest whole number
+}
+
 export async function getLocalUsername(key) {
     let result = await SecureStore.getItemAsync(key);
     if (result) {

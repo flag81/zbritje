@@ -24,7 +24,7 @@ import EmojiPicker from "./EmojiPicker";
 import * as Device from 'expo-device';
 import useStore from './useStore';
 //import {*} from './apiUtils';
-import {updateExpoPushNotificationToken}  from './apiUtils';
+import {updateExpoPushNotificationToken, getPercentageChange}  from './apiUtils';
 import React, { useState, useEffect , useRef, useCallback } from 'react';
 import { View,Text, TouchableOpacity,Image, ImageBackground, StyleSheet,SafeAreaView,RefreshControl,Dimensions,
    ActivityIndicator, KeyboardAvoidingView, Platform
@@ -32,8 +32,6 @@ import { View,Text, TouchableOpacity,Image, ImageBackground, StyleSheet,SafeArea
 
 } from 'react-native';
 
-
-import fetchMock from 'fetch-mock';
 
 import messaging from '@react-native-firebase/messaging';
 import {PermissionsAndroid} from 'react-native';
@@ -1332,11 +1330,7 @@ useEffect
   };
 
 
-  function getPercentageChange(oldNumber, newNumber) {
-    var decreaseValue = oldNumber - newNumber;
-    var percentageChange = (decreaseValue / oldNumber) * 100;
-    return Math.ceil(percentageChange); // Rounded up to the nearest whole number
-}
+
 
 
 
@@ -1603,7 +1597,7 @@ const [isImageLoading, setIsImageLoading ] = useState(true);
   borderColor:'red', borderWidth: 0}}>
     
     <ImageBackground id="saleImage" source={require('./discount-red.png')} style={{justifyContent: 'center', 
-    alignItems: 'center', width:35, height:35}} >
+    alignItems: 'center', width:40, height:40}} >
 
 
 
@@ -1630,6 +1624,7 @@ const [isImageLoading, setIsImageLoading ] = useState(true);
         
           </View>
 
+
         <View style={{ flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center', height:40}}>
 
         <Text style={{ fontSize: 14, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle' }}>{item?.productName}</Text>
@@ -1637,7 +1632,7 @@ const [isImageLoading, setIsImageLoading ] = useState(true);
 
       </View>
       <View style={{  flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap',}}>
-          {item?.onSale  ? <Text style={{ borderRadius: 7, paddingHorizontal: 5,fontSize: 14, fontWeight: 'bold', textAlign: 'center', textDecorationLine: 'line-through', backgroundColor:'#F44336' }}>{`€${oldPrice}`}</Text> : null}
+          {item?.onSale  ? <Text style={{ borderRadius: 7, paddingHorizontal: 5,fontSize: 14, fontWeight: 'bold', textAlign: 'center', textDecorationLine: 'line-through', backgroundColor:'#ff9999' }}>{`€${oldPrice}`}</Text> : null}
           {item?.onSale  ? <Text style={{ borderRadius: 7, paddingHorizontal: 5,fontSize: 14, fontWeight: 'bold', textAlign: 'center',  backgroundColor:'#9CCC65' }}>{`€${discountPrice}`}</Text> : null}
           {item?.onSale  ? <Text style={{ borderRadius: 7, paddingHorizontal: 5,fontSize: 12, fontWeight: 'bold', textAlign: 'center', backgroundColor:'#BBDEFB'  }}>{formattedEndDate}</Text> : null}        
       </View>
@@ -1672,6 +1667,9 @@ return (
           closeOnBlur={true}
           closeOnSubmit={true}
           
+          inputContainerStyle={{borderWidth:2, borderRadius:20}}
+          
+
 
 
           //initialValue={{ id: '2' }} // or just '2'
@@ -1686,19 +1684,21 @@ return (
           //onFocus={() => setBorderColor('red')}
 
           //maxLength={2}
-          
+       
+
 
 
           onSubmit={(e) => onSubmitSearch(e.nativeEvent.text)}
           onClear={onClearPress}
           textInputProps={{
-            placeholder: 'Kerko produkte',
+            placeholder: 'Kerko produkte ketu ...',
             autoCorrect: false,
             autoCapitalize: 'none',
             maxLength: 20,
             style: {
-              borderRadius: 25,
+              borderRadius: 55,
               paddingLeft: 18,
+              borderColor: 'red',
             },
           }}
 
@@ -1863,6 +1863,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold' 
    
   }
+
 
 
 });

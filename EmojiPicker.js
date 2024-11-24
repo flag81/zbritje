@@ -1,6 +1,7 @@
-import { Modal, View, Text, Pressable, StyleSheet, Image, ScrollView, Linking , TouchableOpacity} from 'react-native';
+import { Modal, View, Text, Pressable, StyleSheet, Image, ScrollView, Linking , TouchableOpacity, ImageBackground} from 'react-native';
 
 import { Rating, AirbnbRating } from 'react-native-ratings';
+import { getPercentageChange}  from './apiUtils';
 
 export default function EmojiPicker({ isVisible, children, onClose, productData }) {
 
@@ -62,6 +63,9 @@ let productUrl = '' ;
 
     oldPrice = productData[0].oldPrice;
     discountPrice = productData[0].discountPrice;
+
+    discountPercentage = getPercentageChange(oldPrice, discountPrice);
+
     saleEndDate = productData[0].saleEndDate;
 
     const date = new Date(saleEndDate);
@@ -105,33 +109,43 @@ console.log(productUrl);
             <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',  width: '95%' }}>
 
               <View style={{flexDirection: 'col', alignItems: 'center', paddingVertical: 5, width:'30%'}}>
+
+              <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
             
                 {productData?.length > 0 ? <Image source={productImageUrl} style={[styles2.icon,  { }]} /> : null}
+
+                { productData[0]?.onSale ? <ImageBackground id="saleImage" source={require('./discount-red.png')} style={{justifyContent: 'center', 
+                alignItems: 'center', width:50, height:50}} >
+
+
+
+                    <Text style= {styles2.discountText}>-{discountPercentage}%</Text>
+                    
+                    </ImageBackground>
+
+                    : null }
+
+
+                </View> 
+
+
                 {productData?.length > 0 ? <Text>{productName}</Text>  : null}
               </View>
 
-            {productData?.length > 0 ? 
-            
-            <Image  source={storeLogo} style={[styles2.storeIcon,  { }]} /> 
-            
-            : null}
 
+
+
+          <View style={{flexDirection: 'col', alignItems: 'center', paddingVertical: 5}}>
             <Image id="favoriteImage"
                   source={
                     productData[0]?.isFavorite ? require('./star.png') : require('./white-star.png')
                   } style={styles2.star}
             />
+            <Image  source={storeLogo} style={[styles2.storeIcon,  { }]} /> 
+          </View>
 
-      
 
-            { productData[0]?.onSale ? 
-            
-              <View style={{flexDirection: 'row',  alignItems: 'center'}}>
-
-                <Image id="saleImage" source={require('./discount-red.png')} style={styles2.icon2} />
  
-              </View> 
-            : null }
 
               <TouchableOpacity  style={styles2.category} >
 
@@ -145,8 +159,8 @@ console.log(productUrl);
             { productData[0]?.onSale ?     
 
               <View style={{borderColor: 'red' , borderWidth: 0 , flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '60%'}} >
-                  <View><Text style={{borderRadius: 7, fontSize: 20, textAlign: 'center', verticalAlign:'middle',textDecorationLine: 'line-through', backgroundColor:'#F44336' }}>{oldPrice} </Text></View>
-                  <View><Text style={{borderRadius:7, fontSize: 20, textAlign: 'center', verticalAlign:'middle',  backgroundColor:'green' }}> {discountPrice} </Text></View>
+                  <View><Text style={{borderRadius: 7, fontSize: 20, textAlign: 'center', verticalAlign:'middle',textDecorationLine: 'line-through', backgroundColor:'#F44336', paddingHorizontal:5 }}>€{oldPrice} </Text></View>
+                  <View><Text style={{borderRadius:7, fontSize: 20, textAlign: 'center', verticalAlign:'middle',  backgroundColor:'green', paddingHorizontal:5 }}> €{discountPrice} </Text></View>
                   <View><Text style={{borderRadius:7, fontSize: 20, textAlign: 'center', verticalAlign:'middle',  backgroundColor:'#BBDEFB' }}> {formattedEndDate} </Text></View>
 
               </View>
@@ -242,6 +256,7 @@ const styles2 = StyleSheet.create({
       marginRight: 5,
       marginTop: 5,
      
+
     },
     category: {
       margin: 3,
@@ -250,4 +265,10 @@ const styles2 = StyleSheet.create({
       padding: 5,
       paddingHorizontal: 10,
   },
+  discountText: {
+    textAlign: 'center', 
+    textAlignVertical: 'center', 
+    fontWeight: 'bold' 
+   
+  }
   });
