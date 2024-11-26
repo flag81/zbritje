@@ -207,7 +207,7 @@ console.log(productUrl);
 
 const styles2 = StyleSheet.create({
     modalContent: {
-      height: '30%',
+      height: '50%',
       width: '100%',
       backgroundColor: 'white',
       borderTopRightRadius: 18,
@@ -218,7 +218,7 @@ const styles2 = StyleSheet.create({
 
     },
     titleContainer: {
-      height: '16%',
+      height: '10%',
       backgroundColor: '#464C55',
       borderTopRightRadius: 10,
       borderTopLeftRadius: 10,

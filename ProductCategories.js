@@ -228,35 +228,45 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData, r
            
             <View style={styles1.item}>
 
-                    <View style={{ padding: 5, flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center'}}>
-                            <Text style={styles1.title}>KATEGORITE</Text>
+                    <View style={{ padding: 5, flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center', flexWrap:'nowrap'}}>                     
 
                     <TouchableOpacity onPress={() => handleOnSaleFilter()}>
+                    <View style={{flexWrap: 'nowrap', flexDirection: 'row', alignItems: 'center' }}>
                         <Image id="favoriteImage"
                         source={
                             onSale ? require('./discount-fill.png') : require('./discount.png')                           
                         }
                         style={styles1.star}  />
+                        <Text style={styles1.buttonText}>Ne zbritje</Text>
+                        </View>
                     </TouchableOpacity>
 
 
                     <TouchableOpacity onPress={() =>  handleFavoritesFilter()}>
+                    <View style={{flexWrap: 'nowrap', flexDirection: 'row', alignItems: 'center' }}>
                     <Image id="favoriteImage"
                         source={
 
                             isFavorite ? require('./star.png') : require('./white-star.png')
                         }
-                        style={styles1.star}  />
+                        style={styles1.star} />
+                        <Text style={styles1.buttonText}>Favoritet</Text>
+                        </View>
                     </TouchableOpacity>
+                    
+                    
 
                     
                     <TouchableOpacity onPress={() =>  refreshFilters()}>
+                    <View style={{flexWrap: 'nowrap', flexDirection: 'row', alignItems: 'center' }}>
                     <Image id="favoriteImage"
                         source={
 
                             require('./refresh.png')
                         }
-                        style={styles1.star}  />
+                        style={styles1.star}  /> 
+                        <Text style={styles1.buttonText}>Refresh</Text>
+                        </View>
                     </TouchableOpacity>
 
               
@@ -324,9 +334,12 @@ const styles1 = StyleSheet.create({
        
     },
     subtitle: {
-        color: COLORS.grey,
-        fontWeight: '700',
-        fontSize: SIZES.h4,
+ 
+        fontSize: 15,
+        
+    },
+    buttonText: {
+        fontSize: 12,
     },
     category: {
         margin: 3,
@@ -334,6 +347,7 @@ const styles1 = StyleSheet.create({
         borderWidth: 2,
         padding: 5,
         paddingHorizontal: 10,
+        backgroundColor: COLORS.white,
     },
     text: {
         color: COLORS.title,

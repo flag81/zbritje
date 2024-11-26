@@ -1698,7 +1698,7 @@ return (
             style: {
               borderRadius: 55,
               paddingLeft: 18,
-              borderColor: 'red',
+
             },
           }}
 
@@ -1856,6 +1856,7 @@ const styles = StyleSheet.create({
     marginRight: 5,
     marginTop: 5,
    
+
   },
   discountText: {
     textAlign: 'center', 
@@ -1863,6 +1864,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold' 
    
   }
+
 
 
 

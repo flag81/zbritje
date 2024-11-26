@@ -102,12 +102,14 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     padding: 10,
+   
   },
   storeButton: {
-    borderWidth: 1,
+    borderWidth: 2,
     borderRadius: 15,
     padding: 10,
     marginRight: 10,
+    backgroundColor: '#fff',
   },
   storeName: {
     color: '#000',
