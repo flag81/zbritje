@@ -1616,9 +1616,11 @@ const [isImageLoading, setIsImageLoading ] = useState(true);
                   }
                   style={styles.star} />
 
-            <Image id="storeLogo"
+            {item?.onSale ?
+              <Image id="storeLogo"
                   source={storeLogo}
-                  style={styles.star} />
+                  style={styles.star} /> : null}
+
             </TouchableOpacity>
             </View>
         
@@ -1651,6 +1653,8 @@ return (
 
 
 
+
+
 <SafeAreaView style={styles.container}>
 
 
@@ -1660,7 +1664,7 @@ return (
 
 
     <View >
-      {/* <Banner />   style={{flex: 1}} */}
+      { <Banner /> }
      
       <AutocompleteDropdown
           clearOnFocus={false}
@@ -1685,6 +1689,8 @@ return (
 
           //maxLength={2}
        
+
+
 
 
 
@@ -1732,10 +1738,12 @@ return (
 
       <View style={{ flex:1, width: Dimensions.get("window").width * 0.95}}>
 
+      <View style={{flexDirection: 'row'}}>
+
             <View ><Text>Numri i produkteve: {listLength}</Text></View>
 
             <View style={{flexDirection: 'row'}}>
-              <Text>Filtrat:</Text>
+              <Text>     Filtrat:</Text>
               <Text>{storeId > 0 ?  <Text>  {storeName}</Text> : null}</Text>
               <Text>{categoryId > 0 ?  <Text> : {categoryName}</Text> : null}</Text>
               <Text>{onSale ?  <Text> : Ne zbritje </Text> : null}</Text>
@@ -1744,7 +1752,7 @@ return (
             
             </View>
 
-
+      </View> 
 
           <MasonryFlashList
             data={filteredProducts}

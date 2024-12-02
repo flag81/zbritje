@@ -3,14 +3,26 @@ import { SafeAreaView, View, Text, ScrollView, TextInput, TouchableOpacity , Sty
 import { COLORS , SIZES} from "./theme";
 import useStore from './useStore';
 import {showToast}  from './apiUtils';
+import { Dropdown } from 'react-native-element-dropdown';
 
 
 
 
 const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData, refreshFilters}) => {
 
-    const [location, setLocation] = useState();
-    const [cuisines, setCuisines] = useState(1);
+
+
+    const [value, setValue] = useState(null);
+    const [isFocus, setIsFocus] = useState(false);
+
+    const dropdownData = [
+        { label: 'Viva Fresh', value: '1' },
+        { label: 'Maxi', value: '2' },
+        { label: 'Super Viva', value: '3' },
+        { label: 'Spar', value: '4' },
+        { label: 'Meridian', value: '5' },
+
+      ];
 
 
     const COLORS1 = { primary: '#007bff', grey: '#d3d3d3' };
@@ -228,10 +240,44 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData, r
            
             <View style={styles1.item}>
 
-                    <View style={{ padding: 5, flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center', flexWrap:'nowrap'}}>                     
 
+
+
+                    <View style={{ padding: 5, flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center', flexWrap:'nowrap', borderBlockColor: 'red', borderWidth: 0}}>                     
+
+
+                    <View style={{alignItems: 'center', width: '30%' }}>
+
+                    <Dropdown
+    
+
+                        data={dropdownData}
+                        style={[styles2.dropdown]}
+                        placeholderStyle={styles2.placeholderStyle}
+                        placeholder="Marketi"
+                        selectedTextStyle={styles2.selectedTextStyle}
+                        inputSearchStyle={styles2.inputSearchStyle}
+                        search
+                        maxHeight={200}
+                        labelField="label"
+                        valueField="value"
+                        
+                        
+                        searchPlaceholder="Search..."
+                        value={value}
+                        onFocus={() => setIsFocus(true)}
+                        onBlur={() => setIsFocus(false)}
+                        onChange={item => {
+                            setValue(item.value);
+                            setIsFocus(false);
+                        }}
+
+                        />
+
+                        </View>
+       
                     <TouchableOpacity onPress={() => handleOnSaleFilter()}>
-                    <View style={{flexWrap: 'nowrap', flexDirection: 'row', alignItems: 'center' }}>
+                    <View style={{flexWrap: 'nowrap', flexDirection: 'col', alignItems: 'center' }}>
                         <Image id="favoriteImage"
                         source={
                             onSale ? require('./discount-fill.png') : require('./discount.png')                           
@@ -242,8 +288,10 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData, r
                     </TouchableOpacity>
 
 
+
+
                     <TouchableOpacity onPress={() =>  handleFavoritesFilter()}>
-                    <View style={{flexWrap: 'nowrap', flexDirection: 'row', alignItems: 'center' }}>
+                    <View style={{flexWrap: 'nowrap', flexDirection: 'col', alignItems: 'center' }}>
                     <Image id="favoriteImage"
                         source={
 
@@ -258,7 +306,7 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData, r
 
                     
                     <TouchableOpacity onPress={() =>  refreshFilters()}>
-                    <View style={{flexWrap: 'nowrap', flexDirection: 'row', alignItems: 'center' }}>
+                    <View style={{ flexDirection: 'col', alignItems: 'center' }}>
                     <Image id="favoriteImage"
                         source={
 
@@ -272,7 +320,7 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData, r
               
                     </View>
 
-
+{/*
                         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                             <View style={styles1.row}>
 
@@ -303,7 +351,7 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData, r
                         </ScrollView>
 
                       <SubCategoriesFilter subCategories={subCategories} selectedCategories={selectedCategories} />
-
+                        */}
                 </View>
                 
     )
@@ -383,6 +431,48 @@ const styles1 = StyleSheet.create({
       },
 
 });
+
+const styles2 = StyleSheet.create({
+    container: {
+      backgroundColor: 'white',
+      padding: 16,
+    },
+    dropdown: {
+      height: 50,
+      width: '100%',
+
+      borderColor: 'gray',
+      borderWidth: 0.5,
+      borderRadius: 8,
+      paddingHorizontal: 8,
+    },
+    icon: {
+      marginRight: 5,
+    },
+    label: {
+      position: 'absolute',
+      backgroundColor: 'white',
+      left: 22,
+      top: 8,
+      zIndex: 999,
+      paddingHorizontal: 8,
+      fontSize: 14,
+    },
+    placeholderStyle: {
+      fontSize: 16,
+    },
+    selectedTextStyle: {
+      fontSize: 16,
+    },
+    iconStyle: {
+      width: 20,
+      height: 20,
+    },
+    inputSearchStyle: {
+      height: 40,
+      fontSize: 16,
+    },
+  });
 
 
 export default ProductCategories;

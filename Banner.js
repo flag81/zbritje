@@ -13,29 +13,32 @@ function Banner() {
     const carouselData = [
 		{
 			id: "01",
-			image: {uri:`http://10.12.13.197:8800/images/slider_1.jpg`},
+			image: {uri:`https://res.cloudinary.com/dt7a4yl1x/image/upload/v1732992869/1556089636_xpqkz4.png`},
 		},
 		{
 			id: "02",
-			image: {uri:`http://10.12.13.197:8800/images/slider_2.jpg`},
+			image: {uri:`https://res.cloudinary.com/dt7a4yl1x/image/upload/v1732992879/1720705367482_mmxplf.jpg`},
 		},
 		{
 			id: "03",
-			image: {uri:`http://10.12.13.197:8800/images/slider_3.jpg`},
+			image: {uri:`https://res.cloudinary.com/dt7a4yl1x/image/upload/v1732892174/colgate.81b54c87_m9wowh_whxwub.png`},
             
 		},
 	];
 
+
     return (
-        <View style={{height: height}}>
+        <View style={{height: 120}}>
             <Carousel
                 loop
                 width={width}             
-                height={width / 2}
+                height={120}
                 autoPlay={true}
                 data={carouselData}
                 mode="parallax"
-                scrollAnimationDuration={1000}
+                scrollAnimationDuration={3000}
+                
+                
                 
                 renderItem={({ index , item}) => (
                     <View
@@ -43,12 +46,14 @@ function Banner() {
                             flex: 1,
                             borderWidth: 1,
                             justifyContent: 'center',
+                            backgroundColor: 'white',
+                            
                         }}
                     >
-                    				<Image
-					source={item.image}
-					style={{ height: 200 }}
-				/>
+                        <Image
+					        source={item.image}
+					        style={{ height: 100 }}
+				        />
                        
                     </View>
                 )}
@@ -56,5 +61,6 @@ function Banner() {
         </View>
     );
 }
+
 
 export default Banner;

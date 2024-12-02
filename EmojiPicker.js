@@ -118,7 +118,6 @@ console.log(productUrl);
                 alignItems: 'center', width:50, height:50}} >
 
 
-
                     <Text style= {styles2.discountText}>-{discountPercentage}%</Text>
                     
                     </ImageBackground>
