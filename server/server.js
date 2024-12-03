@@ -421,7 +421,7 @@ console.log("searchText", searchText);
   products.categoryId, 
   products.productSize, 
   products.subCategoryId, 
-  products.storeId, 
+  sales.storeId, 
   products.imageUrl,
   products.productUrl,
   products.productRating,
@@ -453,14 +453,14 @@ console.log("searchText", searchText);
 FROM products
   
 LEFT JOIN sales ON products.productId = sales.productId
-LEFT JOIN store ON products.storeId = store.storeId
+LEFT JOIN store ON sales.storeId = store.storeId
 LEFT JOIN favorites f ON products.productId = f.productId and f.userId = ${userId}
 LEFT JOIN storefavorites sf ON store.storeId = sf.storeId and sf.userId = ${userId} -- Assuming the join condition is correct
 
 
   WHERE 
   CASE 
-    WHEN ${storeId} > 0 THEN products.storeId = ${storeId}
+    WHEN ${storeId} > 0 THEN sales.storeId = ${storeId} and CURRENT_DATE() between sales.saleStartDate and sales.saleEndDate 
     ELSE true
   END
 
@@ -498,7 +498,7 @@ LEFT JOIN storefavorites sf ON store.storeId = sf.storeId and sf.userId = ${user
 
 
 
-  order by isFavorite DESC,sales.saleEndDate DESC,
+  order by onSale DESC,isFavorite DESC,
   isStoreFavorite DESC
   
   limit 10 OFFSET ${offset1} `;
@@ -667,6 +667,32 @@ app.get("/isStoreFavorite", (req, res) => {
       return res.json(data);
     });
   });
+
+
+
+app.get("/getStoresList", (req, res) => {
+
+    //const q = "SELECT tableid,  users.id  FROM orders join users on orders.userid = users.id WHERE orders.status = 0 ";
+
+  console.log("getStoresList called:");
+  
+    
+      const q = `SELECT store.storeId as value, store.storeName as label FROM store`;
+    
+      //const userId=  parseInt(req.query.userId);
+    
+      db.query(q, (err, data) => {
+    
+        if (err) {
+          console.log(err);
+          return res.json(err);
+        }
+
+        console.log("stores:", data);
+    
+        return res.json(data);
+      });
+    });
 
 app.get("/getAllStores", (req, res) => {
 

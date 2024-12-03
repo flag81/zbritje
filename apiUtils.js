@@ -1,6 +1,7 @@
 import * as SecureStore from 'expo-secure-store';
 import Toast from 'react-native-root-toast';
 
+
 export const showToast = (message) => {
   //setFavoritesData((prevProducts) => [...prevProducts, item]);
 
@@ -82,3 +83,27 @@ export async function updateExpoPushNotificationToken(url , userId, token) {
     }
 
   };
+
+  export async function getStoresList(url) {
+
+    console.log("getStoresList url----------------------------", `${url}/getStoresList` );
+
+    try
+    {
+      const resp = await fetch(`${url}/getStoresList`,  {
+        method: 'GET',       
+        headers: {"Content-Type": "application/json"}
+      });
+
+        const data = await resp.json();
+        console.log("all stores list: ",data);
+        //setAllStores(data);
+        return data;
+
+    }
+    catch(e)
+    {
+      console.log("getStoresList error...", e);
+    }
+
+  }

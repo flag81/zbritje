@@ -47,12 +47,11 @@ const StoreFilter = ({ data}) => {
 
 
     useEffect(() => {
-        //console.log("storesData changed", storesData);
+        console.log("storesData changed", storesData);
     }, [storesData]);
 
 
-//setStoresData(getAllStores(1));
-
+  //setStoresData(getAllStores(1));
 
   //console.log("storesData", storesData);
 

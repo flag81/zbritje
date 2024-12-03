@@ -35,7 +35,7 @@ export default
               "backgroundColor": "#ffffff"
             },
             "package": "com.anonymous.zbritje",
-            "googleServicesFile": "./android/app/google-services.json",
+            "googleServicesFile": "./google-services.json",
             "runtimeVersion": "1.0.0",
             "useNextNotificationsApi": true,
             "enableBackgroundNotification": true,

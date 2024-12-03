@@ -2,33 +2,27 @@ import React, { useState, useEffect} from "react";
 import { SafeAreaView, View, Text, ScrollView, TextInput, TouchableOpacity , StyleSheet, Image} from "react-native";
 import { COLORS , SIZES} from "./theme";
 import useStore from './useStore';
-import {showToast}  from './apiUtils';
+import {showToast, getStoresList }  from './apiUtils';
 import { Dropdown } from 'react-native-element-dropdown';
-
 
 
 
 const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData, refreshFilters}) => {
 
 
-
     const [value, setValue] = useState(null);
     const [isFocus, setIsFocus] = useState(false);
 
-    const dropdownData = [
-        { label: 'Viva Fresh', value: '1' },
-        { label: 'Maxi', value: '2' },
-        { label: 'Super Viva', value: '3' },
-        { label: 'Spar', value: '4' },
-        { label: 'Meridian', value: '5' },
 
-      ];
 
 
     const COLORS1 = { primary: '#007bff', grey: '#d3d3d3' };
 
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [selectedSubCategories, setSelectedSubCategorie] = useState([]);
+
+    const [allStoresList, setAllStoresList] = useState([]);
+
 
     const [currentCategory, setCurrentCategory] = useState('0');
 
@@ -40,16 +34,37 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData, r
     const categories = data;
     const subCategories = subData;
 
-    const { admin, url, onSale, setOnSale, isFavorite, setIsFavorite, 
+    const { admin, url, onSale, setOnSale, isFavorite, setIsFavorite, storeId, setStoreId,
         categoryId, setCategoryId, subCategoryId, selectedSubCategoriyId, setCategoryName} = useStore();
 
+
+
+        async function fetchStoresList(url) {
+          try {
+            const data = await getStoresList(url);
+            console.log("getStoresList from fetchStoresList:-------------", data);
+            setAllStoresList(data);
+            return data;
+          } catch (error) {
+            console.error("Error fetching stores list:", error);
+          }
+        }
+        
+        // Call the function
+        
+        //fetchStoresList(url);
+
+
+      
 
     useEffect(() => {
 
         setSelectedCategories([]);       
         sendFilteredCategories();
 
-        console.log("Category data:-------------",data);
+        //console.log("Category data:-------------",data);
+        console.log("calling fetchStoresList:-------------", url);
+        fetchStoresList(url);
         
       }, []);
 
@@ -64,6 +79,14 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData, r
         sendFilteredCategories();
 
       }, [selectedCategories]);
+
+      useEffect(() => {
+
+        //setSelected([]);
+        //console.log("New categories:-------------",data)
+        console.log("All stores list changed:-------------",allStoresList)
+
+      }, [allStoresList]);
 
 
       useEffect(() => {
@@ -251,18 +274,17 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData, r
                     <Dropdown
     
 
-                        data={dropdownData}
+                        data={allStoresList}
                         style={[styles2.dropdown]}
                         placeholderStyle={styles2.placeholderStyle}
                         placeholder="Marketi"
-                        selectedTextStyle={styles2.selectedTextStyle}
+
                         inputSearchStyle={styles2.inputSearchStyle}
-                        search
+
                         maxHeight={200}
                         labelField="label"
                         valueField="value"
-                        
-                        
+                                            
                         searchPlaceholder="Search..."
                         value={value}
                         onFocus={() => setIsFocus(true)}
