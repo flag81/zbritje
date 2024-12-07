@@ -7,8 +7,8 @@ const useStore = create((set) => ({
   
   count: 0,
   myUserName: '',
-  url : 'http://10.12.13.197:8801',
-  //url : 'http://192.168.1.6:8801',
+  //url : 'http://10.12.13.197:8801',
+  url : 'http://192.168.1.7:8801',
   //url : 'https://nodejs-production-18ad6.up.railway.app',
   //url : 'https://flag-81-374131877123.europe-west3.run.app/',
   //url : 'https://qg048c0c0wos4o40gos4k0kc.128.140.43.244.sslip.io',

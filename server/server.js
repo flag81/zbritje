@@ -417,13 +417,10 @@ console.log("searchText", searchText);
   SELECT 
   products.productId, 
   products.productName, 
-  products.productPic, 
   products.categoryId, 
   products.productSize, 
-  products.subCategoryId, 
   sales.storeId, 
   products.imageUrl,
-  products.productUrl,
   products.productRating,
   sales.saleId, 
   sales.saleStartDate,
@@ -448,15 +445,19 @@ console.log("searchText", searchText);
   CASE 
     WHEN CURRENT_DATE() BETWEEN sales.saleStartDate AND sales.saleEndDate THEN true 
     ELSE false 
-  END AS onSale
+  END AS onSale,
+
+  COUNT(ufk.userFavoritesKeyword) AS matchingKeywordsCount
   
 FROM products
   
 LEFT JOIN sales ON products.productId = sales.productId
 LEFT JOIN store ON sales.storeId = store.storeId
 LEFT JOIN favorites f ON products.productId = f.productId and f.userId = ${userId}
-LEFT JOIN storefavorites sf ON store.storeId = sf.storeId and sf.userId = ${userId} -- Assuming the join condition is correct
+LEFT JOIN storefavorites sf ON store.storeId = sf.storeId and sf.userId = ${userId} 
 
+LEFT JOIN productkeywords pk ON products.productId = pk.productId
+LEFT JOIN userfavoriteskeywords ufk ON ufk.userFavoritesKeyword = pk.productKeyword AND ufk.userId = ${userId}
 
   WHERE 
   CASE 
@@ -497,8 +498,33 @@ LEFT JOIN storefavorites sf ON store.storeId = sf.storeId and sf.userId = ${user
     END)
 
 
+    GROUP BY 
+  products.productId, 
+  products.productName, 
+  products.productPic, 
+  products.categoryId, 
+  products.productSize, 
+  sales.storeId, 
+  products.imageUrl,
+  products.productRating,
+  sales.saleId, 
+  sales.saleStartDate,
+  sales.saleEndDate,
+  sales.storeLogo, 
+  sales.oldPrice, 
+  sales.discountPrice,
+  sales.discountPercentage, 
+  store.storeLogo,
+  store.storeLogoUrl,
+  isFavorite,
+  isStoreFavorite,
+  onSale
 
-  order by onSale DESC,isFavorite DESC,
+
+
+  order by onSale DESC,
+  isFavorite DESC,
+   matchingKeywordsCount DESC,
   isStoreFavorite DESC
   
   limit 10 OFFSET ${offset1} `;

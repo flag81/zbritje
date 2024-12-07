@@ -65,7 +65,8 @@ const HomeScreen = () => {
   useEffect(() => {
     renderCount.current += 1;
     console.log(`HomeScreen component has rendered ${renderCount.current} times`);
-  });
+  }
+);
 
 
   const [allProducts, setAllProducts] = useState([]);
@@ -247,7 +248,7 @@ async function getLocalUsername(key) {
   useEffect(() => {
 
     console.log("filteredProducts changed>>>>>:",filteredProducts?.length)
-    setListLength(filteredProducts?.length);
+    //setListLength(filteredProducts?.length);
 
   }, [filteredProducts]);
 
@@ -602,7 +603,7 @@ useEffect(() => {
 
 
   
-    const data = await resp.json();
+  const data = await resp.json();
 
     //console.log("auth data:",data.token);
 
@@ -1028,8 +1029,6 @@ useEffect
   });
 
   console.log("allProducts:>>>>>>>>>>",allProducts.length);
-
-
 
 
 }, [data]);
@@ -1737,6 +1736,7 @@ return (
 
 
 
+{
 
 
       <View >
@@ -1744,6 +1744,12 @@ return (
           refreshFilters={refreshFilters}
           onMainFilterChange={handleMainFilters}/>
       </View>
+
+
+
+
+
+}
 
 
 

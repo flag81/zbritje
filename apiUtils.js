@@ -95,6 +95,10 @@ export async function updateExpoPushNotificationToken(url , userId, token) {
         headers: {"Content-Type": "application/json"}
       });
 
+      if (!resp.ok) {
+        throw new Error(`Server error: ${resp.status}`);
+      }
+
         const data = await resp.json();
         console.log("all stores list: ",data);
         //setAllStores(data);

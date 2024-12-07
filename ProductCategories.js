@@ -58,6 +58,18 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData, r
 
 
 
+
+    
+
+
+
+      
+
+    useEffect(() => {
+
+        //setSelectedCategories([]);       
+        //sendFilteredCategories();
+
         const fetchStores = async (url) => {
           try {
             const stores = await getStoresList(url);
@@ -70,18 +82,8 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData, r
             console.error("Error fetching stores list:", error);
           }
         };
-    
 
-
-
-      
-
-    useEffect(() => {
-
-        //setSelectedCategories([]);       
-        //sendFilteredCategories();
-
-        //console.log("Category data:-------------",data);
+        console.log("----------------------------------------------------------------");
         //console.log("calling fetchStoresList:-------------", url);
         //fetchStoresList(url);
         fetchStores(url);
@@ -98,7 +100,9 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData, r
 
 
         //setSelected([]);
-        console.log("New storeId:-------------",storeId)
+        console.log("New storeId:-------------",storeId);
+
+        console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 
         //sendFilteredCategories();
 
@@ -108,7 +112,7 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData, r
       useEffect(() => {
 
         //setSelected([]);
-        //console.log("New categories:-------------",data)
+        console.log("oooooooooooooooooooooooooooooooooooooooooooooooooooo")
         sendFilteredSubCategories();
 
       }, [selectedSubCategories]);
@@ -117,7 +121,7 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData, r
       useEffect(() => {
 
         //setSelected([]);
-        //console.log("New categories:-------------",data)
+        console.log("pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp")
         onMainFilterChange(favoritesFilter,onSaleFilter); // sales and favorites filters are applied
 
       }, [favoritesFilter, onSaleFilter]);
@@ -246,11 +250,7 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData, r
 
 
 
-            useEffect(() => {
-                // Actions to perform when filteredSubData changes
-                //console.log('filteredSubData changed:', filteredSubData);
-              }, [selectedCategories]); // Dependency array includes filteredSubData to watch for changes
-            
+
 
         return (
             <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
