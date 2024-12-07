@@ -34,59 +34,75 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData, r
     const categories = data;
     const subCategories = subData;
 
-    const { admin, url, onSale, setOnSale, isFavorite, setIsFavorite, storeId, setStoreId,
-        categoryId, setCategoryId, subCategoryId, selectedSubCategoriyId, setCategoryName} = useStore();
+    const { 
+      
+      admin, url, onSale, setOnSale, isFavorite, setIsFavorite, storeId, setStoreId,
+      categoryId, setCategoryId, subCategoryId, selectedSubCategoriyId, setCategoryName, setStoreName
+        
+      
+      } = useStore();
+
+      const handleStoreSelection = (storeId, storeName) => {
+
+        console.log("handleStoreSelection", storeId, storeName);  
+    
+        setStoreId(storeId);
+        setSelectedStore(storeId);
+        setStoreName(storeName);
+        //onStoreFilterChange();
+      };
 
 
 
-        async function fetchStoresList(url) {
+
+
+
+
+        const fetchStores = async (url) => {
           try {
-            const data = await getStoresList(url);
-            console.log("getStoresList from fetchStoresList:-------------", data);
-            setAllStoresList(data);
-            return data;
+            const stores = await getStoresList(url);
+            console.log("getStoresList:-------------", stores);
+            // Assuming you want to set some state with the fetched stores
+            // setStoreId(stores[0].id); // Example
+            // setStoreName(stores[0].name); // Example
+            setAllStoresList(stores);
           } catch (error) {
             console.error("Error fetching stores list:", error);
           }
-        }
-        
-        // Call the function
-        
-        //fetchStoresList(url);
+        };
+    
+
 
 
       
 
     useEffect(() => {
 
-        setSelectedCategories([]);       
-        sendFilteredCategories();
+        //setSelectedCategories([]);       
+        //sendFilteredCategories();
 
         //console.log("Category data:-------------",data);
-        console.log("calling fetchStoresList:-------------", url);
-        fetchStoresList(url);
+        //console.log("calling fetchStoresList:-------------", url);
+        //fetchStoresList(url);
+        fetchStores(url);
         
       }, []);
 
 
 
 
-        useEffect(() => {
 
-        //setSelected([]);
-        //console.log("New categories:-------------",data)
-
-        sendFilteredCategories();
-
-      }, [selectedCategories]);
+      
 
       useEffect(() => {
 
-        //setSelected([]);
-        //console.log("New categories:-------------",data)
-        console.log("All stores list changed:-------------",allStoresList)
 
-      }, [allStoresList]);
+        //setSelected([]);
+        console.log("New storeId:-------------",storeId)
+
+        //sendFilteredCategories();
+
+      }, [storeId]);
 
 
       useEffect(() => {
@@ -258,18 +274,15 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData, r
       };
 
     
-
     return(
            
             <View style={styles1.item}>
 
-
-
-
-                    <View style={{ padding: 5, flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center', flexWrap:'nowrap', borderBlockColor: 'red', borderWidth: 0}}>                     
+                    <View style={{ paddingLeft:10 , paddingRight:5,  flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center', flexWrap:'nowrap', borderBlockColor: 'red', borderWidth: 0}}>                     
 
 
                     <View style={{alignItems: 'center', width: '30%' }}>
+
 
                     <Dropdown
     
@@ -286,15 +299,17 @@ const ProductCategories = ({data, onFilterChange, onMainFilterChange, subData, r
                         valueField="value"
                                             
                         searchPlaceholder="Search..."
-                        value={value}
+                        value={storeId}
                         onFocus={() => setIsFocus(true)}
                         onBlur={() => setIsFocus(false)}
                         onChange={item => {
-                            setValue(item.value);
-                            setIsFocus(false);
+                            setStoreId(item.value);
+                            setStoreName(item.label);
                         }}
 
+
                         />
+                        <Text style={styles1.buttonText}>Marketet</Text>
 
                         </View>
        
@@ -460,7 +475,7 @@ const styles2 = StyleSheet.create({
       padding: 16,
     },
     dropdown: {
-      height: 50,
+      height: 30,
       width: '100%',
 
       borderColor: 'gray',

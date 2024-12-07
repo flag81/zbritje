@@ -677,7 +677,7 @@ app.get("/getStoresList", (req, res) => {
   console.log("getStoresList called:");
   
     
-      const q = `SELECT store.storeId as value, store.storeName as label FROM store`;
+      const q = `SELECT store.storeId as value, store.storeName as label FROM store order by store.storeId`;
     
       //const userId=  parseInt(req.query.userId);
     

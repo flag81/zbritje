@@ -574,6 +574,9 @@ useEffect(() => {
   }, []);
 
 
+
+
+
    async function auth()  {
 
     console.log("auth() with myUserName:",myUserName);
@@ -1533,9 +1536,24 @@ const [isImageLoading, setIsImageLoading ] = useState(true);
   const renderItem = ({ item }) => 
   {
 
-      const imageUrl = {uri:item?.imageUrl};
+      let imageUrl = {uri:item?.imageUrl};
 
       //console.log("imageUrl:",imageUrl);
+
+      let noImage = 'https://res.cloudinary.com/dt7a4yl1x/image/upload/v1733474018/no-image_dwkmda.png'
+
+      // if no image is found then use the default image 
+      imageUrl = item?.imageUrl ? {uri:item?.imageUrl} : {uri:noImage} ;
+
+      // check if item?.imageUrl is valid then set the imageUrl to the item?.imageUrl else set it to the noImage
+
+
+
+
+
+
+
+
 
       
 
@@ -1560,6 +1578,9 @@ const [isImageLoading, setIsImageLoading ] = useState(true);
     const date = new Date(endDate);
     const formatter = new Intl.DateTimeFormat('en-GB', { dateStyle: 'short' });
     formattedEndDate = formatter?.format(date);
+
+    // split productName on -- and get the first part
+    const productName = item?.productName.split('--')[0];
 
 
 
@@ -1627,9 +1648,10 @@ const [isImageLoading, setIsImageLoading ] = useState(true);
           </View>
 
 
+
         <View style={{ flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center', height:40}}>
 
-        <Text style={{ fontSize: 14, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle' }}>{item?.productName}</Text>
+        <Text style={{ fontSize: 14, fontWeight: 'bold', textAlign: 'center', verticalAlign:'middle' }}>{productName}</Text>
 
 
       </View>
@@ -1665,35 +1687,22 @@ return (
 
     <View >
       { <Banner /> }
-     
+     <View style={{paddingLeft : 5, paddingRight:5 }}>
       <AutocompleteDropdown
           clearOnFocus={false}
           closeOnBlur={true}
-          closeOnSubmit={true}
-          
+          closeOnSubmit={true}         
           inputContainerStyle={{borderWidth:2, borderRadius:20}}
-          
-
-
-
           //initialValue={{ id: '2' }} // or just '2'
           onSelectItem={item => {
             item && onSelectItemSearch(item.id)
           }}
           //dataSet={suggestionsList}
           useFilter={false}
-          onChangeText={getSuggestions} 
-          
+          onChangeText={getSuggestions}           
           // change the border color to red if the search text is more that 1 character
           //onFocus={() => setBorderColor('red')}
-
           //maxLength={2}
-       
-
-
-
-
-
           onSubmit={(e) => onSubmitSearch(e.nativeEvent.text)}
           onClear={onClearPress}
           textInputProps={{
@@ -1709,16 +1718,22 @@ return (
           }}
 
       />
-     
+     </View>
 
     </View>
 
 
 
+{
+/*
+
 
       <View >
           <StoreFilter />
       </View>
+
+*/
+}
 
 
 
