@@ -1002,6 +1002,13 @@ app.put("/updateOrder", (req, res) => {
 
 
 
+app.get("/checkConnection", (req, res) => {
+  const data = "connection is ok";
+
+    return res.json(data);
+  
+});
+
 
 app.get("/AllTables", (req, res) => {
   const q = "SELECT * FROM tables";

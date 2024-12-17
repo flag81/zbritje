@@ -3,6 +3,8 @@ import { Modal, View, Text, Pressable, StyleSheet, Image, ScrollView, Linking , 
 import { Rating, AirbnbRating } from 'react-native-ratings';
 import { getPercentageChange}  from './apiUtils';
 
+import ZoomableImage from './ZoomableImage';
+
 export default function EmojiPicker({ isVisible, children, onClose, productData }) {
 
 
@@ -189,6 +191,8 @@ console.log(productUrl);
 
             
           </View>
+
+          <ZoomableImage />
 
 
           </ScrollView>

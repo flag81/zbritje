@@ -105,6 +105,54 @@ const HomeScreen = () => {
   
   } = useStore();
 
+
+  // test the connection to the server
+  const [isConnected, setIsConnected] = useState(false);
+
+  // call the checkConnection first thing in this file    to check if the server is connected
+
+  useEffect(() => {
+    checkConnection();
+  }, []);
+
+  
+
+
+  // do a fetch request to the server to check if the server is connected
+  const checkConnection = async () => {
+    try {
+      const response = await fetch(`${url}/checkConnection`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await response.json();
+      console.log('Server connection:', data);
+      setIsConnected(true);
+    } catch (error) {
+      console.error('Server connection error:', error);
+      setIsConnected(false);
+
+      if(error.message === 'Network request failed')
+      {
+        showToast('Kishte nje problem me lidhjen me serverin.');
+        setServerError('Network request failed');
+
+            // stop the component from loading and exit the component
+            
+      }
+
+
+
+
+
+    }
+  };
+
+
+
+
     
 
 const [isConditionMet, setIsConditionMet] = useState(false);
@@ -335,6 +383,7 @@ useEffect(() => {
          //setAuthToken(result);
  
          
+
          if(isValidExpoPushToken(result))
          {
            setExpoToken(result);
@@ -1668,6 +1717,14 @@ const [isImageLoading, setIsImageLoading ] = useState(true);
 };
 
 
+if (!isConnected) {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.message}>Probleme me server.</Text>
+    </View>
+  );
+}
+
 
 
 return (
@@ -1738,7 +1795,7 @@ return (
 
 {
 
-
+/*
       <View >
           <ProductCategories data={categories}  subData={subCategories} onFilterChange={handleFilters} 
           refreshFilters={refreshFilters}
@@ -1746,7 +1803,7 @@ return (
       </View>
 
 
-
+*/
 
 
 }
